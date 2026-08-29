@@ -44,7 +44,14 @@ what makes each row mean one thing:
 
 - **Share trades are dropped.** The account tracks options and futures; equity fills are
   usually assignment or a hedge and would sit in the table as outliers with no premium.
-- **Price-0 rows are dropped.** These are expiry bookkeeping, not executions.
+- **Price-0 rows are dropped** — but understand what they are before repeating that
+  phrase to the user. When a long option expires worthless IBKR closes it with a
+  synthetic SELL at price 0 and stamps `realized_pnl = 0` on it. The premium is entirely
+  gone; the feed simply never books the loss. One MSTR lot in the 24–28 August week cost
+  $2,160 on Thursday and was written off at zero on Friday, recorded as a $0 result. They
+  are dropped because a row with no price and no result would sit beside real exits
+  diluting the averages and inflating the win rate, not because nothing happened. The
+  money they cost surfaces in `cash_check` instead — see below.
 - **Only SELL legs are kept**, so one row is one exit carrying its own result. This does
   discard the realised P&L on short closes, which the audit sheet reports — mention the
   figure if it is large.

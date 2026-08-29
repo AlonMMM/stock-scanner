@@ -1,0 +1,1128 @@
+<title>פתיחת שבוע</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Suez+One&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ground:      #f4f6f8;
+    --surface:     #fcfcfb;
+    --surface-2:   #eef1f5;
+    --ink:         #10131a;
+    --ink-2:       #545c6b;
+    --ink-3:       #868e9c;
+    --rule:        #dfe3ea;
+    --rule-strong: #c4cad4;
+    --up:          #2a78d6;
+    --down:        #e34948;
+    --third:       #1baf7a;
+    --accent:      #2a78d6;
+    --warnbg:      #fdf4e3;
+    --warnrule:    #e8c583;
+    --warnink:     #6b4a08;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground:      #0d0f14;
+      --surface:     #171a21;
+      --surface-2:   #1f232c;
+      --ink:         #eef1f5;
+      --ink-2:       #a7afbd;
+      --ink-3:       #7d8494;
+      --rule:        #262b35;
+      --rule-strong: #39404d;
+      --up:          #3987e5;
+      --down:        #e66767;
+      --third:       #199e70;
+      --accent:      #3987e5;
+      --warnbg:      #241d0e;
+      --warnrule:    #5d4a1c;
+      --warnink:     #e8c583;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground:      #0d0f14;
+    --surface:     #171a21;
+    --surface-2:   #1f232c;
+    --ink:         #eef1f5;
+    --ink-2:       #a7afbd;
+    --ink-3:       #7d8494;
+    --rule:        #262b35;
+    --rule-strong: #39404d;
+    --up:          #3987e5;
+    --down:        #e66767;
+    --third:       #199e70;
+    --accent:      #3987e5;
+    --warnbg:      #241d0e;
+    --warnrule:    #5d4a1c;
+    --warnink:     #e8c583;
+  }
+
+  body { background: var(--ground); }
+
+  .page {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 20px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+
+  /* ---------- masthead ---------- */
+  .masthead { display: flex; flex-direction: column; gap: 10px; border-bottom: 2px solid var(--ink); padding-bottom: 18px; }
+  .masthead h1 { font-family: "Suez One", Georgia, serif; font-size: clamp(2.1rem, 6vw, 3.1rem); line-height: 1.05; margin: 0; letter-spacing: -0.01em; text-wrap: balance; font-weight: 400; }
+  .masthead .kicker { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+  .masthead .dek { color: var(--ink-2); font-size: 1.02rem; max-width: 62ch; }
+  .stamp { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.83rem; color: var(--ink-3); }
+  .stamp b { color: var(--ink-2); font-weight: 600; }
+
+  /* ---------- kpi ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 2px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+  .kpi { background: var(--surface); padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 3px; }
+  .kpi .lab { font-size: 0.78rem; color: var(--ink-3); font-weight: 600; }
+  .kpi .val { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 1.85rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; direction: ltr; unicode-bidi: isolate; align-self: flex-start; }
+  .kpi .sub { font-size: 0.82rem; color: var(--ink-2); }
+  .kpi .sub .neg { color: var(--down); font-weight: 600; }
+  .kpi .sub .pos { color: var(--up); font-weight: 600; }
+
+  /* ---------- sections ---------- */
+  section { display: flex; flex-direction: column; gap: 16px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--rule-strong); padding-bottom: 8px; }
+  .sec-head h2 { font-family: "Suez One", Georgia, serif; font-weight: 400; font-size: 1.42rem; margin: 0; letter-spacing: -0.005em; }
+  .sec-head h2 { flex: 1 1 auto; min-width: 0; }
+  .sec-head .tag { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-inline-start: auto; flex: 0 0 auto; white-space: nowrap; }
+  section > p { margin: 0; max-width: 68ch; color: var(--ink-2); }
+  section > p strong, li strong { color: var(--ink); font-weight: 700; }
+
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; padding: 20px 22px; }
+
+  /* ---------- charts ---------- */
+  .figure { background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .figure .cap { font-size: 0.86rem; color: var(--ink-2); }
+  .figure .cap b { color: var(--ink); font-weight: 700; }
+  .chart-scroll { overflow-x: auto; direction: ltr; }
+  .chart-scroll svg { display: block; min-width: 560px; width: 100%; height: auto; }
+  .grid-line { stroke: var(--rule); stroke-width: 1; }
+  .axis-line { stroke: var(--rule-strong); stroke-width: 1; }
+  .tick { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-3); }
+  .tick-lab { font-family: "Assistant", sans-serif; font-size: 11px; fill: var(--ink-3); }
+  .row-lab { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500; fill: var(--ink-2); }
+  .val-lab { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .end-lab { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600; fill: var(--ink); }
+  .bar { transition: opacity .12s ease; }
+  .bar-hit:hover + .bar, .bar:hover { opacity: .72; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.83rem; color: var(--ink-2); direction: rtl; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 13px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  /* tooltip */
+  .tip { position: fixed; pointer-events: none; opacity: 0; transform: translate(-50%, -120%); background: var(--ink); color: var(--ground); font-size: 12px; line-height: 1.5; padding: 7px 10px; border-radius: 3px; white-space: nowrap; z-index: 40; transition: opacity .1s ease; font-family: "IBM Plex Mono", monospace; direction: ltr; }
+  .tip.on { opacity: 1; }
+
+  /* ---------- tables ---------- */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  th, td { padding: 9px 14px; text-align: right; border-bottom: 1px solid var(--rule); }
+  thead th { background: var(--surface-2); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; text-align: left; white-space: nowrap; }
+  td.tkr { font-family: "IBM Plex Mono", monospace; font-weight: 600; direction: ltr; unicode-bidi: isolate; text-align: left; }
+  .pos { color: var(--up); font-weight: 600; }
+  .neg { color: var(--down); font-weight: 600; }
+
+  details.tabledisc summary { cursor: pointer; font-size: 0.85rem; color: var(--ink-2); padding: 4px 0; font-weight: 600; }
+  details.tabledisc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  details.tabledisc[open] summary { margin-bottom: 10px; }
+
+
+  /* ---------- per-ticker breakdown ---------- */
+  .breakdown { display: flex; flex-direction: column; gap: 2px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+  details.tk { background: var(--surface); }
+  details.tk > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 14px; padding: 11px 16px; font-size: 0.9rem; }
+  details.tk > summary::-webkit-details-marker { display: none; }
+  details.tk > summary::before { content: "▸"; color: var(--ink-3); font-size: 0.8rem; flex: 0 0 auto; transition: transform .12s ease; }
+  details.tk[open] > summary::before { transform: rotate(90deg); }
+  details.tk > summary:hover { background: var(--surface-2); }
+  details.tk > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .tk-sym { font-family: "IBM Plex Mono", monospace; font-weight: 600; direction: ltr; unicode-bidi: isolate; min-width: 62px; }
+  .tk-n { color: var(--ink-3); font-size: 0.82rem; }
+  .tk-v { margin-inline-start: auto; font-family: "IBM Plex Mono", monospace; font-weight: 600; direction: ltr; unicode-bidi: isolate; }
+  details.tk .tbl-wrap { border: none; border-top: 1px solid var(--rule); border-radius: 0; }
+  details.tk table { font-size: 0.82rem; }
+  details.tk th, details.tk td { padding: 7px 12px; }
+
+  /* ---------- lists ---------- */
+  ul.notes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  ul.notes li { padding-inline-start: 15px; border-inline-start: 2px solid var(--rule-strong); color: var(--ink-2); max-width: 70ch; }
+  ul.notes li .t { color: var(--ink); font-weight: 700; }
+
+  /* ---------- book / position ---------- */
+  .pos-card { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 2px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+  .pos-cell { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .pos-cell .l { font-size: 0.74rem; color: var(--ink-3); font-weight: 600; }
+  .pos-cell .v { font-family: "IBM Plex Mono", monospace; font-size: 1.12rem; font-weight: 600; direction: ltr; unicode-bidi: isolate; align-self: flex-start; }
+
+  .callout { background: var(--warnbg); border: 1px solid var(--warnrule); border-radius: 3px; padding: 15px 18px; color: var(--warnink); font-size: 0.93rem; }
+  .callout b { font-weight: 700; }
+
+  .strikebar { display: flex; flex-direction: column; gap: 7px; }
+  .strikebar .track { position: relative; height: 34px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .strikebar .fill { position: absolute; inset-block: 0; left: 0; background: var(--up); opacity: .22; }
+  .strikebar .mark { position: absolute; inset-block: 0; width: 2px; background: var(--ink); }
+  .strikebar .mark.k { background: var(--down); }
+  .strikebar .lbls { display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--ink-3); }
+
+  /* ---------- calendar ---------- */
+  .cal { display: flex; flex-direction: column; border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; background: var(--surface); }
+  .cal-row { display: grid; grid-template-columns: 116px 1fr; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--rule); }
+  .cal-row:last-child { border-bottom: none; }
+  .cal-row.hot { background: var(--surface-2); }
+  .cal-day { font-weight: 700; font-size: 0.86rem; color: var(--ink); }
+  .cal-day span { display: block; font-weight: 400; font-size: 0.76rem; color: var(--ink-3); font-family: "IBM Plex Mono", monospace; direction: ltr; }
+  .cal-body { color: var(--ink-2); font-size: 0.92rem; }
+  .cal-body b { color: var(--ink); font-weight: 700; }
+
+  /* ---------- sources ---------- */
+  .sources { font-size: 0.84rem; color: var(--ink-3); display: flex; flex-direction: column; gap: 7px; }
+  .sources a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--rule-strong); }
+  .sources a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .sources a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  footer.foot { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 0.8rem; color: var(--ink-3); max-width: 70ch; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="page" dir="rtl" lang="he">
+
+  <header class="masthead">
+    <div class="kicker">פתיחת שבוע · דוח שבועי</div>
+    <h1>הרוטציה שהפכה את השבוע: תוכנה למעלה, שבבים למטה</h1>
+    <p class="dek">שבוע שבו וורש הפך את הפד לניצי, אנבידיה היכתה ונפלה, וסיילספורס עלתה 22%. הפער בין תוכנה לשבבים נפתח ב־813 נקודות בסיס בחמישה ימי מסחר.</p>
+    <div class="stamp">
+      <span>שבוע המסחר <b><span dir="ltr">24–28</span> באוגוסט 2026</b></span>
+      <span>נתונים לסגירת <b>שישי 28.8</b></span>
+      <span>מקור מחירים <b>Interactive Brokers</b></span>
+    </div>
+  </header>
+
+  <!-- ============ KPI ============ -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="lab">S&amp;P 500</div>
+      <div class="val">7,711.76</div>
+      <div class="sub">שישי <span class="neg">−0.25%</span> · שבוע <span class="pos">+0.47%</span></div>
+    </div>
+    <div class="kpi">
+      <div class="lab">הסתברות להעלאת ריבית בספטמבר</div>
+      <div class="val">59%</div>
+      <div class="sub">מ־35% ביום חמישי · CME</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">אינפלציית PCE שנתית</div>
+      <div class="val">3.7%</div>
+      <div class="sub">ליבה 3.3% · קצב חצי־שנתי 4.1%</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">SOXX מהשיא</div>
+      <div class="val">−22.5%</div>
+      <div class="sub">מתחילת השנה עדיין <span class="pos">+67.6%</span></div>
+    </div>
+  </div>
+
+  <!-- ============ הסיפור ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>הסיפור של השבוע</h2>
+      <span class="tag">מאקרו</span>
+    </div>
+
+    <p>ברמת המדדים השבוע נראה שקט — <strong>S&amp;P 500 +0.47%</strong>, <strong>נאסד"ק 100 +0.42%</strong>. מתחת לפני השטח זה היה אחד השבועות התנודתיים של השנה: הכסף יצא מחומרה ונכנס לתוכנה, ובמקביל הפד עשה סיבוב פרסה.</p>
+
+    <p>ביום שישי נשא <strong>קווין וורש</strong> את נאום ג'קסון הול הראשון שלו כיו"ר הפד ואמר שהאינפלציה עדיין גבוהה מדי, שוק העבודה בתעסוקה מלאה, והתנאים הפיננסיים כנראה לא מרסנים בכלל. PCE רץ ב־3.7% שנתי ובקצב <strong>4.1% במונחים שנתיים בחצי השנה האחרונה</strong>. התוצאה: ההסתברות ל<strong>העלאת</strong> ריבית בספטמבר קפצה מ־35% ל־59% ביום אחד, התשואה לשנתיים עלתה ב־9 נ"ב ל־4.32%, והדולר התחזק ב־0.4%.</p>
+
+    <p>זה משנה את חוקי המשחק לתיק טכנולוגיה. עליית תשואות ארוכות מכווצת מכפילים, והמכה הכי חזקה נוחתת על מה שהכי ארוך־טווח ורגיש לריבית: שבבים אחרי ראלי של 68% מתחילת השנה, נאוקלאודים ממונפים, וקוונטום ללא רווחים. TLT ירד 4.5% בחודש.</p>
+
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 760 380" role="img" aria-labelledby="rotTitle rotDesc">
+          <title id="rotTitle">ביצועי תוכנה מול שבבים מול השוק הרחב, תשעה שבועות</title>
+          <desc id="rotDesc">מדד תוכנה IGV עלה ל־117 בעוד מדד שבבים SOXX ירד ל־89.8, כששניהם מנורמלים ל־100 ב־1 ביולי 2026.</desc>
+
+          <!-- gridlines -->
+          <line class="grid-line" x1="56" y1="277.06" x2="660" y2="277.06"></line>
+          <line class="grid-line" x1="56" y1="235.88" x2="660" y2="235.88"></line>
+          <line class="grid-line" x1="56" y1="194.71" x2="660" y2="194.71"></line>
+          <line class="grid-line" x1="56" y1="153.53" x2="660" y2="153.53"></line>
+          <line class="grid-line" x1="56" y1="112.35" x2="660" y2="112.35"></line>
+          <line class="grid-line" x1="56" y1="71.18" x2="660" y2="71.18"></line>
+          <text class="tick" x="48" y="280.5" text-anchor="end">90</text>
+          <text class="tick" x="48" y="239.4" text-anchor="end">95</text>
+          <text class="tick" x="48" y="198.2" text-anchor="end">100</text>
+          <text class="tick" x="48" y="157.0" text-anchor="end">105</text>
+          <text class="tick" x="48" y="115.9" text-anchor="end">110</text>
+          <text class="tick" x="48" y="74.7" text-anchor="end">115</text>
+
+          <line class="axis-line" x1="56" y1="310" x2="660" y2="310"></line>
+
+          <!-- x labels -->
+          <text class="tick" x="56"  y="328" text-anchor="middle">1.7</text>
+          <text class="tick" x="207" y="328" text-anchor="middle">13.7</text>
+          <text class="tick" x="358" y="328" text-anchor="middle">27.7</text>
+          <text class="tick" x="509" y="328" text-anchor="middle">10.8</text>
+          <text class="tick" x="660" y="328" text-anchor="middle">24.8</text>
+
+          <!-- SPY -->
+          <polyline fill="none" stroke="var(--third)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+            points="56.0,194.71 131.5,183.46 207.0,196.35 282.5,201.17 358.0,192.22 433.5,163.21 509.0,159.81 584.5,171.55 660.0,167.54"></polyline>
+          <!-- SOXX -->
+          <polyline fill="none" stroke="var(--down)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+            points="56.0,194.71 131.5,172.86 207.0,259.43 282.5,251.87 358.0,284.04 433.5,228.22 509.0,217.83 584.5,261.99 660.0,278.61"></polyline>
+          <!-- IGV -->
+          <polyline fill="none" stroke="var(--up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+            points="56.0,194.71 131.5,204.92 207.0,201.48 282.5,243.90 358.0,185.82 433.5,114.44 509.0,102.21 584.5,108.45 660.0,54.50"></polyline>
+
+          <!-- end dots -->
+          <circle cx="660" cy="54.50"  r="4.5" fill="var(--up)"    stroke="var(--surface)" stroke-width="2"></circle>
+          <circle cx="660" cy="167.54" r="4.5" fill="var(--third)" stroke="var(--surface)" stroke-width="2"></circle>
+          <circle cx="660" cy="278.61" r="4.5" fill="var(--down)"  stroke="var(--surface)" stroke-width="2"></circle>
+
+          <!-- end labels -->
+          <text class="end-lab" x="672" y="51.5">IGV 117.0</text>
+          <text class="end-lab" x="672" y="164.5">SPY 103.3</text>
+          <text class="end-lab" x="672" y="275.6">SOXX 89.8</text>
+
+          <!-- hover columns -->
+          <g id="rotHit"></g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--up)"></i> IGV · תוכנה</span>
+        <span><i class="swatch" style="background:var(--third)"></i> SPY · שוק רחב</span>
+        <span><i class="swatch" style="background:var(--down)"></i> SOXX · שבבים</span>
+      </div>
+      <div class="cap"><b>הרוטציה בתשעה שבועות.</b> הכל מנורמל ל־100 בשבוע של 1 ביולי. הפער בין תוכנה לשבבים נפתח ל־27 נקודות — רובו נבנה מאז תחילת אוגוסט.</div>
+    </div>
+  </section>
+
+  <!-- ============ מובילים ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>מי זז השבוע</h2>
+      <span class="tag"><span dir="ltr">24–28</span> באוגוסט</span>
+    </div>
+
+    <p>שינוי שבועי בסגירה, על פני רשימות המעקב שלך. שלושת המובילים הם כולם תוכנה שדיווחה תוצאות; חמשת המפגרים הם כולם סיכון גבוה ארוך־טווח — חלל, קוונטום ונאוקלאוד.</p>
+
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 760 626" role="img" aria-labelledby="movTitle movDesc">
+          <title id="movTitle">שינוי שבועי לפי מניה</title>
+          <desc id="movDesc">סיילספורס עלתה 22.4% ואילו ASTS ירדה 15.4%, מתוך 26 מניות ברשימות המעקב.</desc>
+
+          <!-- gridlines -->
+          <line class="grid-line" x1="119.29" y1="30" x2="119.29" y2="608"></line>
+          <line class="grid-line" x1="190.71" y1="30" x2="190.71" y2="608"></line>
+          <line class="grid-line" x1="262.14" y1="30" x2="262.14" y2="608"></line>
+          <line class="grid-line" x1="404.99" y1="30" x2="404.99" y2="608"></line>
+          <line class="grid-line" x1="476.42" y1="30" x2="476.42" y2="608"></line>
+          <line class="grid-line" x1="547.84" y1="30" x2="547.84" y2="608"></line>
+          <line class="grid-line" x1="619.27" y1="30" x2="619.27" y2="608"></line>
+          <text class="tick" x="119.29" y="22" text-anchor="middle">−15%</text>
+          <text class="tick" x="190.71" y="22" text-anchor="middle">−10%</text>
+          <text class="tick" x="262.14" y="22" text-anchor="middle">−5%</text>
+          <text class="tick" x="333.57" y="22" text-anchor="middle">0</text>
+          <text class="tick" x="404.99" y="22" text-anchor="middle">+5%</text>
+          <text class="tick" x="476.42" y="22" text-anchor="middle">+10%</text>
+          <text class="tick" x="547.84" y="22" text-anchor="middle">+15%</text>
+          <text class="tick" x="619.27" y="22" text-anchor="middle">+20%</text>
+
+          <!-- zero baseline -->
+          <line class="axis-line" x1="333.57" y1="30" x2="333.57" y2="608" stroke="var(--rule-strong)"></line>
+
+          <g id="movBars"></g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--up)"></i> עלייה</span>
+        <span><i class="swatch" style="background:var(--down)"></i> ירידה</span>
+      </div>
+      <div class="cap"><b>שינוי שבועי, סגירה מול סגירה.</b> ממוין לפי גודל התנועה. רחף מעל עמודה לפרטים.</div>
+    </div>
+
+    <details class="tabledisc">
+      <summary>הצג את כל המספרים בטבלה</summary>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>מניה</th><th>סגירה קודמת</th><th>סגירה</th><th>שינוי שבועי</th></tr>
+          </thead>
+          <tbody id="movTable"></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ שבבים ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>שבבים</h2>
+      <span class="tag">SOXX −2.2% בשבוע</span>
+    </div>
+
+    <p>אנבידיה דיווחה ביום רביעי והיכתה: <strong>2.22 דולר למניה</strong> מול צפי 2.09, הכנסות של <strong>96.22 מיליארד דולר</strong> (הפתעה של 4.8%), ותחזית צמיחה של 70% לשנת הכספים 2028 — הרבה מעל הקונצנזוס. המניה קפצה ל־230.47 תוך כדי שבוע, ואז מחקה הכל: <strong>−4.43% ביום שישי</strong>, וסגרה את השבוע ב־217.55, עלייה של 1.3% בלבד.</p>
+
+    <p>זה הסיפור האמיתי של הסקטור. דוח מצוין לא הספיק, כי מה שהשתנה זה הריבית ולא הביקוש. ברודקום סיימה את השבוע בדיוק באפס (+0.09%) למרות שקפצה 4.5% ביום חמישי בהשראת אנבידיה; אינטל ויתרה על עלייה של 4.4% וסגרה ב־0.67%−.</p>
+
+    <ul class="notes">
+      <li><span class="t">זיכרון קיבל את המכה הכי חזקה.</span> SNDK ירדה 6.96% ו־MU ירדה 3.51%. הירידות הגיעו ללא שום חדשות על תמחור, אספקה או הזמנות — DRAM ו־NAND עדיין במחסור בגלל בניית תשתיות ה־AI. זו דחיסת מכפילים על רקע ריבית, לא הידרדרות בעסק. מנגד, שתיהן עדיין <span class="t">+255%</span> ו־<span class="t">+653%</span> מתחילת השנה, כך שיש הרבה רווח על השולחן שאפשר לממש.</li>
+      <li><span class="t">SOXX נמצא 22.5% מתחת לשיא 52 השבועות</span> (655.95 מול 508.62), ו־6.4% מתחת לרמתו בתחילת אוגוסט. עדיין +67.6% מתחילת השנה — כלומר זו נסיגה בתוך מגמה, לא שבירה שלה.</li>
+      <li><span class="t">קוואלקום היתה החריגה החיובית</span> עם +2.14%, ככל הנראה בזכות חשיפה נמוכה יחסית לסיפור ה־AI capex שהוא זה שנמצא כרגע תחת לחץ.</li>
+    </ul>
+  </section>
+
+  <!-- ============ תוכנה ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>תוכנה</h2>
+      <span class="tag">IGV +5.9% בשבוע</span>
+    </div>
+
+    <p>עונת הדוחות של התוכנה היתה חד־משמעית, והנושא החוזר בכולם היה אחד: <strong>ביקוש ל־AI סוכנותי מתחיל להופיע בהכנסות בפועל</strong>.</p>
+
+    <ul class="notes">
+      <li><span class="t">Salesforce +22.4% בשבוע.</span> רבעון שני עם 5.90 דולר למניה מול צפי 3.27 — הפתעה של יותר מ־80% — והכנסות של 11.35 מיליארד דולר. המניה זינקה 22.6% ביום חמישי בלבד.</li>
+      <li><span class="t">CrowdStrike +13.8%.</span> היכתה והעלתה תחזית. אוקטה, שנמצאת באותה קטגוריה, זינקה מעל 28% — סייבר הפך השבוע לאזור הכי חזק בשוק.</li>
+      <li><span class="t">ServiceNow +12.6%.</span> סגרה את השבוע ב־144.71 אחרי שפתחה אותו ב־128.48.</li>
+      <li><span class="t">מיקרוסופט +6.3%</span> — התנועה הגדולה ביותר בין המגה־קאפ, וההוכחה שהרוטציה לא היתה רק במניות הקטנות. וויקס הוסיפה 6.8% והשלימה עלייה של כ־70% בחמישה שבועות.</li>
+    </ul>
+
+    <p>שים לב לפער בין הביצוע השנתי לביצוע השבועי: IGV עדיין <strong>−10.5% מתחילת השנה</strong> בזמן ש־SOXX <strong>+67.6%</strong>. אם מה שקרה השבוע הוא תחילת סגירת הפער ולא ספייק חד־פעמי, יש עוד הרבה מרחק לרוץ.</p>
+  </section>
+
+  <!-- ============ סיכון גבוה ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>תשתיות AI, קוונטום וסיכון גבוה</h2>
+      <span class="tag">האזור החלש</span>
+    </div>
+
+    <p>כאן נמצאו כל המפגרים של השבוע, וזה לא במקרה: אלה הנכסים עם המח"מ הארוך ביותר בשוק המניות, ולכן הרגישים ביותר לקפיצה בציפיות הריבית.</p>
+
+    <ul class="notes">
+      <li><span class="t">IREN −15.4%.</span> השבוע הגרוע ביותר ברשימה, ומסיבות ספציפיות: הפסד גדול מהצפוי עם <strong>מחיקה של 638.8 מיליון דולר</strong> על ציוד כרייה ישן, שריפת מזומן של כ־303 מיליון ברבעון מול הוצאה של כ־2.1 מיליארד, וחוב ארוך־טווח שתפח לכ־7.4 מיליארד. על זה נוסף דיווח שמטא מתכננת להשיק עסקי ענן משלה — כלומר לקוח פוטנציאלי שהופך למתחרה.</li>
+      <li><span class="t">ASTS −15.4% ו־RKLB −11.3%.</span> אין כאן חדשות חברה משמעותיות. זו יציאה רוחבית מסיכון ספקולטיבי.</li>
+      <li><span class="t">IONQ −12.6%.</span> ירידה של 8.47% ביום שני בלבד. כל סל הקוונטום ירד יחד — D-Wave ו־Rigetti נפלו באותו קצב — מה שמעיד על פירוק פוזיציות בסל ולא על סיפור ספציפי.</li>
+      <li><span class="t">היוצא מן הכלל: MSTR +6.8%</span>, אחרי +28% בשבוע הקודם. ביטקוין עצמו (IBIT) היה שטוח השבוע עם +0.5%, כך שהתנועה ב־MSTR היא מינוף ופרמיה ולא הנכס הבסיסי.</li>
+    </ul>
+  </section>
+
+  <!-- ============ הטריידים ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>הטריידים שלך השבוע</h2>
+      <span class="tag">102 יציאות · מסונן</span>
+    </div>
+
+    <p>המספרים כאן מבוססים על סט מסונן, לא על כל מה שרץ בחשבון. ירדו: עסקאות במניות עצמן, שורות BUY ושורות פקיעה טכניות, פוזיציות שעברו מרביעי לחמישי חוץ מ־CRM ו־PLTR, וכל טיקר שלא הופיע ביומן המסחר. נשארו <strong>102 יציאות ב־21 טיקרים</strong>.</p>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="lab">רווח ממומש נטו</div>
+        <div class="val" style="color:var(--up)">+$27,146</div>
+        <div class="sub">על פרמיה של $125,702 = +21%</div>
+      </div>
+      <div class="kpi">
+        <div class="lab">שיעור הצלחה</div>
+        <div class="val">30%</div>
+        <div class="sub">31 מתוך 102 יציאות</div>
+      </div>
+      <div class="kpi">
+        <div class="lab">יחס רווח</div>
+        <div class="val">1.53</div>
+        <div class="sub">זוכה ממוצעת +762% · חוסרת −53%</div>
+      </div>
+      <div class="kpi">
+        <div class="lab">עמלות</div>
+        <div class="val">$1,005</div>
+        <div class="sub">3.7% מהרווח הנקי</div>
+      </div>
+    </div>
+
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 760 350" role="img" aria-labelledby="e2T e2D">
+          <title id="e2T">רווח ממומש מצטבר, 102 יציאות מסוננות</title>
+          <desc id="e2D">העקומה יורדת ל־7,635 דולר מתחת לאפס ברביעי, מזנקת ל־30,921 ביום חמישי ומסיימת ב־27,146.</desc>
+          <defs>
+            <clipPath id="cu2"><rect x="0" y="0" width="760" height="238.6"></rect></clipPath>
+            <clipPath id="cd2"><rect x="0" y="238.6" width="760" height="112"></rect></clipPath>
+          </defs>
+          <line class="grid-line" x1="56" y1="300.0" x2="700" y2="300.0"></line>
+          <text class="tick" x="48" y="303.5" text-anchor="end">−$10,000</text>
+          <line class="grid-line" x1="56" y1="177.3" x2="700" y2="177.3"></line>
+          <text class="tick" x="48" y="180.8" text-anchor="end">+$10,000</text>
+          <line class="grid-line" x1="56" y1="115.9" x2="700" y2="115.9"></line>
+          <text class="tick" x="48" y="119.4" text-anchor="end">+$20,000</text>
+          <line class="grid-line" x1="56" y1="54.5" x2="700" y2="54.5"></line>
+          <text class="tick" x="48" y="58.0" text-anchor="end">+$30,000</text>
+          <text class="tick" x="48" y="242.1" text-anchor="end">$0</text>
+          <line class="grid-line" x1="260.0" y1="30" x2="260.0" y2="300"></line>
+          <line class="grid-line" x1="323.8" y1="30" x2="323.8" y2="300"></line>
+          <line class="grid-line" x1="406.7" y1="30" x2="406.7" y2="300"></line>
+          <line class="grid-line" x1="623.5" y1="30" x2="623.5" y2="300"></line>
+          <polygon points="56.0,238.6 56.0,241.4 62.4,241.4 68.8,241.2 75.1,246.7 81.5,248.5 87.9,228.5 94.3,233.6 100.6,221.7 107.0,219.6 113.4,190.5 119.8,198.3 126.1,206.9 132.5,207.9 138.9,138.0 145.3,143.7 151.6,144.3 158.0,146.0 164.4,152.1 170.8,160.5 177.1,163.4 183.5,167.5 189.9,174.6 196.3,180.4 202.7,185.3 209.0,197.3 215.4,200.4 221.8,199.8 228.2,202.8 234.5,203.0 240.9,203.2 247.3,208.5 253.7,208.5 260.0,214.5 266.4,221.9 272.8,224.5 279.2,232.1 285.5,236.3 291.9,240.1 298.3,240.8 304.7,244.3 311.0,249.6 317.4,251.6 323.8,258.5 330.2,258.6 336.6,257.7 342.9,265.2 349.3,273.3 355.7,273.5 362.1,273.7 368.4,273.9 374.8,274.1 381.2,274.3 387.6,275.8 393.9,275.9 400.3,285.5 406.7,271.0 413.1,278.2 419.4,255.0 425.8,223.1 432.2,216.5 438.6,214.5 445.0,221.5 451.3,194.7 457.7,185.3 464.1,156.7 470.5,137.0 476.8,138.4 483.2,130.4 489.6,114.0 496.0,57.7 502.3,67.3 508.7,73.2 515.1,66.4 521.5,72.7 527.8,48.9 534.2,54.1 540.6,56.6 547.0,56.9 553.3,60.2 559.7,52.8 566.1,51.0 572.5,50.4 578.9,52.3 585.2,61.3 591.6,60.6 598.0,53.2 604.4,52.9 610.7,61.7 617.1,68.0 623.5,68.0 629.9,73.0 636.2,80.6 642.6,68.9 649.0,81.6 655.4,82.0 661.7,92.4 668.1,95.9 674.5,101.5 680.9,102.0 687.2,71.5 693.6,82.2 700.0,72.1 700.0,238.6" fill="var(--up)" fill-opacity="0.12" clip-path="url(#cu2)"></polygon>
+          <polygon points="56.0,238.6 56.0,241.4 62.4,241.4 68.8,241.2 75.1,246.7 81.5,248.5 87.9,228.5 94.3,233.6 100.6,221.7 107.0,219.6 113.4,190.5 119.8,198.3 126.1,206.9 132.5,207.9 138.9,138.0 145.3,143.7 151.6,144.3 158.0,146.0 164.4,152.1 170.8,160.5 177.1,163.4 183.5,167.5 189.9,174.6 196.3,180.4 202.7,185.3 209.0,197.3 215.4,200.4 221.8,199.8 228.2,202.8 234.5,203.0 240.9,203.2 247.3,208.5 253.7,208.5 260.0,214.5 266.4,221.9 272.8,224.5 279.2,232.1 285.5,236.3 291.9,240.1 298.3,240.8 304.7,244.3 311.0,249.6 317.4,251.6 323.8,258.5 330.2,258.6 336.6,257.7 342.9,265.2 349.3,273.3 355.7,273.5 362.1,273.7 368.4,273.9 374.8,274.1 381.2,274.3 387.6,275.8 393.9,275.9 400.3,285.5 406.7,271.0 413.1,278.2 419.4,255.0 425.8,223.1 432.2,216.5 438.6,214.5 445.0,221.5 451.3,194.7 457.7,185.3 464.1,156.7 470.5,137.0 476.8,138.4 483.2,130.4 489.6,114.0 496.0,57.7 502.3,67.3 508.7,73.2 515.1,66.4 521.5,72.7 527.8,48.9 534.2,54.1 540.6,56.6 547.0,56.9 553.3,60.2 559.7,52.8 566.1,51.0 572.5,50.4 578.9,52.3 585.2,61.3 591.6,60.6 598.0,53.2 604.4,52.9 610.7,61.7 617.1,68.0 623.5,68.0 629.9,73.0 636.2,80.6 642.6,68.9 649.0,81.6 655.4,82.0 661.7,92.4 668.1,95.9 674.5,101.5 680.9,102.0 687.2,71.5 693.6,82.2 700.0,72.1 700.0,238.6" fill="var(--down)" fill-opacity="0.12" clip-path="url(#cd2)"></polygon>
+          <line class="axis-line" x1="56" y1="238.6" x2="700" y2="238.6" stroke="var(--rule-strong)"></line>
+          <polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="56.0,241.4 62.4,241.4 68.8,241.2 75.1,246.7 81.5,248.5 87.9,228.5 94.3,233.6 100.6,221.7 107.0,219.6 113.4,190.5 119.8,198.3 126.1,206.9 132.5,207.9 138.9,138.0 145.3,143.7 151.6,144.3 158.0,146.0 164.4,152.1 170.8,160.5 177.1,163.4 183.5,167.5 189.9,174.6 196.3,180.4 202.7,185.3 209.0,197.3 215.4,200.4 221.8,199.8 228.2,202.8 234.5,203.0 240.9,203.2 247.3,208.5 253.7,208.5 260.0,214.5 266.4,221.9 272.8,224.5 279.2,232.1 285.5,236.3 291.9,240.1 298.3,240.8 304.7,244.3 311.0,249.6 317.4,251.6 323.8,258.5 330.2,258.6 336.6,257.7 342.9,265.2 349.3,273.3 355.7,273.5 362.1,273.7 368.4,273.9 374.8,274.1 381.2,274.3 387.6,275.8 393.9,275.9 400.3,285.5 406.7,271.0 413.1,278.2 419.4,255.0 425.8,223.1 432.2,216.5 438.6,214.5 445.0,221.5 451.3,194.7 457.7,185.3 464.1,156.7 470.5,137.0 476.8,138.4 483.2,130.4 489.6,114.0 496.0,57.7 502.3,67.3 508.7,73.2 515.1,66.4 521.5,72.7 527.8,48.9 534.2,54.1 540.6,56.6 547.0,56.9 553.3,60.2 559.7,52.8 566.1,51.0 572.5,50.4 578.9,52.3 585.2,61.3 591.6,60.6 598.0,53.2 604.4,52.9 610.7,61.7 617.1,68.0 623.5,68.0 629.9,73.0 636.2,80.6 642.6,68.9 649.0,81.6 655.4,82.0 661.7,92.4 668.1,95.9 674.5,101.5 680.9,102.0 687.2,71.5 693.6,82.2 700.0,72.1"></polyline>
+          <circle cx="400.3" cy="285.5" r="4.5" fill="var(--down)" stroke="var(--surface)" stroke-width="2"></circle>
+          <text class="val-lab" x="410" y="282" text-anchor="start">שפל −$7,635</text>
+          <circle cx="527.8" cy="48.9" r="4.5" fill="var(--up)" stroke="var(--surface)" stroke-width="2"></circle>
+          <text class="val-lab" x="537" y="45" text-anchor="start">שיא +$30,921</text>
+          <circle cx="700" cy="72.1" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"></circle>
+          <text class="end-lab" x="694" y="64" text-anchor="end">סיום +$27,146</text>
+          <g id="eqHit"></g>
+          <text class="tick-lab" x="154.8" y="322" text-anchor="middle">שני</text>
+          <text class="tick-lab" x="288.7" y="322" text-anchor="middle">שלישי</text>
+          <text class="tick-lab" x="362.1" y="322" text-anchor="middle">רביעי</text>
+          <text class="tick-lab" x="511.9" y="322" text-anchor="middle">חמישי</text>
+          <text class="tick-lab" x="661.7" y="322" text-anchor="middle">שישי</text>
+        </svg>
+      </div>
+      <div class="cap"><b>רווח מצטבר על פני 102 יציאות.</b> כל נקודה היא יציאה אחת. השפל ברביעי הוא −$7,635 בלבד — שליש מהשפל לפני הסינון.</div>
+    </div>
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 760 250" role="img" aria-labelledby="d2T d2D">
+          <title id="d2T">רווח ממומש לפי יום</title>
+          <desc id="d2D">חמישי הניב 35,445 דולר; שלישי הפסיד 7,017.</desc>
+          <line class="grid-line" x1="60" y1="194.7" x2="700" y2="194.7"></line>
+          <text class="tick" x="52" y="198.2" text-anchor="end">−$5,000</text>
+          <line class="grid-line" x1="60" y1="137.2" x2="700" y2="137.2"></line>
+          <text class="tick" x="52" y="140.7" text-anchor="end">+$10,000</text>
+          <line class="grid-line" x1="60" y1="98.9" x2="700" y2="98.9"></line>
+          <text class="tick" x="52" y="102.4" text-anchor="end">+$20,000</text>
+          <line class="grid-line" x1="60" y1="60.6" x2="700" y2="60.6"></line>
+          <text class="tick" x="52" y="64.1" text-anchor="end">+$30,000</text>
+          <text class="tick" x="52" y="179.0" text-anchor="end">$0</text>
+          <path d="M96,160.75063829787234 a4,4 0 0 1 4,-4 h48 a4,4 0 0 1 4,4 v14.781276595744686 h-56 Z" fill="var(--up)"></path>
+          <text class="val-lab" x="124" y="149.8" text-anchor="middle">+$4,904</text>
+          <text class="tick-lab" x="124" y="232" text-anchor="middle">שני</text>
+          <text class="tick" x="124" y="244" text-anchor="middle">24.8</text>
+          <path d="M224,175.53191489361703 h56 v22.8736170212766 a4,4 0 0 1 -4,4 h-48 a4,4 0 0 1 -4,-4 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="252" y="217.4" text-anchor="middle">−$7,017</text>
+          <text class="tick-lab" x="252" y="232" text-anchor="middle">שלישי</text>
+          <text class="tick" x="252" y="244" text-anchor="middle">25.8</text>
+          <path d="M352,175.53191489361703 h56 v17.14808510638298 a4,4 0 0 1 -4,4 h-48 a4,4 0 0 1 -4,-4 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="380" y="211.7" text-anchor="middle">−$5,522</text>
+          <text class="tick-lab" x="380" y="232" text-anchor="middle">רביעי</text>
+          <text class="tick" x="380" y="244" text-anchor="middle">26.8</text>
+          <path d="M480,43.78510638297871 a4,4 0 0 1 4,-4 h48 a4,4 0 0 1 4,4 v131.74680851063832 h-56 Z" fill="var(--up)"></path>
+          <text class="val-lab" x="508" y="32.8" text-anchor="middle">+$35,445</text>
+          <text class="tick-lab" x="508" y="232" text-anchor="middle">חמישי</text>
+          <text class="tick" x="508" y="244" text-anchor="middle">27.8</text>
+          <path d="M608,175.53191489361703 h56 v-1.4608510638297787 a4,4 0 0 1 -4,4 h-48 a4,4 0 0 1 -4,-4 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="636" y="193.1" text-anchor="middle">−$663</text>
+          <text class="tick-lab" x="636" y="232" text-anchor="middle">שישי</text>
+          <text class="tick" x="636" y="244" text-anchor="middle">28.8</text>
+          <line class="axis-line" x1="60" y1="175.5" x2="700" y2="175.5" stroke="var(--rule-strong)"></line>
+        </svg>
+      </div>
+      <div class="cap"><b>רווח לפי יום.</b> שלושת הימים הראשונים ירדו יחד 7,635 דולר; חמישי לבדו החזיר 35,445.</div>
+    </div>
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 760 508" role="img" aria-labelledby="s2T s2D">
+          <title id="s2T">רווח ממומש לפי טיקר</title>
+          <desc id="s2D">סיילספורס 44,644 דולר, מיקרון 12,334, פלנטיר 4,613; שאר הטיקרים בהפסד.</desc>
+          <line class="grid-line" x1="112.6" y1="26" x2="112.6" y2="490"></line>
+          <text class="tick" x="112.6" y="20" text-anchor="middle">−$5k</text>
+          <text class="tick" x="169.2" y="20" text-anchor="middle">$0</text>
+          <line class="grid-line" x1="282.5" y1="26" x2="282.5" y2="490"></line>
+          <text class="tick" x="282.5" y="20" text-anchor="middle">$10k</text>
+          <line class="grid-line" x1="395.7" y1="26" x2="395.7" y2="490"></line>
+          <text class="tick" x="395.7" y="20" text-anchor="middle">$20k</text>
+          <line class="grid-line" x1="508.9" y1="26" x2="508.9" y2="490"></line>
+          <text class="tick" x="508.9" y="20" text-anchor="middle">$30k</text>
+          <line class="grid-line" x1="622.1" y1="26" x2="622.1" y2="490"></line>
+          <text class="tick" x="622.1" y="20" text-anchor="middle">$40k</text>
+          <line class="axis-line" x1="169.2" y1="26" x2="169.2" y2="490" stroke="var(--rule-strong)"></line>
+          <text class="row-lab" x="82" y="45" text-anchor="end">CRM</text>
+          <path d="M169.2,34 H670.7 a4,4 0 0 1 4,4 v6 a4,4 0 0 1 -4,4 H169.2 Z" fill="var(--up)"></path>
+          <text class="val-lab" x="680.7" y="45" text-anchor="start">+$44,644</text>
+          <text class="row-lab" x="82" y="67" text-anchor="end">MU</text>
+          <path d="M169.2,56 H304.9 a4,4 0 0 1 4,4 v6 a4,4 0 0 1 -4,4 H169.2 Z" fill="var(--up)"></path>
+          <text class="val-lab" x="314.9" y="67" text-anchor="start">+$12,334</text>
+          <text class="row-lab" x="82" y="89" text-anchor="end">PLTR</text>
+          <path d="M169.2,78 H217.5 a4,4 0 0 1 4,4 v6 a4,4 0 0 1 -4,4 H169.2 Z" fill="var(--up)"></path>
+          <text class="val-lab" x="227.5" y="89" text-anchor="start">+$4,613</text>
+          <text class="row-lab" x="82" y="111" text-anchor="end">NU</text>
+          <path d="M169.2,100 H169.2 a4,4 0 0 1 4,4 v6 a4,4 0 0 1 -4,4 H169.2 Z" fill="var(--up)"></path>
+          <text class="val-lab" x="177.0" y="111" text-anchor="start">+$151</text>
+          <text class="row-lab" x="82" y="133" text-anchor="end">TSLA</text>
+          <path d="M169.2,122 H169.2 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="133" text-anchor="start">−$333</text>
+          <text class="row-lab" x="82" y="155" text-anchor="end">AAOI</text>
+          <path d="M169.2,144 H167.8 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="155" text-anchor="start">−$482</text>
+          <text class="row-lab" x="82" y="177" text-anchor="end">SMCI</text>
+          <path d="M169.2,166 H165.4 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="177" text-anchor="start">−$693</text>
+          <text class="row-lab" x="82" y="199" text-anchor="end">AMZN</text>
+          <path d="M169.2,188 H163.4 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="199" text-anchor="start">−$870</text>
+          <text class="row-lab" x="82" y="221" text-anchor="end">MSFT</text>
+          <path d="M169.2,210 H161.7 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="221" text-anchor="start">−$1,022</text>
+          <text class="row-lab" x="82" y="243" text-anchor="end">NQ</text>
+          <path d="M169.2,232 H160.2 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="243" text-anchor="start">−$1,154</text>
+          <text class="row-lab" x="82" y="265" text-anchor="end">NOW</text>
+          <path d="M169.2,254 H159.9 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="265" text-anchor="start">−$1,178</text>
+          <text class="row-lab" x="82" y="287" text-anchor="end">ES</text>
+          <path d="M169.2,276 H159.8 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="287" text-anchor="start">−$1,191</text>
+          <text class="row-lab" x="82" y="309" text-anchor="end">GC</text>
+          <path d="M169.2,298 H158.8 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="309" text-anchor="start">−$1,275</text>
+          <text class="row-lab" x="82" y="331" text-anchor="end">ANET</text>
+          <path d="M169.2,320 H155.5 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="331" text-anchor="start">−$1,566</text>
+          <text class="row-lab" x="82" y="353" text-anchor="end">OKLO</text>
+          <path d="M169.2,342 H150.8 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="353" text-anchor="start">−$1,980</text>
+          <text class="row-lab" x="82" y="375" text-anchor="end">QQQ</text>
+          <path d="M169.2,364 H149.2 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="375" text-anchor="start">−$2,121</text>
+          <text class="row-lab" x="82" y="397" text-anchor="end">MRNA</text>
+          <path d="M169.2,386 H147.6 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="397" text-anchor="start">−$2,264</text>
+          <text class="row-lab" x="82" y="419" text-anchor="end">CL</text>
+          <path d="M169.2,408 H128.3 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="419" text-anchor="start">−$3,974</text>
+          <text class="row-lab" x="82" y="441" text-anchor="end">INTC</text>
+          <path d="M169.2,430 H120.3 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="441" text-anchor="start">−$4,677</text>
+          <text class="row-lab" x="82" y="463" text-anchor="end">NVDA</text>
+          <path d="M169.2,452 H118.6 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="463" text-anchor="start">−$4,826</text>
+          <text class="row-lab" x="82" y="485" text-anchor="end">MSTR</text>
+          <path d="M169.2,474 H116.8 a4,4 0 0 0 -4,4 v6 a4,4 0 0 0 4,4 H169.2 Z" fill="var(--down)"></path>
+          <text class="val-lab" x="176.2" y="485" text-anchor="start">−$4,990</text>
+        </svg>
+      </div>
+      <div class="cap"><b>רווח לפי טיקר.</b> ארבעה טיקרים בפלוס מתוך 21. CRM לבדה גדולה מהתוצאה הכוללת.</div>
+    </div>
+
+    <ul class="notes">
+      <li><span class="t">המודל הוא לוטו עם ציפוי דק של רווח.</span> 30 יציאות זוכות הפכו פרמיה של $23,098 ל־$76,876 — פי 3.3. אבל 67 יציאות מפסידות שרפו $50,177 מתוך $101,944, כלומר <strong>81% מהפרמיה נפרסה על עסקאות שהפסידו בממוצע חצי מערכן</strong>. כל השיטה תלויה בכך שהזנב הימני ימשיך להופיע.</li>
+      <li><span class="t">CRM לבדה גדולה מהתוצאה.</span> +$44,644 על פרמיה של $14,158 — תשואה של 315%. מול תוצאה כוללת של +$27,146, כלומר שאר 20 הטיקרים יחד הם מינוס $17,498.</li>
+      <li><span class="t">שלושת הימים הראשונים היו במינוס מצטבר של 7,635 דולר.</span> חמישי לבדו החזיר 35,445. אחרי הסינון השפל רדוד בהרבה — שליש ממה שנראה בנתונים הגולמיים.</li>
+      <li><span class="t">14 יציאות איבדו 80% ומעלה מהפרמיה</span> ויחד עלו $10,747. עוד 21 יציאות איבדו 50–80% ועלו $22,323. זה המקום שבו יציאה מוקדמת יותר, גם בהפסד חלקי, הייתה משנה את התמונה יותר מכל שיפור בבחירת הכניסות.</li>
+      <li><span class="t">שלושה טיקרים החזירו פחות מ־30% מהפרמיה:</span> OKLO איבד 91%, ANET 72%, MSTR 68%. ANET זו בדיוק זו שכתבת עליה ביומן שנכנסת מהר בלי ווליום ועם גרף שלא נראה טוב.</li>
+    </ul>
+
+    <div class="sec-head" style="margin-top:12px">
+      <h2 style="font-size:1.1rem">פירוט לכל טיקר</h2>
+      <span class="tag">לחיצה לפתיחה</span>
+    </div>
+    <p>מחיר הכניסה משוחזר מהעלות בפועל: פרמיה ששולמה חלקי כמות. העמודה האחרונה היא כמה מהפרמיה חזרה או נשרפה.</p>
+
+    <div class="breakdown">
+      <details class="tk">
+        <summary><span class="tk-sym">CRM</span><span class="tk-n">19 יציאות</span><span class="tk-v pos">+$44,644</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">12:40</td><td class="num">70</td><td class="num">$0.30</td><td class="num">$0.16</td><td class="num">$2,068</td><td class="num neg">−$948</td><td class="num neg">−46%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">15:19</td><td class="num">2</td><td class="num">$0.14</td><td class="num">$0.12</td><td class="num">$29</td><td class="num neg">−$5</td><td class="num neg">−17%</td></tr>
+          <tr><td>שלישי 25.8</td><td class="num">10:03</td><td class="num">10</td><td class="num">$0.97</td><td class="num">$0.53</td><td class="num">$965</td><td class="num neg">−$435</td><td class="num neg">−45%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:34</td><td class="num">4</td><td class="num">$1.00</td><td class="num">$6.90</td><td class="num">$402</td><td class="num pos">+$2,358</td><td class="num pos">+587%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:41</td><td class="num">4</td><td class="num">$1.00</td><td class="num">$10.45</td><td class="num">$402</td><td class="num pos">+$3,778</td><td class="num pos">+941%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:45</td><td class="num">15</td><td class="num">$0.24</td><td class="num">$3.70</td><td class="num">$355</td><td class="num pos">+$5,195</td><td class="num pos">+1461%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:56</td><td class="num">15</td><td class="num">$0.24</td><td class="num">$3.15</td><td class="num">$355</td><td class="num pos">+$4,370</td><td class="num pos">+1231%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:10</td><td class="num">10</td><td class="num">$0.24</td><td class="num">$4.90</td><td class="num">$237</td><td class="num pos">+$4,663</td><td class="num pos">+1969%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:24</td><td class="num">2</td><td class="num">$0.24</td><td class="num">$6.80</td><td class="num">$47</td><td class="num pos">+$1,313</td><td class="num pos">+2769%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:25</td><td class="num">4</td><td class="num">$0.24</td><td class="num">$6.90</td><td class="num">$95</td><td class="num pos">+$2,665</td><td class="num pos">+2812%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:25</td><td class="num">14</td><td class="num">$0.24</td><td class="num">$6.80</td><td class="num">$332</td><td class="num pos">+$9,188</td><td class="num pos">+2769%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">11:28</td><td class="num">35</td><td class="num">$1.39</td><td class="num">$2.50</td><td class="num">$4,870</td><td class="num pos">+$3,880</td><td class="num pos">+80%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">14:07</td><td class="num">11</td><td class="num">$0.44</td><td class="num">$0.70</td><td class="num">$486</td><td class="num pos">+$284</td><td class="num pos">+59%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">14:07</td><td class="num">4</td><td class="num">$0.44</td><td class="num">$0.71</td><td class="num">$176</td><td class="num pos">+$108</td><td class="num pos">+61%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">15:59</td><td class="num">2</td><td class="num">$0.44</td><td class="num">$0.97</td><td class="num">$88</td><td class="num pos">+$106</td><td class="num pos">+120%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">15:59</td><td class="num">22</td><td class="num">$0.44</td><td class="num">$0.99</td><td class="num">$973</td><td class="num pos">+$1,205</td><td class="num pos">+124%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">16:00</td><td class="num">1</td><td class="num">$0.44</td><td class="num">$0.97</td><td class="num">$44</td><td class="num pos">+$53</td><td class="num pos">+120%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:49</td><td class="num">10</td><td class="num">$0.45</td><td class="num">$2.34</td><td class="num">$448</td><td class="num pos">+$1,892</td><td class="num pos">+423%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">10:05</td><td class="num">40</td><td class="num">$0.45</td><td class="num">$1.69</td><td class="num">$1,785</td><td class="num pos">+$4,975</td><td class="num pos">+279%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">MU</span><span class="tk-n">18 יציאות</span><span class="tk-v pos">+$12,334</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">09:33</td><td class="num">7</td><td class="num">$0.51</td><td class="num">$5.15</td><td class="num">$355</td><td class="num pos">+$3,250</td><td class="num pos">+916%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">09:40</td><td class="num">3</td><td class="num">$0.51</td><td class="num">$7.00</td><td class="num">$152</td><td class="num pos">+$1,948</td><td class="num pos">+1281%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">09:52</td><td class="num">5</td><td class="num">$0.51</td><td class="num">$10.00</td><td class="num">$254</td><td class="num pos">+$4,746</td><td class="num pos">+1872%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">10:21</td><td class="num">15</td><td class="num">$0.51</td><td class="num">$8.10</td><td class="num">$765</td><td class="num pos">+$11,385</td><td class="num pos">+1489%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">10:30</td><td class="num">1</td><td class="num">$2.46</td><td class="num">$1.60</td><td class="num">$246</td><td class="num neg">−$86</td><td class="num neg">−35%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">10:32</td><td class="num">2</td><td class="num">$2.46</td><td class="num">$1.03</td><td class="num">$491</td><td class="num neg">−$285</td><td class="num neg">−58%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">10:32</td><td class="num">7</td><td class="num">$2.46</td><td class="num">$1.05</td><td class="num">$1,719</td><td class="num neg">−$984</td><td class="num neg">−57%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">10:32</td><td class="num">10</td><td class="num">$2.46</td><td class="num">$1.08</td><td class="num">$2,456</td><td class="num neg">−$1,376</td><td class="num neg">−56%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">11:13</td><td class="num">25</td><td class="num">$0.75</td><td class="num">$0.49</td><td class="num">$1,887</td><td class="num neg">−$662</td><td class="num neg">−35%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">11:29</td><td class="num">20</td><td class="num">$0.91</td><td class="num">$0.33</td><td class="num">$1,811</td><td class="num neg">−$1,151</td><td class="num neg">−64%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">12:46</td><td class="num">18</td><td class="num">$1.12</td><td class="num">$0.68</td><td class="num">$2,018</td><td class="num neg">−$794</td><td class="num neg">−39%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">13:13</td><td class="num">18</td><td class="num">$0.95</td><td class="num">$0.67</td><td class="num">$1,702</td><td class="num neg">−$496</td><td class="num neg">−29%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">14:13</td><td class="num">33</td><td class="num">$0.51</td><td class="num">$0.36</td><td class="num">$1,676</td><td class="num neg">−$488</td><td class="num neg">−29%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">14:36</td><td class="num">1</td><td class="num">$0.72</td><td class="num">$0.50</td><td class="num">$72</td><td class="num neg">−$22</td><td class="num neg">−30%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">14:37</td><td class="num">1</td><td class="num">$0.71</td><td class="num">$0.39</td><td class="num">$71</td><td class="num neg">−$32</td><td class="num neg">−45%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">14:37</td><td class="num">28</td><td class="num">$0.71</td><td class="num">$0.40</td><td class="num">$1,994</td><td class="num neg">−$874</td><td class="num neg">−44%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:54</td><td class="num">1</td><td class="num">$0.73</td><td class="num">$0.16</td><td class="num">$73</td><td class="num neg">−$57</td><td class="num neg">−78%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:55</td><td class="num">29</td><td class="num">$0.72</td><td class="num">$0.14</td><td class="num">$2,095</td><td class="num neg">−$1,689</td><td class="num neg">−81%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">PLTR</span><span class="tk-n">3 יציאות</span><span class="tk-v pos">+$4,613</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>חמישי 27.8</td><td class="num">09:47</td><td class="num">5</td><td class="num">$0.67</td><td class="num">$2.81</td><td class="num">$334</td><td class="num pos">+$1,071</td><td class="num pos">+321%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:48</td><td class="num">2</td><td class="num">$0.67</td><td class="num">$2.34</td><td class="num">$133</td><td class="num pos">+$335</td><td class="num pos">+251%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:15</td><td class="num">23</td><td class="num">$0.67</td><td class="num">$2.06</td><td class="num">$1,531</td><td class="num pos">+$3,207</td><td class="num pos">+210%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">NU</span><span class="tk-n">1 יציאות</span><span class="tk-v pos">+$151</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>רביעי 26.8</td><td class="num">13:49</td><td class="num">50</td><td class="num">$0.08</td><td class="num">$0.11</td><td class="num">$399</td><td class="num pos">+$151</td><td class="num pos">+38%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">TSLA</span><span class="tk-n">1 יציאות</span><span class="tk-v neg">−$333</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שלישי 25.8</td><td class="num">13:04</td><td class="num">60</td><td class="num">$0.34</td><td class="num">$0.28</td><td class="num">$2,013</td><td class="num neg">−$333</td><td class="num neg">−17%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">AAOI</span><span class="tk-n">1 יציאות</span><span class="tk-v neg">−$482</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">11:04</td><td class="num">25</td><td class="num">$0.84</td><td class="num">$0.65</td><td class="num">$2,107</td><td class="num neg">−$482</td><td class="num neg">−23%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">SMCI</span><span class="tk-n">1 יציאות</span><span class="tk-v neg">−$693</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שלישי 25.8</td><td class="num">11:05</td><td class="num">40</td><td class="num">$0.53</td><td class="num">$0.36</td><td class="num">$2,133</td><td class="num neg">−$693</td><td class="num neg">−32%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">AMZN</span><span class="tk-n">5 יציאות</span><span class="tk-v neg">−$870</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">13:14</td><td class="num">50</td><td class="num">$0.40</td><td class="num">$0.42</td><td class="num">$2,013</td><td class="num pos">+$87</td><td class="num pos">+4%</td></tr>
+          <tr><td>שלישי 25.8</td><td class="num">10:03</td><td class="num">50</td><td class="num">$0.39</td><td class="num">$0.14</td><td class="num">$1,928</td><td class="num neg">−$1,228</td><td class="num neg">−64%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:32</td><td class="num">65</td><td class="num">$0.34</td><td class="num">$0.21</td><td class="num">$2,180</td><td class="num neg">−$815</td><td class="num neg">−37%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:59</td><td class="num">60</td><td class="num">$0.27</td><td class="num">$0.18</td><td class="num">$1,648</td><td class="num neg">−$568</td><td class="num neg">−34%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">12:54</td><td class="num">15</td><td class="num">$0.24</td><td class="num">$1.34</td><td class="num">$357</td><td class="num pos">+$1,653</td><td class="num pos">+463%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">MSFT</span><span class="tk-n">1 יציאות</span><span class="tk-v neg">−$1,022</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>חמישי 27.8</td><td class="num">11:23</td><td class="num">40</td><td class="num">$0.51</td><td class="num">$0.25</td><td class="num">$2,022</td><td class="num neg">−$1,022</td><td class="num neg">−51%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">NQ</span><span class="tk-n">5 יציאות</span><span class="tk-v neg">−$1,154</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">00:03</td><td class="num">6</td><td class="num">$5.50</td><td class="num">$5.50</td><td class="num">$660</td><td class="num pos">$0</td><td class="num pos">0%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">01:36</td><td class="num">1</td><td class="num">$29.89</td><td class="num">$31.75</td><td class="num">$598</td><td class="num pos">+$37</td><td class="num pos">+6%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">04:20</td><td class="num">8</td><td class="num">$14.14</td><td class="num">$8.50</td><td class="num">$2,263</td><td class="num neg">−$903</td><td class="num neg">−40%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">07:40</td><td class="num">5</td><td class="num">$29.89</td><td class="num">$27.00</td><td class="num">$2,989</td><td class="num neg">−$289</td><td class="num neg">−10%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">01:23</td><td class="num">1</td><td class="num">$29,612.50</td><td class="num">$29,612.50</td><td class="num">$592,250</td><td class="num pos">$0</td><td class="num pos">0%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">NOW</span><span class="tk-n">6 יציאות</span><span class="tk-v neg">−$1,178</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>חמישי 27.8</td><td class="num">09:56</td><td class="num">20</td><td class="num">$0.64</td><td class="num">$1.40</td><td class="num">$1,276</td><td class="num pos">+$1,524</td><td class="num pos">+120%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:39</td><td class="num">80</td><td class="num">$0.47</td><td class="num">$0.27</td><td class="num">$3,727</td><td class="num neg">−$1,567</td><td class="num neg">−42%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:40</td><td class="num">25</td><td class="num">$0.64</td><td class="num">$1.08</td><td class="num">$1,592</td><td class="num pos">+$1,108</td><td class="num pos">+70%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:43</td><td class="num">70</td><td class="num">$0.34</td><td class="num">$0.16</td><td class="num">$2,354</td><td class="num neg">−$1,234</td><td class="num neg">−52%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">10:03</td><td class="num">59</td><td class="num">$0.34</td><td class="num">$0.18</td><td class="num">$1,978</td><td class="num neg">−$916</td><td class="num neg">−46%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">10:04</td><td class="num">6</td><td class="num">$0.34</td><td class="num">$0.18</td><td class="num">$201</td><td class="num neg">−$93</td><td class="num neg">−46%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">ES</span><span class="tk-n">4 יציאות</span><span class="tk-v neg">−$1,191</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שלישי 25.8</td><td class="num">11:16</td><td class="num">17</td><td class="num">$2.13</td><td class="num">$1.40</td><td class="num">$1,812</td><td class="num neg">−$622</td><td class="num neg">−34%</td></tr>
+          <tr><td>שלישי 25.8</td><td class="num">11:16</td><td class="num">3</td><td class="num">$2.13</td><td class="num">$1.45</td><td class="num">$320</td><td class="num neg">−$102</td><td class="num neg">−32%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">13:06</td><td class="num">27</td><td class="num">$1.16</td><td class="num">$0.85</td><td class="num">$1,561</td><td class="num neg">−$414</td><td class="num neg">−26%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">13:07</td><td class="num">3</td><td class="num">$1.16</td><td class="num">$0.80</td><td class="num">$173</td><td class="num neg">−$53</td><td class="num neg">−31%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">GC</span><span class="tk-n">1 יציאות</span><span class="tk-v neg">−$1,275</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">10:12</td><td class="num">5</td><td class="num">$5.25</td><td class="num">$2.70</td><td class="num">$2,625</td><td class="num neg">−$1,275</td><td class="num neg">−49%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">ANET</span><span class="tk-n">2 יציאות</span><span class="tk-v neg">−$1,566</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">10:14</td><td class="num">46</td><td class="num">$0.43</td><td class="num">$0.12</td><td class="num">$1,961</td><td class="num neg">−$1,409</td><td class="num neg">−72%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">10:14</td><td class="num">5</td><td class="num">$0.42</td><td class="num">$0.11</td><td class="num">$212</td><td class="num neg">−$157</td><td class="num neg">−74%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">OKLO</span><span class="tk-n">8 יציאות</span><span class="tk-v neg">−$1,980</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>רביעי 26.8</td><td class="num">13:51</td><td class="num">1</td><td class="num">$0.34</td><td class="num">$0.04</td><td class="num">$34</td><td class="num neg">−$30</td><td class="num neg">−88%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">14:04</td><td class="num">1</td><td class="num">$0.34</td><td class="num">$0.04</td><td class="num">$34</td><td class="num neg">−$30</td><td class="num neg">−88%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">14:05</td><td class="num">1</td><td class="num">$0.34</td><td class="num">$0.04</td><td class="num">$34</td><td class="num neg">−$30</td><td class="num neg">−88%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">14:08</td><td class="num">1</td><td class="num">$0.34</td><td class="num">$0.04</td><td class="num">$34</td><td class="num neg">−$30</td><td class="num neg">−88%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">14:11</td><td class="num">1</td><td class="num">$0.34</td><td class="num">$0.04</td><td class="num">$34</td><td class="num neg">−$30</td><td class="num neg">−88%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">14:33</td><td class="num">8</td><td class="num">$0.34</td><td class="num">$0.03</td><td class="num">$268</td><td class="num neg">−$244</td><td class="num neg">−91%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">14:34</td><td class="num">1</td><td class="num">$0.34</td><td class="num">$0.03</td><td class="num">$34</td><td class="num neg">−$31</td><td class="num neg">−91%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">15:16</td><td class="num">51</td><td class="num">$0.34</td><td class="num">$0.03</td><td class="num">$1,709</td><td class="num neg">−$1,556</td><td class="num neg">−91%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">QQQ</span><span class="tk-n">2 יציאות</span><span class="tk-v neg">−$2,121</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">10:21</td><td class="num">80</td><td class="num">$0.26</td><td class="num">$0.14</td><td class="num">$2,048</td><td class="num neg">−$928</td><td class="num neg">−45%</td></tr>
+          <tr><td>שלישי 25.8</td><td class="num">09:58</td><td class="num">60</td><td class="num">$0.34</td><td class="num">$0.14</td><td class="num">$2,033</td><td class="num neg">−$1,193</td><td class="num neg">−59%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">MRNA</span><span class="tk-n">3 יציאות</span><span class="tk-v neg">−$2,264</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">09:35</td><td class="num">11</td><td class="num">$1.06</td><td class="num">$0.30</td><td class="num">$1,161</td><td class="num neg">−$831</td><td class="num neg">−72%</td></tr>
+          <tr><td>שלישי 25.8</td><td class="num">12:20</td><td class="num">7</td><td class="num">$2.21</td><td class="num">$1.38</td><td class="num">$1,544</td><td class="num neg">−$578</td><td class="num neg">−37%</td></tr>
+          <tr><td>שלישי 25.8</td><td class="num">12:21</td><td class="num">20</td><td class="num">$0.80</td><td class="num">$0.37</td><td class="num">$1,595</td><td class="num neg">−$855</td><td class="num neg">−54%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">CL</span><span class="tk-n">6 יציאות</span><span class="tk-v neg">−$3,974</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">00:02</td><td class="num">2</td><td class="num">$85.83</td><td class="num">$85.61</td><td class="num">$171,669</td><td class="num neg">−$449</td><td class="num neg">−0%</td></tr>
+          <tr><td>שני 24.8</td><td class="num">13:08</td><td class="num">20</td><td class="num">$0.19</td><td class="num">$0.09</td><td class="num">$3,764</td><td class="num neg">−$1,964</td><td class="num neg">−52%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">14:02</td><td class="num">2</td><td class="num">$83.57</td><td class="num">$84.18</td><td class="num">$167,149</td><td class="num pos">+$1,211</td><td class="num pos">+1%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">14:28</td><td class="num">3</td><td class="num">$83.57</td><td class="num">$83.47</td><td class="num">$250,724</td><td class="num neg">−$314</td><td class="num neg">−0%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">23:08</td><td class="num">7</td><td class="num">$0.23</td><td class="num">$0.03</td><td class="num">$1,643</td><td class="num neg">−$1,433</td><td class="num neg">−87%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">23:16</td><td class="num">5</td><td class="num">$0.23</td><td class="num">$0.03</td><td class="num">$1,174</td><td class="num neg">−$1,024</td><td class="num neg">−87%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">INTC</span><span class="tk-n">4 יציאות</span><span class="tk-v neg">−$4,677</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>רביעי 26.8</td><td class="num">10:40</td><td class="num">125</td><td class="num">$0.14</td><td class="num">$0.05</td><td class="num">$1,745</td><td class="num neg">−$1,120</td><td class="num neg">−64%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:39</td><td class="num">125</td><td class="num">$0.14</td><td class="num">$0.06</td><td class="num">$1,722</td><td class="num neg">−$972</td><td class="num neg">−56%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">11:37</td><td class="num">80</td><td class="num">$0.29</td><td class="num">$0.18</td><td class="num">$2,284</td><td class="num neg">−$844</td><td class="num neg">−37%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">10:08</td><td class="num">120</td><td class="num">$0.20</td><td class="num">$0.05</td><td class="num">$2,341</td><td class="num neg">−$1,741</td><td class="num neg">−74%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">NVDA</span><span class="tk-n">7 יציאות</span><span class="tk-v neg">−$4,826</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שני 24.8</td><td class="num">09:48</td><td class="num">55</td><td class="num">$0.41</td><td class="num">$0.47</td><td class="num">$2,246</td><td class="num pos">+$339</td><td class="num pos">+15%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">13:39</td><td class="num">10</td><td class="num">$0.61</td><td class="num">$0.59</td><td class="num">$613</td><td class="num neg">−$23</td><td class="num neg">−4%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:36</td><td class="num">50</td><td class="num">$0.42</td><td class="num">$0.19</td><td class="num">$2,117</td><td class="num neg">−$1,167</td><td class="num neg">−55%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">09:49</td><td class="num">55</td><td class="num">$0.41</td><td class="num">$0.20</td><td class="num">$2,238</td><td class="num neg">−$1,138</td><td class="num neg">−51%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">10:20</td><td class="num">65</td><td class="num">$0.30</td><td class="num">$0.26</td><td class="num">$1,924</td><td class="num neg">−$234</td><td class="num neg">−12%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">13:30</td><td class="num">40</td><td class="num">$0.62</td><td class="num">$0.49</td><td class="num">$2,493</td><td class="num neg">−$533</td><td class="num neg">−21%</td></tr>
+          <tr><td>שישי 28.8</td><td class="num">09:52</td><td class="num">70</td><td class="num">$0.35</td><td class="num">$0.05</td><td class="num">$2,421</td><td class="num neg">−$2,071</td><td class="num neg">−86%</td></tr>
+        </tbody></table></div>
+      </details>
+      <details class="tk">
+        <summary><span class="tk-sym">MSTR</span><span class="tk-n">4 יציאות</span><span class="tk-v neg">−$4,990</span></summary>
+        <div class="tbl-wrap"><table><thead><tr><th>יום</th><th>שעה</th><th>כמות</th><th>כניסה</th><th>יציאה</th><th>פרמיה</th><th>תוצאה</th><th>% מהפרמיה</th></tr></thead><tbody>
+          <tr><td>שלישי 25.8</td><td class="num">09:55</td><td class="num">45</td><td class="num">$0.41</td><td class="num">$0.19</td><td class="num">$1,833</td><td class="num neg">−$978</td><td class="num neg">−53%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">13:51</td><td class="num">55</td><td class="num">$0.25</td><td class="num">$0.03</td><td class="num">$1,394</td><td class="num neg">−$1,229</td><td class="num neg">−88%</td></tr>
+          <tr><td>רביעי 26.8</td><td class="num">13:51</td><td class="num">35</td><td class="num">$0.47</td><td class="num">$0.09</td><td class="num">$1,635</td><td class="num neg">−$1,320</td><td class="num neg">−81%</td></tr>
+          <tr><td>חמישי 27.8</td><td class="num">14:29</td><td class="num">100</td><td class="num">$0.25</td><td class="num">$0.10</td><td class="num">$2,463</td><td class="num neg">−$1,463</td><td class="num neg">−59%</td></tr>
+        </tbody></table></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============ הפוזיציה הפתוחה ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>מה נשאר פתוח</h2>
+      <span class="tag">פוזיציה אחת</span>
+    </div>
+
+    <div class="pos-card">
+      <div class="pos-cell"><span class="l">פוזיציה</span><span class="v">AMZN 267.5C</span></div>
+      <div class="pos-cell"><span class="l">פקיעה</span><span class="v">31.8.2026</span></div>
+      <div class="pos-cell"><span class="l">כמות</span><span class="v">85</span></div>
+      <div class="pos-cell"><span class="l">שווי שוק</span><span class="v">$12,155</span></div>
+      <div class="pos-cell"><span class="l">עלות</span><span class="v">$1,999</span></div>
+      <div class="pos-cell"><span class="l">רווח לא ממומש</span><span class="v" style="color:var(--up)">+$10,156</span></div>
+    </div>
+
+    <div class="strikebar">
+      <div class="track" dir="ltr" role="img" aria-label="אמזון סגרה ב־266.16 דולר, מתחת לסטרייק של 267.50 דולר. טווח התצוגה 258 עד 270 דולר.">
+        <div class="fill" style="width: 68.0%"></div>
+        <div class="mark" style="left: 68.0%"></div>
+        <div class="mark k" style="left: 79.2%"></div>
+      </div>
+      <div class="lbls" dir="ltr">
+        <span class="mono">$258</span>
+        <span>סגירה <b class="mono">$266.16</b> · סטרייק <b class="mono">$267.50</b></span>
+        <span class="mono">$270</span>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>הפוזיציה מחוץ לכסף ב־1.34 דולר, ונותר לה יום מסחר אחד.</b> השווי של 12,155 דולר הוא כולו ערך זמן — אין בו שום ערך פנימי. ביום שישי אמזון עלתה 3.86% ונגעה ב־267.56 תוך כדי המסחר, כלומר חצתה את הסטרייק וסגרה מתחתיו. בפקיעה ביום שני, כל מחיר מתחת ל־267.50 מאפס את הפוזיציה; כדי לשמר את השווי הנוכחי אמזון צריכה לסגור סביב <b>268.93</b> ומעלה. נקודת האיזון מול העלות המקורית שלך היא 267.74 בלבד, כך שהפוזיציה עדיין רווחית מאוד ברוב התרחישים החיוביים — אבל הבינארי כאן חד במיוחד.
+    </div>
+
+    <p>אם היא תיפקע ללא ערך, הרווח הממומש של השבוע נשאר 7,955 דולר. אם היא תיסגר במקום שבו היא נסחרת עכשיו, השבוע מסתיים סביב 20,000 — כלומר פוזיציה אחת שווה יותר מפי שניים מכל 700 העסקאות האחרות יחד.</p>
+  </section>
+
+  <!-- ============ השבוע הקרוב ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>השבוע הקרוב</h2>
+      <span class="tag">31 באוג׳ עד 4 בספט׳</span>
+    </div>
+
+    <p>אחרי נאום וורש, כל נתון תעסוקה השבוע נקרא דרך עדשה אחת: האם הוא מקרב או מרחיק העלאת ריבית ב־16 בספטמבר. וורש אמר במפורש ששוק העבודה בתעסוקה מלאה — כלומר נתון חזק הוא עכשיו חדשות רעות למניות.</p>
+
+    <div class="cal">
+      <div class="cal-row">
+        <div class="cal-day">שני<span>31.8</span></div>
+        <div class="cal-body">אין נתוני מאקרו מהותיים. <b>יום הפקיעה של פוזיציית האמזון שלך.</b></div>
+      </div>
+      <div class="cal-row">
+        <div class="cal-day">שלישי<span>1.9</span></div>
+        <div class="cal-body"><b>ISM ייצור</b> לאוגוסט, מדדי PMI, הוצאות בנייה ליולי, ו־<b>JOLTS</b> — משרות פנויות, מדד מפתח למידת ההידוק של שוק העבודה.</div>
+      </div>
+      <div class="cal-row">
+        <div class="cal-day">רביעי<span>2.9</span></div>
+        <div class="cal-body"><b>דוח התעסוקה של ADP</b>, הזמנות מפעלים ליולי, ו<b>הספר הבז'</b> של הפד — קריאה ראשונה לטון שאחרי ג'קסון הול.</div>
+      </div>
+      <div class="cal-row">
+        <div class="cal-day">חמישי<span>3.9</span></div>
+        <div class="cal-body">מאזן סחר ליולי, תביעות אבטלה שבועיות, ו־<b>ISM שירותים</b> לאוגוסט.</div>
+      </div>
+      <div class="cal-row hot">
+        <div class="cal-day">שישי<span>4.9</span></div>
+        <div class="cal-body"><b>דוח התעסוקה לאוגוסט</b> — נתון השיא של השבוע, 15:30 שעון ישראל. תעסוקה חזקה תדחוף את הסתברות ההעלאה מעל 59% ותלחץ שוב על שבבים ועל כל מה שארוך־מח"מ.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מקורות ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>מקורות</h2>
+      <span class="tag">אימות</span>
+    </div>
+    <div class="sources">
+      <span>מחירים, רשימות מעקב ופוזיציות: Interactive Brokers, נתוני סגירה 28.8.2026.</span>
+      <a href="https://finance.yahoo.com/markets/live/stock-market-today-friday-august-28-dow-sp-500-nasdaq-dip-fed-warsh-jackson-hole-speech-081514091.html">Yahoo Finance — סיכום המסחר ביום שישי וההימור על העלאת ריבית</a>
+      <a href="https://www.cnbc.com/2026/08/28/-september-fed-decision-now-a-coin-flip-as-rate-hike-odds-increase.html">CNBC — החלטת הפד בספטמבר הפכה להטלת מטבע</a>
+      <a href="https://www.benzinga.com/markets/prediction-markets/26/08/61499396/fed-hike-odds-warsh-jackson-hole">Benzinga — הסתברות ההעלאה קפצה ל־59% אחרי נאום וורש</a>
+      <a href="https://finance.yahoo.com/markets/stocks/articles/stock-market-news-aug-28-133400922.html">Yahoo Finance — סיכום 28 באוגוסט, תוצאות אנבידיה וסיילספורס</a>
+      <a href="https://www.schaeffersresearch.com/content/news/2026/08/28/iren-stock-dinged-by-impairment-charge-neocloud-transition">Schaeffer's — המחיקה של IREN והמעבר לנאוקלאוד</a>
+      <a href="https://247wallst.com/investing/2026/08/18/micron-technology-falls-5-sandisk-sinks-6-western-digital-drops-7-as-higher-rates-test-the-memory-boom/">24/7 Wall St — ריבית גבוהה בוחנת את בום הזיכרון</a>
+      <a href="https://www.schaeffersresearch.com/content/news/2026/08/27/the-week-ahead-august-jobs-report-takes-center-stage">Schaeffer's — לוח השנה הכלכלי לשבוע הקרוב</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    הדוח מופק מנתוני חשבון הדמה שלך ב־Interactive Brokers ומדיווחי שוק פומביים. עסקאות במניות עצמן (16 במספר) סוננו לבקשתך ואינן נכללות בשום מספר בדוח, וכך גם שורות מכירת אופציות שנוצרו בעקבות הריסטרט של הפלטפורמה. אין כאן ייעוץ השקעות.
+  </footer>
+
+</div>
+
+<div class="tip mono" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var movers = [
+    ["CRM",   209.17, 256.00,  22.39],
+    ["CRWD",  191.95, 218.40,  13.78],
+    ["NOW",   128.48, 144.71,  12.63],
+    ["MSTR",  119.25, 127.31,   6.76],
+    ["WIX",    82.07,  87.62,   6.76],
+    ["MSFT",  483.24, 513.53,   6.27],
+    ["META",  549.90, 578.02,   5.11],
+    ["PLTR",  179.94, 186.29,   3.53],
+    ["AAPL",  309.35, 319.70,   3.35],
+    ["AMZN",  258.63, 266.43,   3.02],
+    ["ORCL",  146.47, 150.85,   2.99],
+    ["QCOM",  160.75, 164.19,   2.14],
+    ["NVDA",  214.72, 217.55,   1.32],
+    ["GOOGL", 344.82, 346.59,   0.51],
+    ["IBIT",   43.68,  43.90,   0.50],
+    ["AVGO",  368.45, 368.79,   0.09],
+    ["SMCI",   37.24,  37.08,  -0.43],
+    ["INTC",   90.07,  89.47,  -0.67],
+    ["MU",    966.78, 932.86,  -3.51],
+    ["HOOD",  108.13, 104.26,  -3.58],
+    ["TSLA",  362.86, 348.75,  -3.89],
+    ["SNDK", 1596.08,1484.98,  -6.96],
+    ["RKLB",   72.57,  64.39, -11.27],
+    ["IONQ",   44.86,  39.20, -12.62],
+    ["IREN",   41.88,  35.45, -15.35],
+    ["ASTS",   68.65,  58.05, -15.44]
+  ];
+
+  var NS = "http://www.w3.org/2000/svg";
+  var ZERO = 333.57, PPU = 14.2857, ROW = 22, TOP = 34, BARH = 14;
+
+  function el(tag, attrs) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) { if (Object.prototype.hasOwnProperty.call(attrs, k)) n.setAttribute(k, attrs[k]); }
+    return n;
+  }
+  function fmtPct(v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(2) + "%"; }
+  function fmtNum(v) { return v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  var tip = document.getElementById("tip");
+  function showTip(e, html) {
+    tip.innerHTML = html;
+    tip.classList.add("on");
+    tip.style.left = e.clientX + "px";
+    tip.style.top = e.clientY + "px";
+  }
+  function hideTip() { tip.classList.remove("on"); }
+
+  /* ---------- movers bars ---------- */
+  var g = document.getElementById("movBars");
+  if (g) {
+    movers.forEach(function (m, i) {
+      var name = m[0], prev = m[1], last = m[2], pct = m[3];
+      var cy = TOP + i * ROW + ROW / 2;
+      var y = cy - BARH / 2;
+      var up = pct >= 0;
+      var len = Math.abs(pct) * PPU;
+      var x = up ? ZERO : ZERO - len;
+      var color = up ? "var(--up)" : "var(--down)";
+
+      // ticker label
+      var lab = el("text", { x: 56, y: cy + 4, "text-anchor": "end", "class": "row-lab" });
+      lab.textContent = name;
+      g.appendChild(lab);
+
+      // bar with rounded data-end, square at baseline
+      var r = 4, w = Math.max(len, 1.5);
+      var d;
+      if (up) {
+        d = "M" + ZERO + "," + y + " H" + (ZERO + Math.max(w - r, 0)) +
+            " a" + r + "," + r + " 0 0 1 " + r + "," + r +
+            " v" + (BARH - 2 * r) +
+            " a" + r + "," + r + " 0 0 1 " + (-r) + "," + r +
+            " H" + ZERO + " Z";
+      } else {
+        d = "M" + ZERO + "," + y + " H" + (ZERO - Math.max(w - r, 0)) +
+            " a" + r + "," + r + " 0 0 0 " + (-r) + "," + r +
+            " v" + (BARH - 2 * r) +
+            " a" + r + "," + r + " 0 0 0 " + r + "," + r +
+            " H" + ZERO + " Z";
+      }
+      var bar = el("path", { d: d, fill: color, "class": "bar" });
+      g.appendChild(bar);
+
+      // value label at the tip, outside the bar
+      var vx = up ? ZERO + len + 6 : ZERO - len - 6;
+      var vlab = el("text", { x: vx, y: cy + 4, "text-anchor": up ? "start" : "end", "class": "val-lab" });
+      vlab.textContent = fmtPct(pct);
+      g.appendChild(vlab);
+
+      // hover hit area — taller than the mark
+      var hit = el("rect", { x: 60, y: cy - ROW / 2, width: 690, height: ROW, fill: "transparent" });
+      hit.addEventListener("mousemove", function (e) {
+        showTip(e, name + " &nbsp;<b>" + fmtPct(pct) + "</b><br>" + fmtNum(prev) + " &rarr; " + fmtNum(last));
+        bar.style.opacity = ".72";
+      });
+      hit.addEventListener("mouseleave", function () { hideTip(); bar.style.opacity = "1"; });
+      g.appendChild(hit);
+    });
+  }
+
+  /* ---------- movers table ---------- */
+  var tb = document.getElementById("movTable");
+  if (tb) {
+    movers.forEach(function (m) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="tkr">' + m[0] + "</td>" +
+        '<td class="num">' + fmtNum(m[1]) + "</td>" +
+        '<td class="num">' + fmtNum(m[2]) + "</td>" +
+        '<td class="num ' + (m[3] >= 0 ? "pos" : "neg") + '">' + fmtPct(m[3]) + "</td>";
+      tb.appendChild(tr);
+    });
+  }
+
+
+  /* ---------- equity curve hover ---------- */
+  var eqPts = [[56.0,241.4,-449,"שני 24.8",1],[62.4,241.4,-449,"שני 24.8",2],[68.8,241.2,-412,"שני 24.8",3],[75.1,246.7,-1315,"שני 24.8",4],[81.5,248.5,-1604,"שני 24.8",5],[87.9,228.5,1646,"שני 24.8",6],[94.3,233.6,815,"שני 24.8",7],[100.6,221.7,2763,"שני 24.8",8],[107.0,219.6,3103,"שני 24.8",9],[113.4,190.5,7849,"שני 24.8",10],[119.8,198.3,6574,"שני 24.8",11],[126.1,206.9,5165,"שני 24.8",12],[132.5,207.9,5008,"שני 24.8",13],[138.9,138.0,16393,"שני 24.8",14],[145.3,143.7,15465,"שני 24.8",15],[151.6,144.3,15379,"שני 24.8",16],[158.0,146.0,15094,"שני 24.8",17],[164.4,152.1,14110,"שני 24.8",18],[170.8,160.5,12734,"שני 24.8",19],[177.1,163.4,12253,"שני 24.8",20],[183.5,167.5,11591,"שני 24.8",21],[189.9,174.6,10440,"שני 24.8",22],[196.3,180.4,9492,"שני 24.8",23],[202.7,185.3,8698,"שני 24.8",24],[209.0,197.3,6734,"שני 24.8",25],[215.4,200.4,6238,"שני 24.8",26],[221.8,199.8,6325,"שני 24.8",27],[228.2,202.8,5837,"שני 24.8",28],[234.5,203.0,5815,"שני 24.8",29],[240.9,203.2,5783,"שני 24.8",30],[247.3,208.5,4909,"שני 24.8",31],[253.7,208.5,4904,"שני 24.8",32],[260.0,214.5,3927,"שלישי 25.8",33],[266.4,221.9,2734,"שלישי 25.8",34],[272.8,224.5,2298,"שלישי 25.8",35],[279.2,232.1,1071,"שלישי 25.8",36],[285.5,236.3,378,"שלישי 25.8",37],[291.9,240.1,-244,"שלישי 25.8",38],[298.3,240.8,-346,"שלישי 25.8",39],[304.7,244.3,-925,"שלישי 25.8",40],[311.0,249.6,-1780,"שלישי 25.8",41],[317.4,251.6,-2113,"שלישי 25.8",42],[323.8,258.5,-3233,"רביעי 26.8",43],[330.2,258.6,-3257,"רביעי 26.8",44],[336.6,257.7,-3105,"רביעי 26.8",45],[342.9,265.2,-4334,"רביעי 26.8",46],[349.3,273.3,-5654,"רביעי 26.8",47],[355.7,273.5,-5685,"רביעי 26.8",48],[362.1,273.7,-5715,"רביעי 26.8",49],[368.4,273.9,-5745,"רביעי 26.8",50],[374.8,274.1,-5775,"רביעי 26.8",51],[381.2,274.3,-5805,"רביעי 26.8",52],[387.6,275.8,-6049,"רביעי 26.8",53],[393.9,275.9,-6079,"רביעי 26.8",54],[400.3,285.5,-7635,"רביעי 26.8",55],[406.7,271.0,-5277,"חמישי 27.8",56],[413.1,278.2,-6443,"חמישי 27.8",57],[419.4,255.0,-2665,"חמישי 27.8",58],[425.8,223.1,2530,"חמישי 27.8",59],[432.2,216.5,3601,"חמישי 27.8",60],[438.6,214.5,3935,"חמישי 27.8",61],[445.0,221.5,2797,"חמישי 27.8",62],[451.3,194.7,7167,"חמישי 27.8",63],[457.7,185.3,8691,"חמישי 27.8",64],[464.1,156.7,13354,"חמישי 27.8",65],[470.5,137.0,16562,"חמישי 27.8",66],[476.8,138.4,16328,"חמישי 27.8",67],[483.2,130.4,17641,"חמישי 27.8",68],[489.6,114.0,20306,"חמישי 27.8",69],[496.0,57.7,29494,"חמישי 27.8",70],[502.3,67.3,27927,"חמישי 27.8",71],[508.7,73.2,26955,"חמישי 27.8",72],[515.1,66.4,28063,"חמישי 27.8",73],[521.5,72.7,27041,"חמישי 27.8",74],[527.8,48.9,30921,"חמישי 27.8",75],[534.2,54.1,30077,"חמישי 27.8",76],[540.6,56.6,29664,"חמישי 27.8",77],[547.0,56.9,29610,"חמישי 27.8",78],[553.3,60.2,29078,"חמישי 27.8",79],[559.7,52.8,30288,"חמישי 27.8",80],[566.1,51.0,30573,"חמישי 27.8",81],[572.5,50.4,30680,"חמישי 27.8",82],[578.9,52.3,30366,"חמישי 27.8",83],[585.2,61.3,28903,"חמישי 27.8",84],[591.6,60.6,29009,"חמישי 27.8",85],[598.0,53.2,30214,"חמישי 27.8",86],[604.4,52.9,30266,"חמישי 27.8",87],[610.7,61.7,28833,"חמישי 27.8",88],[617.1,68.0,27810,"חמישי 27.8",89],[623.5,68.0,27810,"שישי 28.8",90],[629.9,73.0,26995,"שישי 28.8",91],[636.2,80.6,25761,"שישי 28.8",92],[642.6,68.9,27654,"שישי 28.8",93],[649.0,81.6,25583,"שישי 28.8",94],[655.4,82.0,25526,"שישי 28.8",95],[661.7,92.4,23837,"שישי 28.8",96],[668.1,95.9,23269,"שישי 28.8",97],[674.5,101.5,22353,"שישי 28.8",98],[680.9,102.0,22260,"שישי 28.8",99],[687.2,71.5,27234,"שישי 28.8",100],[693.6,82.2,25493,"שישי 28.8",101],[700.0,72.1,27146,"שישי 28.8",102]];
+  var eh = document.getElementById("eqHit");
+  if (eh) {
+    var cross = el("line", { x1: 0, y1: 30, x2: 0, y2: 300, stroke: "var(--rule-strong)", "stroke-width": "1", opacity: "0" });
+    var dot = el("circle", { r: 5, fill: "var(--accent)", stroke: "var(--surface)", "stroke-width": "2", opacity: "0" });
+    eh.appendChild(cross); eh.appendChild(dot);
+    var pane = el("rect", { x: 56, y: 30, width: 644, height: 270, fill: "transparent" });
+    pane.addEventListener("mousemove", function (e) {
+      var r = pane.ownerSVGElement.getBoundingClientRect();
+      var vx = (e.clientX - r.left) / r.width * 760;
+      var best = eqPts[0], bd = 1e9;
+      for (var i = 0; i < eqPts.length; i++) {
+        var d = Math.abs(eqPts[i][0] - vx);
+        if (d < bd) { bd = d; best = eqPts[i]; }
+      }
+      cross.setAttribute("x1", best[0]); cross.setAttribute("x2", best[0]); cross.setAttribute("opacity", "1");
+      dot.setAttribute("cx", best[0]); dot.setAttribute("cy", best[1]); dot.setAttribute("opacity", "1");
+      var v = best[2];
+      showTip(e, "<b>" + best[3] + "</b><br>" + (v >= 0 ? "+" : "\u2212") + "$" +
+        Math.abs(v).toLocaleString("en-US") + "<br>" + best[4] + " / 102 \u05e1\u05d2\u05d9\u05e8\u05d5\u05ea");
+    });
+    pane.addEventListener("mouseleave", function () {
+      cross.setAttribute("opacity", "0"); dot.setAttribute("opacity", "0"); hideTip();
+    });
+    eh.appendChild(pane);
+  }
+
+  /* ---------- rotation chart hover ---------- */
+  var series = {
+    IGV:  [100.00, 98.76, 99.18, 94.03, 101.08, 109.75, 111.23, 110.47, 117.02],
+    SPY:  [100.00, 101.37, 99.80, 99.22, 100.30, 103.82, 104.24, 102.81, 103.30],
+    SOXX: [100.00, 102.65, 92.14, 93.06, 89.15, 95.93, 97.19, 91.83, 89.81]
+  };
+  var weeks = ["1.7", "6.7", "13.7", "20.7", "27.7", "3.8", "10.8", "17.8", "24.8"];
+  var rh = document.getElementById("rotHit");
+  if (rh) {
+    for (var i = 0; i < 9; i++) {
+      (function (idx) {
+        var cx = 56 + idx * 75.5;
+        var line = el("line", { x1: cx, y1: 30, x2: cx, y2: 310, stroke: "var(--rule-strong)", "stroke-width": "1", opacity: "0" });
+        rh.appendChild(line);
+        var hit = el("rect", { x: cx - 37, y: 30, width: 75, height: 280, fill: "transparent" });
+        hit.addEventListener("mousemove", function (e) {
+          line.setAttribute("opacity", "1");
+          showTip(e,
+            "<b>" + weeks[idx] + "</b><br>" +
+            "IGV &nbsp;" + series.IGV[idx].toFixed(1) + "<br>" +
+            "SPY &nbsp;" + series.SPY[idx].toFixed(1) + "<br>" +
+            "SOXX " + series.SOXX[idx].toFixed(1));
+        });
+        hit.addEventListener("mouseleave", function () { line.setAttribute("opacity", "0"); hideTip(); });
+        rh.appendChild(hit);
+      })(i);
+    }
+  }
+})();
+</script>

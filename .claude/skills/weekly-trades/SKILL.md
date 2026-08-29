@@ -1,6 +1,16 @@
 ---
 name: weekly-trades
-description: Build the end-of-week trading workbook from the user's Interactive Brokers account — pulls the week's executions, folds fills into exit events, derives premium paid / entry price / return on premium, and writes a 4-sheet .xlsx plus a .csv into data/<week>/ in this repo. Use this whenever the user wants their trading week summarised, exported, or analysed: "סיכום שבוע", "סגירת שבוע", "תוציא לי את הטריידים", "weekly trades", "export my trades", "how did I do this week", or a request for trade data, P&L by day, P&L by ticker, win rate, or premium burn. Trigger it even when the user does not name a file format or say "workbook" — if they are asking what their trading week looked like, this is the skill. Do not use it for market commentary or watchlist news; that is the separate Weekly Market Pulse routine.
+description: >-
+  Build the end-of-week trading workbook from the user's Interactive Brokers account —
+  pulls the week's executions, folds fills into exit events, derives premium paid, entry
+  price and return on premium, and writes a 4-sheet .xlsx plus a .csv. Use this whenever
+  the user wants their trading week summarised, exported, or analysed — "סיכום שבוע",
+  "סגירת שבוע", "תוציא לי את הטריידים", "weekly trades", "export my trades", "how did I
+  do this week" — or asks for trade data, P&L by day, P&L by ticker, win rate, or premium
+  burn. Trigger it even when the user does not name a file format or say "workbook"; if
+  they are asking what their trading week looked like, this is the skill. Do not use it
+  for market commentary or watchlist news, which is the separate Weekly Market Pulse
+  routine.
 ---
 
 # Weekly trade workbook
@@ -21,21 +31,27 @@ disconnected or the call errors, say so and stop rather than working from stale 
 
 **2. Run the script.**
 
+`scripts/build_week.py` sits next to this file — invoke it by its path relative to this
+skill's directory, which differs depending on whether the skill is installed in an
+account or checked into a repo:
+
 ```bash
-python3 .claude/skills/weekly-trades/scripts/build_week.py \
-    <path-to-trades-json> data/<YYYY-MM-DD>-week
+python3 <this-skill-dir>/scripts/build_week.py \
+    <path-to-trades-json> <output-dir>
 ```
 
 It picks the week automatically (the Monday of whichever week holds the most trades),
 applies the standing filters, writes `trades-filtered.xlsx` and `trades-filtered.csv`,
-and prints a summary JSON. Name the output directory after that Monday.
+and prints a summary JSON.
 
 **3. Read the summary and report it.** The printed JSON has the numbers worth saying out
 loud: net P&L, exits, win rate, profit factor, per-day and per-ticker breakdowns, and the
 cash-flow check. Quote from it rather than re-deriving anything from the raw feed.
 
-**4. Save it.** Commit the output directory to the repo. Past weeks live in
-`data/2026-08-24-week/`, which also carries a README worth mirroring.
+**4. Save it.** If the session is working in the account holder's `stock-scanner` repo,
+write to `data/<YYYY-MM-DD>-week/` named after the Monday and commit it; past weeks live
+there, and `data/2026-08-24-week/README.md` is worth mirroring. Outside that repo, write
+somewhere sensible and hand the files over.
 
 ## What gets filtered, and why
 

@@ -1,7 +1,7 @@
 {
   "week_start": "2026-08-24",
-  "exits": 107,
-  "fills_kept": 307,
+  "exits": 104,
+  "fills_kept": 302,
   "tickers": [
     "AAOI",
     "AMZN",
@@ -26,14 +26,14 @@
     "SMCI",
     "TSLA"
   ],
-  "net_pnl": 15975.39,
+  "net_pnl": 22486.39,
   "wins": 31,
-  "losses": 74,
-  "win_rate": 0.2897,
-  "profit_factor": 1.257,
+  "losses": 71,
+  "win_rate": 0.2981,
+  "profit_factor": 1.404,
   "commission_sell_leg": 1004.5,
-  "option_premium": 136872.57,
-  "return_on_option_premium": 0.1135,
+  "option_premium": 130361.57,
+  "return_on_option_premium": 0.1691,
   "by_day": [
     [
       "2026-08-24",
@@ -45,7 +45,7 @@
     ],
     [
       "2026-08-26",
-      -12032.83
+      -5521.83
     ],
     [
       "2026-08-27",
@@ -59,7 +59,7 @@
   "by_ticker": [
     [
       "CRM",
-      42964.44
+      44644.44
     ],
     [
       "MU",
@@ -68,6 +68,10 @@
     [
       "PLTR",
       4612.74
+    ],
+    [
+      "NU",
+      151.43
     ],
     [
       "TSLA",
@@ -126,10 +130,6 @@
       -2500.0
     ],
     [
-      "NU",
-      -2788.57
-    ],
-    [
       "CL",
       -3974.08
     ],
@@ -139,7 +139,7 @@
     ],
     [
       "NVDA",
-      -6717.14
+      -4826.14
     ],
     [
       "MSTR",
@@ -149,33 +149,33 @@
   "by_hold": [
     {
       "bucket": "עד 5 דק׳",
-      "exits": 6,
-      "premium": 9897.89,
-      "pnl": -2508.89,
-      "return_on_premium": -0.2535,
+      "exits": 9,
+      "premium": 13732.69,
+      "pnl": -3752.69,
+      "return_on_premium": -0.2733,
       "wins": 0,
       "largest_contributor": "NQ",
-      "pnl_without_largest": -2508.89
+      "pnl_without_largest": -3752.69
     },
     {
       "bucket": "5–30 דק׳",
-      "exits": 17,
-      "premium": 27104.87,
-      "pnl": -6623.81,
-      "return_on_premium": -0.289,
+      "exits": 24,
+      "premium": 35718.09,
+      "pnl": -11347.03,
+      "return_on_premium": -0.3516,
       "wins": 3,
       "largest_contributor": "NOW",
-      "pnl_without_largest": -8148.27
+      "pnl_without_largest": -12871.49
     },
     {
       "bucket": "30–120 דק׳",
-      "exits": 17,
-      "premium": 29085.28,
-      "pnl": -402.94,
-      "return_on_premium": -0.0031,
+      "exits": 18,
+      "premium": 31103.25,
+      "pnl": -1196.91,
+      "return_on_premium": -0.0284,
       "wins": 5,
       "largest_contributor": "CRM",
-      "pnl_without_largest": -4282.45
+      "pnl_without_largest": -5076.42
     },
     {
       "bucket": "2–8 שעות",
@@ -189,25 +189,21 @@
     },
     {
       "bucket": "מעל לילה",
-      "exits": 36,
-      "premium": 35539.19,
-      "pnl": 20551.81,
-      "return_on_premium": 0.5783,
+      "exits": 35,
+      "premium": 31196.41,
+      "pnl": 25316.59,
+      "return_on_premium": 0.8115,
       "wins": 14,
       "largest_contributor": "CRM",
-      "pnl_without_largest": 11363.66
+      "pnl_without_largest": 16128.44
     }
   ],
   "expiries": {
-    "count": 5,
-    "contracts": 601,
-    "premium_lost": 11171.0,
-    "share_of_gross_loss": 0.1799,
+    "count": 2,
+    "contracts": 160,
+    "premium_lost": 4660.0,
+    "share_of_gross_loss": 0.0838,
     "by_ticker": [
-      [
-        "NU",
-        2940.0
-      ],
       [
         "PURR",
         2500.0
@@ -215,14 +211,6 @@
       [
         "MSTR",
         2160.0
-      ],
-      [
-        "NVDA",
-        1891.0
-      ],
-      [
-        "CRM",
-        1680.0
       ]
     ]
   },
@@ -238,14 +226,19 @@
       2408.2
     ],
     [
+      "(-) פוזיציות שנעלמו בריסט של חשבון הדמה (CRM, NU, NVDA)",
+      -5,
+      0
+    ],
+    [
       "(-) מכירות ב-0 ללא פוזיציה פתוחה — שאריות ריסטרט",
       -3,
       0
     ],
     [
       "(=) שורות פקיעה — נזקפות כהפסד מלא",
-      5,
-      -11171.0
+      2,
+      -4660.0
     ],
     [
       "(-) רגלי BUY",

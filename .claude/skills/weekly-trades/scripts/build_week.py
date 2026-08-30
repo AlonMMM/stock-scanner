@@ -27,6 +27,11 @@ Options:
                               held overnight into the following day.
     --carry-day YYYY-MM-DD    The day the carried positions were closed on;
                               required with --drop-carry.
+    --drop-expiry SYM[,SYM]   Treat these symbols' price-0 rows on --expiry-day as
+                              positions that vanished, not as expiries, and drop
+                              them. A paper-account reset looks exactly like an
+                              expiry in the feed; only the account holder knows.
+    --expiry-day YYYY-MM-DD   Required with --drop-expiry.
     --keep-stock              Keep trades in the shares themselves.
     --keep-buys               Keep BUY legs (one row per fill, not per exit).
     --tz-offset -4            Hours from UTC to the exchange session (default -4,
@@ -115,6 +120,17 @@ def build(trades, holds, args):
     # price 0 and stamps realized_pnl 0 on it, but the whole premium is gone — the
     # feed simply never books the loss. to_exits() charges it back from the cost of
     # the lots that died, so an expiry reads as the -100% it actually was.
+    if args.drop_expiry:
+        # A paper-account reset makes open positions vanish. IBKR writes them off the
+        # same way it writes off an expiry — a sell at price 0 against real lots — so
+        # nothing in the feed tells the two apart. Only the account holder knows, and
+        # this is where he says so.
+        gone, gday = set(args.drop_expiry), datetime.date.fromisoformat(args.expiry_day)
+        rows = drop(rows,
+                    lambda t: not (t["price"] == 0 and t["symbol"] in gone
+                                   and session_time(t["trade_time"], tz).date() == gday),
+                    "(-) פוזיציות שנעלמו בריסט של חשבון הדמה ({})".format(", ".join(sorted(gone))))
+
     def closed_something(t):
         dt = session_time(t["trade_time"], tz)
         info = holds.get((t["symbol"], dt.strftime("%Y-%m-%d %H:%M"), t["price"])) or {}
@@ -492,12 +508,16 @@ def main():
     p.add_argument("--tickers", type=lambda s: [x.strip().upper() for x in s.split(",") if x.strip()])
     p.add_argument("--drop-carry", type=lambda s: [x.strip().upper() for x in s.split(",") if x.strip()])
     p.add_argument("--carry-day")
+    p.add_argument("--drop-expiry", type=lambda s: [x.strip().upper() for x in s.split(",") if x.strip()])
+    p.add_argument("--expiry-day")
     p.add_argument("--keep-stock", action="store_true")
     p.add_argument("--keep-buys", action="store_true")
     p.add_argument("--tz-offset", type=int, default=-4)
     args = p.parse_args()
     if args.drop_carry and not args.carry_day:
         sys.exit("--drop-carry needs --carry-day")
+    if args.drop_expiry and not args.expiry_day:
+        sys.exit("--drop-expiry needs --expiry-day")
 
     trades = load_trades(args.trades_json)
     if not args.week_start:

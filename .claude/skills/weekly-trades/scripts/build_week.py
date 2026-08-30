@@ -6,6 +6,12 @@ Reads the JSON that get_account_trades returns, folds the fills into exit
 events, derives the fields IBKR does not send (premium, entry price, return on
 premium), and writes an .xlsx, a .csv and a summary JSON.
 
+An option that expires worthless comes back as a sell at price 0 with
+realized_pnl 0 — the premium is gone and the broker books nothing. Those rows
+are charged the full cost of the lots that died, so the week's result is the
+week's result. Sells at price 0 against nothing open are a different animal, a
+platform-restart artefact, and are dropped.
+
 Everything that can be checked is checked: the filter chain is reconciled
 against the kept rows, and the cash-flow gap that IBKR's realized_pnl hides is
 reported so the caller can quote it rather than discover it later.
@@ -62,9 +68,17 @@ def session_time(iso, tz_offset):
         datetime.timezone(datetime.timedelta(hours=tz_offset)))
 
 
-def session_day(dt):
-    """Futures trade in an evening session that belongs to the next day."""
+def session_day(dt, expiry=False):
+    """Futures trade in an evening session that belongs to the next day.
+
+    An expiry is the exception. IBKR stamps the write-off hours after the close —
+    22:25 on the Wednesday, 22:16 on the Friday — and rolling those forward would
+    date Wednesday's expiry to Thursday and Friday's to the following Monday, out of
+    the week entirely. An option that expired on Friday expired on Friday.
+    """
     day = dt.date()
+    if expiry:
+        return day
     if dt.hour >= 18:
         day += datetime.timedelta(days=1)
     while day.weekday() >= 5:
@@ -74,7 +88,7 @@ def session_day(dt):
 
 # --------------------------------------------------------------- filtering ---
 
-def build(trades, args):
+def build(trades, holds, args):
     """Apply the filter chain, keeping a running audit of what each step cost."""
     tz = args.tz_offset
     audit = [("סה\"כ עסקאות שנמשכו מ-IBKR", len(trades),
@@ -92,11 +106,23 @@ def build(trades, args):
     if args.week_start:
         start = datetime.date.fromisoformat(args.week_start)
         end = start + datetime.timedelta(days=4)
-        rows = drop(rows, lambda t: start <= session_day(session_time(t["trade_time"], tz)) <= end,
+        rows = drop(rows, lambda t: start <= session_day(session_time(t["trade_time"], tz),
+                                                         t["price"] == 0) <= end,
                     "(-) מחוץ לשבוע {} עד {}".format(start, end))
     if not args.keep_stock:
         rows = drop(rows, lambda t: t["sec_type"] != "STK", "(-) עסקאות במניות עצמן")
-    rows = drop(rows, lambda t: t["price"] != 0, "(-) שורות פקיעה טכניות (מחיר 0)")
+    # Expiry rows are kept. IBKR closes a worthless option with a synthetic SELL at
+    # price 0 and stamps realized_pnl 0 on it, but the whole premium is gone — the
+    # feed simply never books the loss. to_exits() charges it back from the cost of
+    # the lots that died, so an expiry reads as the -100% it actually was.
+    def closed_something(t):
+        dt = session_time(t["trade_time"], tz)
+        info = holds.get((t["symbol"], dt.strftime("%Y-%m-%d %H:%M"), t["price"])) or {}
+        return info.get("qty", 0) > 0
+    rows = drop(rows, lambda t: t["price"] != 0 or closed_something(t),
+                "(-) מכירות ב-0 ללא פוזיציה פתוחה — שאריות ריסטרט")
+    if any(t["price"] == 0 for t in rows):
+        audit.append(("(=) שורות פקיעה — נזקפות כהפסד מלא", 0, 0.0))
     if not args.keep_buys:
         rows = drop(rows, lambda t: t["side"] == "SELL", "(-) רגלי BUY")
     if args.tickers:
@@ -118,30 +144,44 @@ def holding_times(all_trades, tz):
     opened by BUY fills that the filters drop, so matching against the filtered set
     would leave most exits with no entry to measure from.
 
-    Returns {(symbol, exit_iso_minute, price): weighted mean minutes held}.
+    The book is two-sided. A sell with nothing open does not vanish — it opens a
+    short lot that a later buy closes. That is what the restart artefacts are, and
+    treating their buy-to-cover as a fresh long instead would jam phantom lots at the
+    head of the queue and hand the real exits somebody else's cost basis. Before this
+    was signed, the MSTR lot that expired on Friday priced at $1,440 instead of the
+    $2,160 actually paid for it.
+
+    Returns {(symbol, exit_iso_minute, price): {"hold", "premium", "qty", "mult"}} where
+    qty is how much of the fill closed something real. On a price-0 row that is the whole
+    test: qty 0 means nothing was open and the row is a restart artefact, not an expiry.
+    The multiplier comes along because an expiry has no price to derive it from.
     """
-    book = collections.defaultdict(collections.deque)
-    acc = collections.defaultdict(lambda: [0.0, 0])   # [qty*minutes, qty]
+    book = collections.defaultdict(collections.deque)   # [signed qty, opened, cost, mult]
+    acc = collections.defaultdict(lambda: [0.0, 0, 0.0, 0.0])  # qty*min, qty, premium, qty*mult
     for t in sorted(all_trades, key=lambda x: x["trade_time"]):
         sym, qty, px = t["symbol"], t["size"], t["price"]
         dt = session_time(t["trade_time"], tz)
-        if t["side"] == "BUY" and px:
-            book[sym].append([qty, dt])
-            continue
-        if t["side"] != "SELL":
-            continue
-        key = (sym, dt.strftime("%Y-%m-%d %H:%M"), px)
-        left = qty
-        while left > 0 and book[sym]:
-            lot = book[sym][0]
-            take = min(left, lot[0])
-            acc[key][0] += take * (dt - lot[1]).total_seconds() / 60.0
-            acc[key][1] += take
-            lot[0] -= take
+        sign = 1 if t["side"] == "BUY" else -1
+        mult = (t.get("net_amount", 0) / (qty * px)) if (qty and px) else 100
+        lots, left = book[sym], qty
+        while left > 0 and lots and (lots[0][0] > 0) != (sign > 0):
+            lot = lots[0]
+            take = min(left, abs(lot[0]))
+            if sign < 0:                      # a close of a long: this is an exit
+                key = (sym, dt.strftime("%Y-%m-%d %H:%M"), px)
+                acc[key][0] += take * (dt - lot[1]).total_seconds() / 60.0
+                acc[key][1] += take
+                acc[key][2] += take * lot[2]
+                acc[key][3] += take * lot[3]
+            lot[0] -= take * (1 if lot[0] > 0 else -1)
             left -= take
-            if lot[0] <= 0:
-                book[sym].popleft()
-    return {k: (v[0] / v[1]) for k, v in acc.items() if v[1]}
+            if lot[0] == 0:
+                lots.popleft()
+        if left:
+            lots.append([sign * left, dt, px * mult, mult])
+    return {k: {"hold": v[0] / v[1], "premium": v[2], "qty": v[1],
+                "mult": round(v[3] / v[1])}
+            for k, v in acc.items() if v[1]}
 
 
 def to_exits(rows, tz, holds=None):
@@ -161,14 +201,28 @@ def to_exits(rows, tz, holds=None):
     exits = []
     for (sym, day, hhmm, px), m in sorted(merged.items(), key=lambda kv: (kv[0][1], kv[0][2], kv[0][0])):
         # IBKR sends proceeds and net P&L; premium and entry follow from them.
-        mult = round(m["amt"] / (m["sz"] * px)) if m["sz"] and px else 0
-        premium = m["amt"] - m["pnl"]
-        hold = holds.get((sym, "{} {}".format(day, hhmm), px))
+        info = holds.get((sym, "{} {}".format(day, hhmm), px)) or {}
+        hold = info.get("hold")
+        if px == 0:
+            # Nothing came back: the premium of the lots that died is the loss. Size
+            # the row by what the book actually closed, not by the fill quantity —
+            # the restart oversold some names, and those extra contracts were never
+            # open. NU sold 390 at zero against 340 held.
+            if not info.get("qty"):
+                continue                      # restart artefact, dropped in build()
+            m["sz"] = info["qty"]
+            premium = info["premium"]
+            m["pnl"] = -premium
+            mult = info.get("mult") or 0    # no price here to derive it from
+        else:
+            mult = round(m["amt"] / (m["sz"] * px)) if m["sz"] and px else 0
+            premium = m["amt"] - m["pnl"]
         exits.append(dict(
             date=day, day=HE_DAY[day.weekday()], time=hhmm, sym=sym, st=m["st"],
             qty=m["sz"], px=px, mult=mult, amt=round(m["amt"], 2),
             pnl=round(m["pnl"], 2), premium=round(premium, 2),
             entry=round(premium / (m["sz"] * mult), 4) if mult else "",
+            expired=(px == 0),
             ret=round(m["pnl"] / premium, 6) if premium else "",
             hold=round(hold, 1) if hold is not None else "",
             com=round(m["com"], 2)))
@@ -436,15 +490,23 @@ def main():
         # straggler would otherwise be read as "the week" and empty the report.
         weeks = collections.Counter()
         for t in trades:
-            d = session_day(session_time(t["trade_time"], args.tz_offset))
+            d = session_day(session_time(t["trade_time"], args.tz_offset), t["price"] == 0)
             weeks[d - datetime.timedelta(days=d.weekday())] += 1
         if not weeks:
             sys.exit("no trades in the file")
         args.week_start = str(weeks.most_common(1)[0][0])
 
-    kept, audit = build(trades, args)
     holds = holding_times(trades, args.tz_offset)
+    kept, audit = build(trades, holds, args)
     exits = to_exits(kept, args.tz_offset, holds)
+
+    # The expiry line was reserved in build() before the charge was known; fill it in
+    # so the audit chain still reconciles against the exits it produced.
+    expired = [e for e in exits if e.get("expired")]
+    charge = sum(e["pnl"] for e in expired)
+    for i, (label, n, _) in enumerate(audit):
+        if label.startswith("(=) שורות פקיעה"):
+            audit[i] = (label, len(expired), charge)
     if not exits:
         sys.exit("every trade was filtered out — check --week-start and --tickers")
 
@@ -485,6 +547,17 @@ def main():
         "by_ticker": sorted([[s, round(sum(e["pnl"] for e in exits if e["sym"] == s), 2)]
                              for s in {e["sym"] for e in exits}], key=lambda r: -r[1]),
         "by_hold": hold_analysis(exits),
+        "expiries": {
+            "count": len(expired),
+            "contracts": sum(e["qty"] for e in expired),
+            "premium_lost": round(-charge, 2),
+            "share_of_gross_loss": (
+                round(-charge / -sum(e["pnl"] for e in exits if e["pnl"] < 0), 4)
+                if any(e["pnl"] < 0 for e in exits) else None),
+            "by_ticker": sorted(
+                [[s_, round(-sum(e["pnl"] for e in expired if e["sym"] == s_), 2)]
+                 for s_ in {e["sym"] for e in expired}], key=lambda r: -r[1]),
+        },
         "audit": [[a, n, round(p, 2)] for a, n, p in audit],
         "audit_reconciles": abs(chain - net) < 0.05,
         "cash_check": cash_gap(trades, args.tz_offset, args.keep_stock),

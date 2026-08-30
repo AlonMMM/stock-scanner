@@ -56,39 +56,51 @@ def session_day(dt):
 def walk_book(trades, tz):
     """Replay the week, carrying an open book so exposure can be read at any point.
 
-    Lots are matched first-in-first-out. A sell with no matching lot is a restart
-    artifact, not a real close, so it is dropped rather than pushing the book negative.
+    Lots are matched first-in-first-out on a two-sided book: a sell with nothing open
+    opens a short lot that a later buy closes. Those pairs are the platform-restart
+    artefacts, and the alternative — dropping the sell and letting its buy-to-cover
+    open a fresh long — books 155 contracts of MSTR and OKLO that were never held,
+    against the exposure ceiling in rule 12.
+
+    Returns, alongside the timeline, the premium written off by expiry: a sell at
+    price 0 closing real lots, which IBKR reports as a zero result.
     """
-    book = collections.defaultdict(collections.deque)
+    book = collections.defaultdict(collections.deque)   # [signed qty, cost/contract]
     last_px = {}
     timeline = []
+    expiry_loss = collections.defaultdict(float)
     for t in sorted(trades, key=lambda x: x["trade_time"]):
         sym, qty, px = t["symbol"], t["size"], t["price"]
         if px:
             last_px[sym] = px
+        sign = 1 if t["side"] == "BUY" else -1
         mult = (t.get("net_amount", 0) / (qty * px)) if (qty and px) else 100
-        if t["side"] == "BUY" and px:
-            book[sym].append([qty, px * mult])
-        elif t["side"] == "SELL":
-            left = qty
-            while left > 0 and book[sym]:
-                lot = book[sym][0]
-                take = min(left, lot[0])
-                lot[0] -= take
-                left -= take
-                if lot[0] <= 0:
-                    book[sym].popleft()
+        lots, left, closed = book[sym], qty, 0.0
+        while left > 0 and lots and (lots[0][0] > 0) != (sign > 0):
+            lot = lots[0]
+            take = min(left, abs(lot[0]))
+            if sign < 0:
+                closed += take * lot[1]
+            lot[0] -= take * (1 if lot[0] > 0 else -1)
+            left -= take
+            if lot[0] == 0:
+                lots.popleft()
+        if left:
+            lots.append([sign * left, px * mult])
         dt = session_time(t["trade_time"], tz)
-        open_cost = sum(l[0] * l[1] for dq in book.values() for l in dq)
-        open_qty = {s: sum(l[0] for l in dq) for s, dq in book.items() if sum(l[0] for l in dq)}
+        if px == 0 and sign < 0 and closed:
+            expiry_loss[dt.date()] -= closed
+        open_cost = sum(abs(l[0]) * l[1] for dq in book.values() for l in dq if l[0] > 0)
+        open_qty = {s: q for s, q in
+                    ((s, sum(l[0] for l in dq if l[0] > 0)) for s, dq in book.items()) if q}
         timeline.append((dt, open_cost, dict(open_qty), dict(last_px)))
-    return timeline
+    return timeline, dict(expiry_loss)
 
 
 def check(trades, p, acct, tz):
     findings = []
     opts = [t for t in trades if t["sec_type"] in ("OPT", "FOP")]
-    timeline = walk_book(opts, tz)
+    timeline, expiry_loss = walk_book(opts, tz)
 
     # ---- rule 12: total open exposure, measured at cost
     cap12 = p["total_open_exposure_cap_pct"] * acct
@@ -153,14 +165,20 @@ def check(trades, p, acct, tz):
     daily = collections.defaultdict(float)
     for t in opts:
         daily[session_day(session_time(t["trade_time"], tz))] += t.get("realized_pnl", 0)
+    # An option that expired worthless comes back as realized_pnl 0. The premium is
+    # gone, so it belongs in the day that lost it — dated to the calendar day, not
+    # rolled forward by session_day: IBKR stamps the write-off after 22:00.
+    for d, v in expiry_loss.items():
+        daily[d] += v
     bad = [(d, v) for d, v in sorted(daily.items()) if v < -lim]
     findings.append({
         "rule": 15, "name": "a day down 7% ends the day",
         "status": "FAIL" if bad else "PASS",
         "detail": ("; ".join("{} {:+,.0f}".format(d, v) for d, v in bad)
                    if bad else "no day lost more than ${:,.0f} in realised terms".format(lim)),
-        "caveat": "Realised P&L only. The rule is written against account value, which also "
-                  "moves with open positions, so a day can breach it without showing here.",
+        "caveat": "Realised P&L plus premium written off at expiry. The rule is written "
+                  "against account value, which also moves with open positions, so a day "
+                  "can breach it without showing here.",
     })
 
     return findings

@@ -1,0 +1,317 @@
+{
+  "week_start": "2026-08-24",
+  "exits": 121,
+  "fills_kept": 357,
+  "tickers": [
+    "AAOI",
+    "AAPL",
+    "AMZN",
+    "ANET",
+    "BABA",
+    "CL",
+    "CRM",
+    "CSCO",
+    "ES",
+    "GC",
+    "GOOGL",
+    "IBIT",
+    "INTC",
+    "META",
+    "MRNA",
+    "MSFT",
+    "MSTR",
+    "MU",
+    "NOW",
+    "NQ",
+    "NU",
+    "NVDA",
+    "OKLO",
+    "PLTR",
+    "PURR",
+    "QQQ",
+    "SMCI",
+    "TLT",
+    "TSLA"
+  ],
+  "net_pnl": 8359.72,
+  "wins": 31,
+  "losses": 88,
+  "win_rate": 0.2562,
+  "profit_factor": 1.12,
+  "commission_sell_leg": 1409.34,
+  "option_premium": 162248.24,
+  "return_on_option_premium": 0.0488,
+  "by_day": [
+    [
+      "2026-08-24",
+      2703.64
+    ],
+    [
+      "2026-08-25",
+      -14955.47
+    ],
+    [
+      "2026-08-26",
+      -6989.95
+    ],
+    [
+      "2026-08-27",
+      32924.88
+    ],
+    [
+      "2026-08-28",
+      -5323.38
+    ]
+  ],
+  "by_ticker": [
+    [
+      "CRM",
+      44644.44
+    ],
+    [
+      "MU",
+      12334.4
+    ],
+    [
+      "PLTR",
+      4612.74
+    ],
+    [
+      "NU",
+      151.43
+    ],
+    [
+      "TSLA",
+      -333.45
+    ],
+    [
+      "AAOI",
+      -481.53
+    ],
+    [
+      "GOOGL",
+      -528.86
+    ],
+    [
+      "BABA",
+      -586.41
+    ],
+    [
+      "SMCI",
+      -693.07
+    ],
+    [
+      "TLT",
+      -773.26
+    ],
+    [
+      "AMZN",
+      -869.95
+    ],
+    [
+      "CSCO",
+      -876.92
+    ],
+    [
+      "MSFT",
+      -1021.54
+    ],
+    [
+      "NQ",
+      -1154.48
+    ],
+    [
+      "NOW",
+      -1177.59
+    ],
+    [
+      "ES",
+      -1191.0
+    ],
+    [
+      "GC",
+      -1275.1
+    ],
+    [
+      "AAPL",
+      -1313.4
+    ],
+    [
+      "OKLO",
+      -1980.35
+    ],
+    [
+      "QQQ",
+      -2121.37
+    ],
+    [
+      "ANET",
+      -2337.25
+    ],
+    [
+      "PURR",
+      -2500.0
+    ],
+    [
+      "META",
+      -3357.01
+    ],
+    [
+      "CL",
+      -3974.08
+    ],
+    [
+      "MRNA",
+      -4012.59
+    ],
+    [
+      "IBIT",
+      -4171.1
+    ],
+    [
+      "INTC",
+      -4676.9
+    ],
+    [
+      "NVDA",
+      -4826.14
+    ],
+    [
+      "MSTR",
+      -7149.94
+    ]
+  ],
+  "by_hold": [
+    {
+      "bucket": "עד 5 דק׳",
+      "exits": 10,
+      "premium": 16006.09,
+      "pnl": -5066.09,
+      "return_on_premium": -0.3165,
+      "wins": 0,
+      "largest_contributor": "NQ",
+      "pnl_without_largest": -5066.09
+    },
+    {
+      "bucket": "5–30 דק׳",
+      "exits": 30,
+      "premium": 41669.1,
+      "pnl": -14704.04,
+      "return_on_premium": -0.3819,
+      "wins": 3,
+      "largest_contributor": "NOW",
+      "pnl_without_largest": -16228.5
+    },
+    {
+      "bucket": "30–120 דק׳",
+      "exits": 21,
+      "premium": 37082.29,
+      "pnl": -3375.95,
+      "return_on_premium": -0.0826,
+      "wins": 5,
+      "largest_contributor": "CRM",
+      "pnl_without_largest": -7255.46
+    },
+    {
+      "bucket": "2–8 שעות",
+      "exits": 11,
+      "premium": 16620.14,
+      "pnl": -3114.58,
+      "return_on_premium": -0.1604,
+      "wins": 5,
+      "largest_contributor": "AMZN",
+      "pnl_without_largest": -4767.71
+    },
+    {
+      "bucket": "מעל לילה",
+      "exits": 39,
+      "premium": 41820.22,
+      "pnl": 19798.78,
+      "return_on_premium": 0.4734,
+      "wins": 14,
+      "largest_contributor": "CRM",
+      "pnl_without_largest": 10610.63
+    }
+  ],
+  "expiries": {
+    "count": 2,
+    "contracts": 160,
+    "premium_lost": 4660.0,
+    "share_of_gross_loss": 0.0668,
+    "by_ticker": [
+      [
+        "PURR",
+        2500.0
+      ],
+      [
+        "MSTR",
+        2160.0
+      ]
+    ]
+  },
+  "audit": [
+    [
+      "סה\"כ עסקאות שנמשכו מ-IBKR",
+      716,
+      5547.22
+    ],
+    [
+      "(-) עסקאות במניות עצמן",
+      -16,
+      2408.2
+    ],
+    [
+      "(-) פוזיציות שנעלמו בריסט של חשבון הדמה (CRM, NU, NVDA)",
+      -5,
+      0
+    ],
+    [
+      "(-) מכירות ב-0 ללא פוזיציה פתוחה — שאריות ריסטרט",
+      -3,
+      0
+    ],
+    [
+      "(=) שורות פקיעה — נזקפות כהפסד מלא",
+      2,
+      -4660.0
+    ],
+    [
+      "(-) רגלי BUY",
+      -335,
+      5064.34
+    ]
+  ],
+  "audit_reconciles": true,
+  "cash_check": {
+    "cash_flow": 3111.32,
+    "realized": 7955.41,
+    "gap": -4844.1,
+    "expiry_rows": 10,
+    "worst_gaps": [
+      [
+        "NU",
+        -4312.59
+      ],
+      [
+        "NVDA",
+        -2934.1
+      ],
+      [
+        "MSTR",
+        -2641.99
+      ],
+      [
+        "PURR",
+        -2449.01
+      ],
+      [
+        "AMZN",
+        -1999.04
+      ]
+    ]
+  },
+  "files": {
+    "xlsx": "data/2026-08-24-week/unfiltered/trades-filtered.xlsx",
+    "csv": "data/2026-08-24-week/unfiltered/trades-filtered.csv"
+  }
+}

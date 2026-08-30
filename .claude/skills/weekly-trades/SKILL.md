@@ -48,7 +48,21 @@ and prints a summary JSON.
 loud: net P&L, exits, win rate, profit factor, per-day and per-ticker breakdowns, and the
 cash-flow check. Quote from it rather than re-deriving anything from the raw feed.
 
-**4. Save it.** If the session is working in the account holder's `stock-scanner` repo,
+**4. Check the week against the rules.** When `docs/risk-rules.md` is present, run it —
+the account holder keeps a written rule set and wants each week measured against it:
+
+```bash
+python3 <this-skill-dir>/scripts/check_rules.py <path-to-trades-json> --rules docs/risk-rules.md
+```
+
+It reads its thresholds from the YAML block inside that document, so the rules and the
+check can never drift apart. Report the FAILs and CHECKs, and pass on the caveats attached
+to them rather than presenting a flag as a confirmed breach. It also prints the rules it
+*cannot* evaluate and why — most of them need an expiry date the feed does not carry.
+Repeat that list; a check that only mentions what it could see reads as a clean bill of
+health, which it is not.
+
+**5. Save it.** If the session is working in the account holder's `stock-scanner` repo,
 write to `data/<YYYY-MM-DD>-week/` named after the Monday and commit it; past weeks live
 there, and `data/2026-08-24-week/README.md` is worth mirroring. Outside that repo, write
 somewhere sensible and hand the files over.

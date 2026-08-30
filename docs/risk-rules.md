@@ -136,8 +136,9 @@ four instruments.*
 A week to expiration, 70% of premium. Two days, 90%. Past that there is no thesis, only
 hope.
 
-*Twenty-one exits that gave back 50%–80% of premium cost $22,323 in a single week. It is
-the largest line item there is.*
+*Twenty-one exits that gave back 50%–80% of premium cost $22,323 in a single week. The
+five positions that were left to expire cost another $11,171 — the whole premium, and the
+only exits where the stop budget was never consulted at all.*
 
 ### 10 — Zone 3 does not count toward the stop
 
@@ -242,6 +243,11 @@ Recompute these if the account moves by more than 10%.
   appear at all, so a protected position looks exposed.
 - **An exit reason, in one word.** Target, stop, time, thesis changed. It constrains no
   decision and makes it possible, a month from now, to compare returns by reason.
+
+An expiry needs none of that to be measured. IBKR reports it as a sell at price 0 with
+`realized_pnl = 0`, so the loss is invisible in the broker's own numbers; the weekly
+workbook charges it the cost of the lots that died and reports it separately. It is the
+one breach of rule 9 that can be counted exactly.
 
 ---
 

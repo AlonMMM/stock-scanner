@@ -48,13 +48,28 @@ and prints a summary JSON.
 loud: net P&L, exits, win rate, profit factor, per-day and per-ticker breakdowns, and the
 cash-flow check. Quote from it rather than re-deriving anything from the raw feed.
 
-`by_hold` groups the week by how long each position was held, which is the one cut the
+`expiries` is the block to read first — see below. `by_hold` groups the week by how long
+each position was held, which is the one cut the
 account holder cannot get from the broker. Read it with the guard beside it: every bucket
 also reports `largest_contributor` and `pnl_without_largest`, because a single outsized
 winner routinely flips a bucket's sign. In the 24-28 August week the overnight bucket
 looked like a +59% edge until CRM came out of it, at which point it lost 36% like every
 other bucket. Never quote a bucket's return without checking what it looks like without
 its largest name.
+
+**3b. Where the premium burned.** `scripts/burn_slices.py` cuts the same week at lot
+level and classifies every closing slice by whether the account holder could have acted:
+intraday (both ends inside 09:30–16:00 ET on one day), off-hours, overnight, expiry. It
+prints the burn per class and, separately, the exits whose cost basis predates the feed —
+those have a real result but no reconstructable entry time.
+
+```bash
+python3 <this-skill-dir>/scripts/burn_slices.py <path-to-trades-json> <out.json>
+```
+
+The account holder's standing question is where the loss was a decision and where it was
+the risk he bought. An expiry is the second kind; a 45% average give-back in the middle of
+the trading day is the first.
 
 **4. Check the week against the rules.** When `docs/risk-rules.md` is present, run it —
 the account holder keeps a written rule set and wants each week measured against it:
@@ -82,14 +97,17 @@ what makes each row mean one thing:
 
 - **Share trades are dropped.** The account tracks options and futures; equity fills are
   usually assignment or a hedge and would sit in the table as outliers with no premium.
-- **Price-0 rows are dropped** — but understand what they are before repeating that
-  phrase to the user. When a long option expires worthless IBKR closes it with a
-  synthetic SELL at price 0 and stamps `realized_pnl = 0` on it. The premium is entirely
-  gone; the feed simply never books the loss. One MSTR lot in the 24–28 August week cost
-  $2,160 on Thursday and was written off at zero on Friday, recorded as a $0 result. They
-  are dropped because a row with no price and no result would sit beside real exits
-  diluting the averages and inflating the win rate, not because nothing happened. The
-  money they cost surfaces in `cash_check` instead — see below.
+- **Price-0 rows are split in two, and only one kind is dropped.** When a long option
+  expires worthless IBKR closes it with a synthetic SELL at price 0 and stamps
+  `realized_pnl = 0` on it. Nothing came back and the whole premium is gone, but the feed
+  books no loss at all. Those rows are **kept and charged the full premium** — the script
+  reads the cost of the lots that died out of the FIFO book, so an expiry reads as the
+  −100% it was. In the 24–28 August week that is five events, 601 contracts and $11,171,
+  18% of the week's gross loss; PURR was bought and never sold, so without this it did not
+  appear in the report at all. The other kind of price-0 row is a **restart artefact** —
+  a sell against a position that was not open, which the platform pairs with a
+  buy-to-cover the next morning. Those are dropped, and the audit sheet names them
+  separately.
 - **Only SELL legs are kept**, so one row is one exit carrying its own result. This does
   discard the realised P&L on short closes, which the audit sheet reports — mention the
   figure if it is large.
@@ -115,11 +133,13 @@ These are easy to get wrong and both make the week look better than it was:
 on both legs. The workbook's commission column is the sell leg only, shown for reference —
 subtracting it again double-counts.
 
-**`realized_pnl` does not book losses on options that expire worthless.** The summary's
-`cash_check` compares true cash movement against the reported figures and names the
-symbols with the widest gaps. In the 24–28 August week the account was $4,844 below what
-the realised numbers implied. If `cash_check.gap` is materially negative, say so — the
-workbook is a record of exits taken, not a complete economic P&L.
+**`realized_pnl` does not book losses on options that expire worthless — the workbook
+does.** The `expiries` block in the summary is the number to quote: count, contracts,
+premium lost, share of the week's gross loss, and a per-ticker split. Say it out loud
+every week. It is the largest single line item that the broker's own numbers hide, and a
+week's result read straight off `realized_pnl` will be too flattering by exactly that
+amount. `cash_check` remains as an independent check on true cash movement; a materially
+negative `gap` that the expiries do not account for means something else is missing.
 
 ## How the derived fields work
 

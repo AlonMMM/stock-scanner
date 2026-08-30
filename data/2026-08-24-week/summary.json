@@ -1,0 +1,299 @@
+{
+  "week_start": "2026-08-24",
+  "exits": 107,
+  "fills_kept": 307,
+  "tickers": [
+    "AAOI",
+    "AMZN",
+    "ANET",
+    "CL",
+    "CRM",
+    "ES",
+    "GC",
+    "INTC",
+    "MRNA",
+    "MSFT",
+    "MSTR",
+    "MU",
+    "NOW",
+    "NQ",
+    "NU",
+    "NVDA",
+    "OKLO",
+    "PLTR",
+    "PURR",
+    "QQQ",
+    "SMCI",
+    "TSLA"
+  ],
+  "net_pnl": 15975.39,
+  "wins": 31,
+  "losses": 74,
+  "win_rate": 0.2897,
+  "profit_factor": 1.257,
+  "commission_sell_leg": 1004.5,
+  "option_premium": 136872.57,
+  "return_on_option_premium": 0.1135,
+  "by_day": [
+    [
+      "2026-08-24",
+      4904.38
+    ],
+    [
+      "2026-08-25",
+      -7017.37
+    ],
+    [
+      "2026-08-26",
+      -12032.83
+    ],
+    [
+      "2026-08-27",
+      35444.59
+    ],
+    [
+      "2026-08-28",
+      -5323.38
+    ]
+  ],
+  "by_ticker": [
+    [
+      "CRM",
+      42964.44
+    ],
+    [
+      "MU",
+      12334.4
+    ],
+    [
+      "PLTR",
+      4612.74
+    ],
+    [
+      "TSLA",
+      -333.45
+    ],
+    [
+      "AAOI",
+      -481.53
+    ],
+    [
+      "SMCI",
+      -693.07
+    ],
+    [
+      "AMZN",
+      -869.95
+    ],
+    [
+      "MSFT",
+      -1021.54
+    ],
+    [
+      "NQ",
+      -1154.48
+    ],
+    [
+      "NOW",
+      -1177.59
+    ],
+    [
+      "ES",
+      -1191.0
+    ],
+    [
+      "GC",
+      -1275.1
+    ],
+    [
+      "ANET",
+      -1566.01
+    ],
+    [
+      "OKLO",
+      -1980.35
+    ],
+    [
+      "QQQ",
+      -2121.37
+    ],
+    [
+      "MRNA",
+      -2264.12
+    ],
+    [
+      "PURR",
+      -2500.0
+    ],
+    [
+      "NU",
+      -2788.57
+    ],
+    [
+      "CL",
+      -3974.08
+    ],
+    [
+      "INTC",
+      -4676.9
+    ],
+    [
+      "NVDA",
+      -6717.14
+    ],
+    [
+      "MSTR",
+      -7149.94
+    ]
+  ],
+  "by_hold": [
+    {
+      "bucket": "עד 5 דק׳",
+      "exits": 6,
+      "premium": 9897.89,
+      "pnl": -2508.89,
+      "return_on_premium": -0.2535,
+      "wins": 0,
+      "largest_contributor": "NQ",
+      "pnl_without_largest": -2508.89
+    },
+    {
+      "bucket": "5–30 דק׳",
+      "exits": 17,
+      "premium": 27104.87,
+      "pnl": -6623.81,
+      "return_on_premium": -0.289,
+      "wins": 3,
+      "largest_contributor": "NOW",
+      "pnl_without_largest": -8148.27
+    },
+    {
+      "bucket": "30–120 דק׳",
+      "exits": 17,
+      "premium": 29085.28,
+      "pnl": -402.94,
+      "return_on_premium": -0.0031,
+      "wins": 5,
+      "largest_contributor": "CRM",
+      "pnl_without_largest": -4282.45
+    },
+    {
+      "bucket": "2–8 שעות",
+      "exits": 10,
+      "premium": 13509.35,
+      "pnl": -2253.79,
+      "return_on_premium": -0.1336,
+      "wins": 5,
+      "largest_contributor": "AMZN",
+      "pnl_without_largest": -3906.92
+    },
+    {
+      "bucket": "מעל לילה",
+      "exits": 36,
+      "premium": 35539.19,
+      "pnl": 20551.81,
+      "return_on_premium": 0.5783,
+      "wins": 14,
+      "largest_contributor": "CRM",
+      "pnl_without_largest": 11363.66
+    }
+  ],
+  "expiries": {
+    "count": 5,
+    "contracts": 601,
+    "premium_lost": 11171.0,
+    "share_of_gross_loss": 0.1799,
+    "by_ticker": [
+      [
+        "NU",
+        2940.0
+      ],
+      [
+        "PURR",
+        2500.0
+      ],
+      [
+        "MSTR",
+        2160.0
+      ],
+      [
+        "NVDA",
+        1891.0
+      ],
+      [
+        "CRM",
+        1680.0
+      ]
+    ]
+  },
+  "audit": [
+    [
+      "סה\"כ עסקאות שנמשכו מ-IBKR",
+      716,
+      5547.22
+    ],
+    [
+      "(-) עסקאות במניות עצמן",
+      -16,
+      2408.2
+    ],
+    [
+      "(-) מכירות ב-0 ללא פוזיציה פתוחה — שאריות ריסטרט",
+      -3,
+      0
+    ],
+    [
+      "(=) שורות פקיעה — נזקפות כהפסד מלא",
+      5,
+      -11171.0
+    ],
+    [
+      "(-) רגלי BUY",
+      -335,
+      5064.34
+    ],
+    [
+      "(-) טיקרים שאינם ברשימה שנמסרה",
+      -46,
+      11606.97
+    ],
+    [
+      "(-) פוזיציות שהועברו ללילה (ANET, MRNA)",
+      -9,
+      2519.7
+    ]
+  ],
+  "audit_reconciles": true,
+  "cash_check": {
+    "cash_flow": 3111.32,
+    "realized": 7955.41,
+    "gap": -4844.1,
+    "expiry_rows": 10,
+    "worst_gaps": [
+      [
+        "NU",
+        -4312.59
+      ],
+      [
+        "NVDA",
+        -2934.1
+      ],
+      [
+        "MSTR",
+        -2641.99
+      ],
+      [
+        "PURR",
+        -2449.01
+      ],
+      [
+        "AMZN",
+        -1999.04
+      ]
+    ]
+  },
+  "files": {
+    "xlsx": "data/2026-08-24-week/trades-filtered.xlsx",
+    "csv": "data/2026-08-24-week/trades-filtered.csv"
+  }
+}

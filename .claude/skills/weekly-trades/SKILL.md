@@ -57,6 +57,20 @@ looked like a +59% edge until CRM came out of it, at which point it lost 36% lik
 other bucket. Never quote a bucket's return without checking what it looks like without
 its largest name.
 
+**3b. Where the premium burned.** `scripts/burn_slices.py` cuts the same week at lot
+level and classifies every closing slice by whether the account holder could have acted:
+intraday (both ends inside 09:30–16:00 ET on one day), off-hours, overnight, expiry. It
+prints the burn per class and, separately, the exits whose cost basis predates the feed —
+those have a real result but no reconstructable entry time.
+
+```bash
+python3 <this-skill-dir>/scripts/burn_slices.py <path-to-trades-json> <out.json>
+```
+
+The account holder's standing question is where the loss was a decision and where it was
+the risk he bought. An expiry is the second kind; a 45% average give-back in the middle of
+the trading day is the first.
+
 **4. Check the week against the rules.** When `docs/risk-rules.md` is present, run it —
 the account holder keeps a written rule set and wants each week measured against it:
 

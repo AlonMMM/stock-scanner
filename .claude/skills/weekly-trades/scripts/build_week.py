@@ -144,41 +144,57 @@ def holding_times(all_trades, tz):
     opened by BUY fills that the filters drop, so matching against the filtered set
     would leave most exits with no entry to measure from.
 
-    The book is two-sided. A sell with nothing open does not vanish — it opens a
-    short lot that a later buy closes. That is what the restart artefacts are, and
-    treating their buy-to-cover as a fresh long instead would jam phantom lots at the
-    head of the queue and hand the real exits somebody else's cost basis. Before this
-    was signed, the MSTR lot that expired on Friday priced at $1,440 instead of the
-    $2,160 actually paid for it.
+    Longs and shorts are kept in separate books, and which one a fill touches is not
+    inferred from a running position — the feed says so directly. IBKR stamps
+    realized_pnl on whichever leg closed something, so a BUY carrying a result is a
+    buy-to-cover and a BUY carrying none opens a long, no matter what the position
+    looks like from inside a seven-day window. That distinction is the whole game
+    here. MU began the week already long, so its opening sells look like shorts and
+    every later buy looks like a cover; read that way its Monday exits inherit the
+    wrong cost basis. The restart artefacts are the mirror image — a sell against
+    nothing, covered the next morning — and reading *those* as fresh longs jams
+    phantom lots at the head of the queue, which is what priced the MSTR lot that
+    expired on Friday at $1,440 against the $2,160 actually paid for it.
 
-    Returns {(symbol, exit_iso_minute, price): {"hold", "premium", "qty", "mult"}} where
-    qty is how much of the fill closed something real. On a price-0 row that is the whole
-    test: qty 0 means nothing was open and the row is a restart artefact, not an expiry.
-    The multiplier comes along because an expiry has no price to derive it from.
+    A sell with no long to match is a position opened before the feed begins. There
+    is no cost basis for it anywhere in the data, so it yields no exit here; its
+    result is real and lands in the P&L, but its premium is unknowable.
+
+    Returns {(symbol, exit_iso_minute, price): {"hold", "premium", "qty", "mult"}}
+    where qty is how much of the fill closed a lot the feed can price. On a price-0
+    row that is the whole test: qty 0 means nothing was open and the row is a restart
+    artefact, not an expiry. The multiplier comes along because an expiry has no
+    price to derive one from.
     """
-    book = collections.defaultdict(collections.deque)   # [signed qty, opened, cost, mult]
+    longs = collections.defaultdict(collections.deque)   # [qty, opened, cost, mult]
+    shorts = collections.defaultdict(int)
     acc = collections.defaultdict(lambda: [0.0, 0, 0.0, 0.0])  # qty*min, qty, premium, qty*mult
     for t in sorted(all_trades, key=lambda x: x["trade_time"]):
         sym, qty, px = t["symbol"], t["size"], t["price"]
         dt = session_time(t["trade_time"], tz)
-        sign = 1 if t["side"] == "BUY" else -1
         mult = (t.get("net_amount", 0) / (qty * px)) if (qty and px) else 100
-        lots, left = book[sym], qty
-        while left > 0 and lots and (lots[0][0] > 0) != (sign > 0):
-            lot = lots[0]
-            take = min(left, abs(lot[0]))
-            if sign < 0:                      # a close of a long: this is an exit
-                key = (sym, dt.strftime("%Y-%m-%d %H:%M"), px)
-                acc[key][0] += take * (dt - lot[1]).total_seconds() / 60.0
-                acc[key][1] += take
-                acc[key][2] += take * lot[2]
-                acc[key][3] += take * lot[3]
-            lot[0] -= take * (1 if lot[0] > 0 else -1)
+        if t["side"] == "BUY":
+            left = qty
+            if t.get("realized_pnl"):          # a result on a buy means it covered
+                take = min(left, shorts[sym])
+                shorts[sym] -= take
+                left -= take
+            if left:
+                longs[sym].append([left, dt, px * mult, mult])
+            continue
+        key, left, book = (sym, dt.strftime("%Y-%m-%d %H:%M"), px), qty, longs[sym]
+        while left > 0 and book:
+            lot = book[0]
+            take = min(left, lot[0])
+            acc[key][0] += take * (dt - lot[1]).total_seconds() / 60.0
+            acc[key][1] += take
+            acc[key][2] += take * lot[2]
+            acc[key][3] += take * lot[3]
+            lot[0] -= take
             left -= take
-            if lot[0] == 0:
-                lots.popleft()
-        if left:
-            lots.append([sign * left, dt, px * mult, mult])
+            if lot[0] <= 0:
+                book.popleft()
+        shorts[sym] += left                    # opened before the feed, or an artefact
     return {k: {"hold": v[0] / v[1], "premium": v[2], "qty": v[1],
                 "mult": round(v[3] / v[1])}
             for k, v in acc.items() if v[1]}

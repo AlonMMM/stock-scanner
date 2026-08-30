@@ -56,16 +56,19 @@ def session_day(dt):
 def walk_book(trades, tz):
     """Replay the week, carrying an open book so exposure can be read at any point.
 
-    Lots are matched first-in-first-out on a two-sided book: a sell with nothing open
-    opens a short lot that a later buy closes. Those pairs are the platform-restart
-    artefacts, and the alternative — dropping the sell and letting its buy-to-cover
-    open a fresh long — books 155 contracts of MSTR and OKLO that were never held,
-    against the exposure ceiling in rule 12.
+    Which side a fill touches comes from the feed, not from a running position: IBKR
+    stamps realized_pnl on whichever leg closed something, so a BUY carrying a result
+    is a buy-to-cover and a BUY carrying none opens a long. Inside a seven-day window
+    a position opened last week looks short from its first sell onward, and reading
+    its later buys as covers would erase real exposure; reading the restart artefacts'
+    covers as fresh longs would invent 155 contracts of MSTR and OKLO that were never
+    held, against the ceiling in rule 12.
 
     Returns, alongside the timeline, the premium written off by expiry: a sell at
     price 0 closing real lots, which IBKR reports as a zero result.
     """
-    book = collections.defaultdict(collections.deque)   # [signed qty, cost/contract]
+    longs = collections.defaultdict(collections.deque)   # [qty, cost/contract]
+    shorts = collections.defaultdict(int)
     last_px = {}
     timeline = []
     expiry_loss = collections.defaultdict(float)
@@ -73,27 +76,33 @@ def walk_book(trades, tz):
         sym, qty, px = t["symbol"], t["size"], t["price"]
         if px:
             last_px[sym] = px
-        sign = 1 if t["side"] == "BUY" else -1
         mult = (t.get("net_amount", 0) / (qty * px)) if (qty and px) else 100
-        lots, left, closed = book[sym], qty, 0.0
-        while left > 0 and lots and (lots[0][0] > 0) != (sign > 0):
-            lot = lots[0]
-            take = min(left, abs(lot[0]))
-            if sign < 0:
+        if t["side"] == "BUY":
+            left = qty
+            if t.get("realized_pnl"):
+                take = min(left, shorts[sym])
+                shorts[sym] -= take
+                left -= take
+            if left:
+                longs[sym].append([left, px * mult])
+        else:
+            left, closed, book = qty, 0.0, longs[sym]
+            while left > 0 and book:
+                lot = book[0]
+                take = min(left, lot[0])
                 closed += take * lot[1]
-            lot[0] -= take * (1 if lot[0] > 0 else -1)
-            left -= take
-            if lot[0] == 0:
-                lots.popleft()
-        if left:
-            lots.append([sign * left, px * mult])
+                lot[0] -= take
+                left -= take
+                if lot[0] <= 0:
+                    book.popleft()
+            shorts[sym] += left
+            if px == 0 and closed:
+                expiry_loss[session_time(t["trade_time"], tz).date()] -= closed
         dt = session_time(t["trade_time"], tz)
-        if px == 0 and sign < 0 and closed:
-            expiry_loss[dt.date()] -= closed
-        open_cost = sum(abs(l[0]) * l[1] for dq in book.values() for l in dq if l[0] > 0)
+        open_cost = sum(l[0] * l[1] for dq in longs.values() for l in dq)
         open_qty = {s: q for s, q in
-                    ((s, sum(l[0] for l in dq if l[0] > 0)) for s, dq in book.items()) if q}
-        timeline.append((dt, open_cost, dict(open_qty), dict(last_px)))
+                    ((s, sum(l[0] for l in dq)) for s, dq in longs.items()) if q}
+        timeline.append((dt, open_cost, open_qty, dict(last_px)))
     return timeline, dict(expiry_loss)
 
 

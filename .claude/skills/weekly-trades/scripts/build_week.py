@@ -111,8 +111,42 @@ def build(trades, args):
     return rows, audit
 
 
-def to_exits(rows, tz):
+def holding_times(all_trades, tz):
+    """How long each closing fill had been held, by first-in-first-out lot matching.
+
+    Runs over the *unfiltered* trade list on purpose: the lots being closed were
+    opened by BUY fills that the filters drop, so matching against the filtered set
+    would leave most exits with no entry to measure from.
+
+    Returns {(symbol, exit_iso_minute, price): weighted mean minutes held}.
+    """
+    book = collections.defaultdict(collections.deque)
+    acc = collections.defaultdict(lambda: [0.0, 0])   # [qty*minutes, qty]
+    for t in sorted(all_trades, key=lambda x: x["trade_time"]):
+        sym, qty, px = t["symbol"], t["size"], t["price"]
+        dt = session_time(t["trade_time"], tz)
+        if t["side"] == "BUY" and px:
+            book[sym].append([qty, dt])
+            continue
+        if t["side"] != "SELL":
+            continue
+        key = (sym, dt.strftime("%Y-%m-%d %H:%M"), px)
+        left = qty
+        while left > 0 and book[sym]:
+            lot = book[sym][0]
+            take = min(left, lot[0])
+            acc[key][0] += take * (dt - lot[1]).total_seconds() / 60.0
+            acc[key][1] += take
+            lot[0] -= take
+            left -= take
+            if lot[0] <= 0:
+                book[sym].popleft()
+    return {k: (v[0] / v[1]) for k, v in acc.items() if v[1]}
+
+
+def to_exits(rows, tz, holds=None):
     """Fills at the same symbol, minute and price are one exit."""
+    holds = holds or {}
     merged = collections.defaultdict(
         lambda: {"sz": 0, "amt": 0.0, "pnl": 0.0, "com": 0.0, "st": None})
     for t in rows:
@@ -129,14 +163,52 @@ def to_exits(rows, tz):
         # IBKR sends proceeds and net P&L; premium and entry follow from them.
         mult = round(m["amt"] / (m["sz"] * px)) if m["sz"] and px else 0
         premium = m["amt"] - m["pnl"]
+        hold = holds.get((sym, "{} {}".format(day, hhmm), px))
         exits.append(dict(
             date=day, day=HE_DAY[day.weekday()], time=hhmm, sym=sym, st=m["st"],
             qty=m["sz"], px=px, mult=mult, amt=round(m["amt"], 2),
             pnl=round(m["pnl"], 2), premium=round(premium, 2),
             entry=round(premium / (m["sz"] * mult), 4) if mult else "",
             ret=round(m["pnl"] / premium, 6) if premium else "",
+            hold=round(hold, 1) if hold is not None else "",
             com=round(m["com"], 2)))
     return exits
+
+
+HOLD_BUCKETS = [(0, 5, "עד 5 דק׳"), (5, 30, "5–30 דק׳"), (30, 120, "30–120 דק׳"),
+                (120, 480, "2–8 שעות"), (480, float("inf"), "מעל לילה")]
+
+
+def hold_analysis(exits):
+    """Group results by how long the position was held.
+
+    Worth reading with the concentration check beside it: one outsized winner in a
+    bucket can invert its sign, so the summary also reports each bucket without its
+    largest contributor.
+    """
+    out = []
+    for lo, hi, label in HOLD_BUCKETS:
+        g = [e for e in exits
+             if isinstance(e["hold"], (int, float))
+             and (e["hold"] <= hi if lo == 0 else lo < e["hold"] <= hi)]
+        if not g:
+            continue
+        # Outright futures carry notional, not premium, so a single futures exit
+        # would swamp the ratio. Keep them in the P&L and out of the denominator.
+        opt = [e for e in g if e["st"] != "FUT"]
+        prem = sum(e["premium"] for e in opt)
+        pnl = sum(e["pnl"] for e in g)
+        opt_pnl = sum(e["pnl"] for e in opt)
+        top = max(g, key=lambda e: e["pnl"])
+        out.append({
+            "bucket": label, "exits": len(g),
+            "premium": round(prem, 2), "pnl": round(pnl, 2),
+            "return_on_premium": round(opt_pnl / prem, 4) if prem else None,
+            "wins": sum(1 for e in g if e["pnl"] > 0),
+            "largest_contributor": top["sym"],
+            "pnl_without_largest": round(pnl - top["pnl"], 2),
+        })
+    return out
 
 
 def cash_gap(trades, tz, keep_stock):
@@ -167,11 +239,12 @@ def write_csv(exits, path):
         w = csv.writer(fh)
         w.writerow(["date", "day_he", "time_session", "ticker", "sec_type", "qty",
                     "exit_price", "multiplier", "proceeds_usd", "net_pnl_usd",
-                    "premium_paid_usd", "entry_price", "pct_of_premium", "commission_usd"])
+                    "premium_paid_usd", "entry_price", "pct_of_premium",
+                    "hold_minutes", "commission_usd"])
         for e in exits:
             w.writerow([e["date"], e["day"], e["time"], e["sym"], e["st"], e["qty"],
                         e["px"], e["mult"], e["amt"], e["pnl"], e["premium"],
-                        e["entry"], e["ret"], e["com"]])
+                        e["entry"], e["ret"], e["hold"], e["com"]])
 
 
 def write_xlsx(exits, audit, path, notes):
@@ -192,7 +265,8 @@ def write_xlsx(exits, audit, path, notes):
     ws.sheet_view.rightToLeft = True
     cols = [("תאריך", 12), ("יום", 9), ("שעה", 9), ("טיקר", 10), ("סוג", 8), ("כמות", 9),
             ("מחיר יציאה", 12), ("מכפיל", 9), ("תמורה ($)", 13), ("תוצאה נטו ($)", 14),
-            ("פרמיה ששולמה ($)", 17), ("מחיר כניסה", 12), ("% מהפרמיה", 12), ("עמלה ($)", 11)]
+            ("פרמיה ששולמה ($)", 17), ("מחיר כניסה", 12), ("% מהפרמיה", 12),
+            ("החזקה (דק׳)", 13), ("עמלה ($)", 11)]
     for i, (h, w) in enumerate(cols, 1):
         c = ws.cell(1, i, h)
         c.font, c.fill = hdr, navy
@@ -203,7 +277,8 @@ def write_xlsx(exits, audit, path, notes):
     for j, e in enumerate(exits):
         x = j + 2
         for i, v in enumerate([e["date"], e["day"], e["time"], e["sym"], e["st"], e["qty"],
-                               e["px"], None, e["amt"], e["pnl"], None, None, None, e["com"]], 1):
+                               e["px"], None, e["amt"], e["pnl"], None, None, None,
+                               e["hold"] if e["hold"] != "" else None, e["com"]], 1):
             c = ws.cell(x, i, v)
             c.font, c.border = body, rule
             if j % 2:
@@ -214,7 +289,7 @@ def write_xlsx(exits, audit, path, notes):
         ws.cell(x, 12, '=IF(OR(F{0}=0,H{0}=""),"",K{0}/(F{0}*H{0}))'.format(x))
         ws.cell(x, 13, '=IF(K{0}=0,"",J{0}/K{0})'.format(x))
         for i, fmt in ((6, '#,##0'), (7, MONEY2), (8, '#,##0'), (9, MONEY), (10, MONEY),
-                       (11, MONEY), (12, MONEY2), (13, PCT), (14, MONEY2)):
+                       (11, MONEY), (12, MONEY2), (13, PCT), (14, '#,##0'), (15, MONEY2)):
             ws.cell(x, i).number_format = fmt
 
     last, trow = len(exits) + 1, len(exits) + 2
@@ -225,11 +300,11 @@ def write_xlsx(exits, audit, path, notes):
                       (10, '=SUM(J2:J{})'.format(last), MONEY),
                       (11, '=SUM(K2:K{})'.format(last), MONEY),
                       (13, '=IF(K{0}=0,"",J{0}/K{0})'.format(trow), PCT),
-                      (14, '=SUM(N2:N{})'.format(last), MONEY2)):
+                      (15, '=SUM(O2:O{})'.format(last), MONEY2)):
         c = ws.cell(trow, i, f)
         c.font, c.fill, c.number_format = bold, tot, fmt
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = "A1:N{}".format(last)
+    ws.auto_filter.ref = "A1:O{}".format(last)
     for k, txt in enumerate(notes, start=trow + 2):
         ws.cell(k, 1, txt).font = arial(size=9, italic=True)
 
@@ -368,7 +443,8 @@ def main():
         args.week_start = str(weeks.most_common(1)[0][0])
 
     kept, audit = build(trades, args)
-    exits = to_exits(kept, args.tz_offset)
+    holds = holding_times(trades, args.tz_offset)
+    exits = to_exits(kept, args.tz_offset, holds)
     if not exits:
         sys.exit("every trade was filtered out — check --week-start and --tickers")
 
@@ -408,6 +484,7 @@ def main():
                    for d in sorted({e["date"] for e in exits})],
         "by_ticker": sorted([[s, round(sum(e["pnl"] for e in exits if e["sym"] == s), 2)]
                              for s in {e["sym"] for e in exits}], key=lambda r: -r[1]),
+        "by_hold": hold_analysis(exits),
         "audit": [[a, n, round(p, 2)] for a, n, p in audit],
         "audit_reconciles": abs(chain - net) < 0.05,
         "cash_check": cash_gap(trades, args.tz_offset, args.keep_stock),

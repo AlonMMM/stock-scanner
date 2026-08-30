@@ -48,6 +48,14 @@ and prints a summary JSON.
 loud: net P&L, exits, win rate, profit factor, per-day and per-ticker breakdowns, and the
 cash-flow check. Quote from it rather than re-deriving anything from the raw feed.
 
+`by_hold` groups the week by how long each position was held, which is the one cut the
+account holder cannot get from the broker. Read it with the guard beside it: every bucket
+also reports `largest_contributor` and `pnl_without_largest`, because a single outsized
+winner routinely flips a bucket's sign. In the 24-28 August week the overnight bucket
+looked like a +59% edge until CRM came out of it, at which point it lost 36% like every
+other bucket. Never quote a bucket's return without checking what it looks like without
+its largest name.
+
 **4. Check the week against the rules.** When `docs/risk-rules.md` is present, run it —
 the account holder keeps a written rule set and wants each week measured against it:
 

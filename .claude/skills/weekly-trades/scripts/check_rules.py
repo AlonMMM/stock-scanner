@@ -53,7 +53,7 @@ def session_day(dt):
     return day
 
 
-def walk_book(trades, tz):
+def walk_book(trades, tz, vanished=()):
     """Replay the week, carrying an open book so exposure can be read at any point.
 
     Which side a fill touches comes from the feed, not from a running position: IBKR
@@ -65,7 +65,10 @@ def walk_book(trades, tz):
     held, against the ceiling in rule 12.
 
     Returns, alongside the timeline, the premium written off by expiry: a sell at
-    price 0 closing real lots, which IBKR reports as a zero result.
+    price 0 closing real lots, which IBKR reports as a zero result. `vanished` names
+    (symbol, date) pairs the account holder has identified as a paper-account reset
+    rather than an expiry — the feed writes both the same way and cannot tell them
+    apart, so those close the lots without booking a loss.
     """
     longs = collections.defaultdict(collections.deque)   # [qty, cost/contract]
     shorts = collections.defaultdict(int)
@@ -86,6 +89,7 @@ def walk_book(trades, tz):
             if left:
                 longs[sym].append([left, px * mult])
         else:
+            dt = session_time(t["trade_time"], tz)
             left, closed, book = qty, 0.0, longs[sym]
             while left > 0 and book:
                 lot = book[0]
@@ -96,8 +100,8 @@ def walk_book(trades, tz):
                 if lot[0] <= 0:
                     book.popleft()
             shorts[sym] += left
-            if px == 0 and closed:
-                expiry_loss[session_time(t["trade_time"], tz).date()] -= closed
+            if px == 0 and closed and (sym, dt.date()) not in vanished:
+                expiry_loss[dt.date()] -= closed
         dt = session_time(t["trade_time"], tz)
         open_cost = sum(l[0] * l[1] for dq in longs.values() for l in dq)
         open_qty = {s: q for s, q in
@@ -106,10 +110,10 @@ def walk_book(trades, tz):
     return timeline, dict(expiry_loss)
 
 
-def check(trades, p, acct, tz):
+def check(trades, p, acct, tz, vanished=()):
     findings = []
     opts = [t for t in trades if t["sec_type"] in ("OPT", "FOP")]
-    timeline, expiry_loss = walk_book(opts, tz)
+    timeline, expiry_loss = walk_book(opts, tz, vanished)
 
     # ---- rule 12: total open exposure, measured at cost
     cap12 = p["total_open_exposure_cap_pct"] * acct
@@ -214,6 +218,8 @@ def main():
     ap.add_argument("--rules", default="docs/risk-rules.md")
     ap.add_argument("--account", type=float)
     ap.add_argument("--tz-offset", type=int, default=-4)
+    ap.add_argument("--vanished", default="", help="SYM@YYYY-MM-DD[,...] — price-0 rows "
+                    "that were a paper-account reset, not an expiry")
     ap.add_argument("--json", action="store_true", help="emit findings as JSON")
     a = ap.parse_args()
 
@@ -226,7 +232,14 @@ def main():
         blob = json.load(fh)
     trades = blob.get("trades") if isinstance(blob, dict) else blob
 
-    findings = check(trades, p, acct, a.tz_offset)
+    vanished = set()
+    for item in filter(None, (x.strip() for x in a.vanished.split(","))):
+        sym, _, day = item.partition("@")
+        if not day:
+            sys.exit("--vanished wants SYM@YYYY-MM-DD, got {!r}".format(item))
+        vanished.add((sym.upper(), datetime.date.fromisoformat(day)))
+
+    findings = check(trades, p, acct, a.tz_offset, vanished)
 
     if a.json:
         print(json.dumps({"account": acct, "findings": findings,

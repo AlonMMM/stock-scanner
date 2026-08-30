@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 """Lot-level premium burn: every closing slice, where it burned, and whether a stop did it.
 
+Usage: burn_slices.py TRADES_JSON OUT_JSON [SYM@YYYY-MM-DD,...]
+The third argument names price-0 rows that were a paper-account reset, not an expiry.
+
 Longs and shorts are separate books and the feed says which one a fill touches: IBKR
 stamps realized_pnl on whichever leg closed something, so a BUY with a result is a
 buy-to-cover and a BUY without one opens a long. A sell with no long to match was
@@ -25,7 +28,10 @@ def classify(a, b, expired):
         return "אוברנייט"
     return "תוך יום" if (in_session(a) and in_session(b)) else "מחוץ לשעות"
 
-def run(path):
+def run(path, vanished=()):
+    """`vanished` names (symbol, date) pairs whose price-0 rows were a paper-account
+    reset rather than an expiry. The feed writes both as a sell at 0 against real
+    lots and cannot tell them apart; only the account holder can."""
     trades = json.load(open(path))["trades"]
     opts = [t for t in trades if t["sec_type"] in ("OPT", "FOP")]
     longs = collections.defaultdict(collections.deque)
@@ -49,6 +55,11 @@ def run(path):
         while left > 0 and book:
             lot = book[0]
             take = min(left, lot[0]); matched += take
+            if px == 0 and (sym, dt.date()) in vanished:
+                lot[0] -= take; left -= take
+                if lot[0] <= 0:
+                    book.popleft()
+                continue
             slices.append(dict(
                 sym=sym, qty=take, entry_px=lot[2], exit_px=px, mult=lot[3],
                 entry_t=lot[1].isoformat(), exit_t=dt.isoformat(),
@@ -68,7 +79,12 @@ def run(path):
     return slices, dict(uncovered)
 
 if __name__ == "__main__":
-    sl, unc = run(sys.argv[1])
+    import datetime as _dt
+    van = set()
+    for item in filter(None, (x.strip() for x in (sys.argv[3] if len(sys.argv) > 3 else "").split(","))):
+        sym_, _, day_ = item.partition("@")
+        van.add((sym_.upper(), _dt.date.fromisoformat(day_)))
+    sl, unc = run(sys.argv[1], van)
     json.dump(sl, open(sys.argv[2], "w"), ensure_ascii=False)
     burn = [x for x in sl if x["pnl"] < 0]
     print("slices {}  losing {}  burn ${:,.0f}".format(len(sl), len(burn), -sum(x["pnl"] for x in burn)))

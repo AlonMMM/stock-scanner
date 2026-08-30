@@ -102,12 +102,19 @@ what makes each row mean one thing:
   `realized_pnl = 0` on it. Nothing came back and the whole premium is gone, but the feed
   books no loss at all. Those rows are **kept and charged the full premium** — the script
   reads the cost of the lots that died out of the FIFO book, so an expiry reads as the
-  −100% it was. In the 24–28 August week that is five events, 601 contracts and $11,171,
-  18% of the week's gross loss; PURR was bought and never sold, so without this it did not
-  appear in the report at all. The other kind of price-0 row is a **restart artefact** —
-  a sell against a position that was not open, which the platform pairs with a
-  buy-to-cover the next morning. Those are dropped, and the audit sheet names them
-  separately.
+  −100% it was. In the 24–28 August week that is two events, 160 contracts and $4,660;
+  PURR was bought and never sold, so without this it did not appear in the report at all.
+  The other kind of price-0 row is a **restart artefact** — a sell against a position that
+  was not open, which the platform pairs with a buy-to-cover the next morning. Those are
+  dropped, and the audit sheet names them separately.
+
+  There is a third kind, and it is the one to ask about. A **paper-account reset** makes
+  open positions vanish, and IBKR writes them off exactly as it writes off an expiry: a
+  sell at price 0 against lots that were genuinely open. No field in the feed separates
+  them. Only the account holder knows, so ask before reporting a large expiry — in the
+  24–28 August week the Wednesday-night write-offs of CRM, NU and NVDA looked like $6,511
+  of expiries and were a reset. Name them with `--drop-expiry SYM,SYM --expiry-day DATE`
+  and they come off on their own audit line.
 - **Only SELL legs are kept**, so one row is one exit carrying its own result. This does
   discard the realised P&L on short closes, which the audit sheet reports — mention the
   figure if it is large.
@@ -118,6 +125,7 @@ Everything else is opt-in, because it encodes a judgement the user has to make:
 |---|---|
 | `--tickers A,B,C` | Restricting to names from a trading journal |
 | `--drop-carry SYM --carry-day YYYY-MM-DD` | Removing positions held overnight |
+| `--drop-expiry SYM --expiry-day YYYY-MM-DD` | Price-0 rows that were a reset, not an expiry |
 | `--keep-stock`, `--keep-buys` | Auditing the raw feed instead of the exits |
 | `--week-start YYYY-MM-DD` | The auto-detected week is not the one wanted |
 | `--tz-offset -5` | Winter — the default -4 is US Eastern in daylight time |

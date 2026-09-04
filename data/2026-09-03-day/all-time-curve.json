@@ -1,0 +1,2663 @@
+{
+  "trades": [
+    {
+      "date": "2026-08-24",
+      "time": "00:02",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": -449.44,
+      "com": 4.72,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "00:03",
+      "sym": "NQU6",
+      "qty": 6,
+      "pnl": 0.0,
+      "com": 8.46,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "01:36",
+      "sym": "NQU6",
+      "qty": 1,
+      "pnl": 37.18,
+      "com": 1.41,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "04:20",
+      "sym": "NQU6",
+      "qty": 8,
+      "pnl": -902.56,
+      "com": 11.28,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "07:40",
+      "sym": "NQU6",
+      "qty": 5,
+      "pnl": -289.1,
+      "com": 7.05,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:33",
+      "sym": "MU",
+      "qty": 7,
+      "pnl": 3251.16,
+      "com": 1.97,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:35",
+      "sym": "MRNA",
+      "qty": 11,
+      "pnl": -830.77,
+      "com": 3.2,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:40",
+      "sym": "MU",
+      "qty": 3,
+      "pnl": 1948.34,
+      "com": 0.86,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:48",
+      "sym": "NVDA",
+      "qty": 55,
+      "pnl": 339.23,
+      "com": 28.94,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:52",
+      "sym": "MU",
+      "qty": 5,
+      "pnl": 4746.96,
+      "com": 1.46,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:54",
+      "sym": "IBIT",
+      "qty": 100,
+      "pnl": -99.64,
+      "com": 52.19,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:12",
+      "sym": "GCV6",
+      "qty": 5,
+      "pnl": -1275.1,
+      "com": 12.55,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:14",
+      "sym": "ANET",
+      "qty": 46,
+      "pnl": -1410.54,
+      "com": 22.02,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:14",
+      "sym": "ANET",
+      "qty": 5,
+      "pnl": -155.47,
+      "com": 0.94,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:21",
+      "sym": "MU",
+      "qty": 15,
+      "pnl": 11383.52,
+      "com": 8.42,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:21",
+      "sym": "QQQ",
+      "qty": 80,
+      "pnl": -928.47,
+      "com": 51.66,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:30",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -86.04,
+      "com": 0.77,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:32",
+      "sym": "MU",
+      "qty": 2,
+      "pnl": -285.08,
+      "com": 0.55,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:32",
+      "sym": "MU",
+      "qty": 7,
+      "pnl": -983.84,
+      "com": 1.97,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:32",
+      "sym": "MU",
+      "qty": 10,
+      "pnl": -1375.6,
+      "com": 2.93,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:41",
+      "sym": "BABA",
+      "qty": 50,
+      "pnl": -586.41,
+      "com": 12.69,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "11:04",
+      "sym": "AAOI",
+      "qty": 25,
+      "pnl": -481.53,
+      "com": -2.45,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "11:13",
+      "sym": "MU",
+      "qty": 25,
+      "pnl": -662.05,
+      "com": 6.79,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "11:29",
+      "sym": "MU",
+      "qty": 20,
+      "pnl": -1151.05,
+      "com": 5.43,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "12:40",
+      "sym": "CRM",
+      "qty": 70,
+      "pnl": -947.68,
+      "com": 18.96,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "12:46",
+      "sym": "MU",
+      "qty": 18,
+      "pnl": -793.97,
+      "com": 4.9,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:08",
+      "sym": "CLV6",
+      "qty": 20,
+      "pnl": -1964.4,
+      "com": 47.2,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:13",
+      "sym": "MU",
+      "qty": 18,
+      "pnl": -495.71,
+      "com": 4.9,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:14",
+      "sym": "AMZN",
+      "qty": 50,
+      "pnl": 87.32,
+      "com": 8.49,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:14",
+      "sym": "GOOGL",
+      "qty": 80,
+      "pnl": -528.86,
+      "com": 27.19,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:13",
+      "sym": "MU",
+      "qty": 33,
+      "pnl": -488.37,
+      "com": 14.06,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:13",
+      "sym": "TLT",
+      "qty": 210,
+      "pnl": -773.26,
+      "com": 85.73,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:36",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -23.32,
+      "com": 0.79,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:37",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -29.62,
+      "com": 0.35,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:37",
+      "sym": "MU",
+      "qty": 28,
+      "pnl": -874.71,
+      "com": 8.17,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "15:19",
+      "sym": "CRM",
+      "qty": 2,
+      "pnl": -4.91,
+      "com": 0.54,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "09:37",
+      "sym": "AAPL",
+      "qty": 60,
+      "pnl": -1313.4,
+      "com": 32.68,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "09:55",
+      "sym": "MSTR",
+      "qty": 45,
+      "pnl": -977.62,
+      "com": 20.59,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "09:58",
+      "sym": "QQQ",
+      "qty": 60,
+      "pnl": -1192.9,
+      "com": 28.4,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "10:03",
+      "sym": "AMZN",
+      "qty": 50,
+      "pnl": -1227.69,
+      "com": 6.57,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "10:03",
+      "sym": "CRM",
+      "qty": 10,
+      "pnl": -435.39,
+      "com": 2.72,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "10:03",
+      "sym": "CSCO",
+      "qty": 50,
+      "pnl": -876.92,
+      "com": 13.55,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "11:05",
+      "sym": "SMCI",
+      "qty": 40,
+      "pnl": -693.07,
+      "com": 2.37,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "11:16",
+      "sym": "ESU6",
+      "qty": 17,
+      "pnl": -610.44,
+      "com": 23.97,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "11:16",
+      "sym": "ESU6",
+      "qty": 3,
+      "pnl": -113.46,
+      "com": 4.23,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "12:20",
+      "sym": "MRNA",
+      "qty": 7,
+      "pnl": -578.35,
+      "com": 1.91,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "12:21",
+      "sym": "MRNA",
+      "qty": 20,
+      "pnl": -855.0,
+      "com": 6.38,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "13:04",
+      "sym": "TSLA",
+      "qty": 60,
+      "pnl": -333.45,
+      "com": 17.42,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "15:51",
+      "sym": "META",
+      "qty": 38,
+      "pnl": -1090.65,
+      "com": 10.3,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "15:53",
+      "sym": "META",
+      "qty": 4,
+      "pnl": -314.88,
+      "com": 1.81,
+      "expired": false
+    },
+    {
+      "date": "2026-08-25",
+      "time": "15:53",
+      "sym": "META",
+      "qty": 6,
+      "pnl": -483.36,
+      "com": 1.76,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "10:40",
+      "sym": "INTC",
+      "qty": 125,
+      "pnl": -1120.14,
+      "com": 64.38,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "11:57",
+      "sym": "META",
+      "qty": 36,
+      "pnl": -1056.46,
+      "com": 10.47,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "12:03",
+      "sym": "META",
+      "qty": 2,
+      "pnl": -59.2,
+      "com": 1.09,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "12:04",
+      "sym": "META",
+      "qty": 12,
+      "pnl": -352.46,
+      "com": 3.8,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "13:39",
+      "sym": "NVDA",
+      "qty": 10,
+      "pnl": 0.0,
+      "com": 2.14,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "13:49",
+      "sym": "NU",
+      "qty": 50,
+      "pnl": 0.0,
+      "com": 26.48,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "13:51",
+      "sym": "MSTR",
+      "qty": 55,
+      "pnl": 0.0,
+      "com": 4.57,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "13:51",
+      "sym": "MSTR",
+      "qty": 35,
+      "pnl": 0.0,
+      "com": 9.48,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "13:51",
+      "sym": "OKLO",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 0.79,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "14:04",
+      "sym": "OKLO",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 0.78,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "14:05",
+      "sym": "OKLO",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 0.02,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "14:08",
+      "sym": "OKLO",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 0.79,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "14:11",
+      "sym": "OKLO",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 0.02,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "14:33",
+      "sym": "OKLO",
+      "qty": 9,
+      "pnl": 0.0,
+      "com": -0.13,
+      "expired": false
+    },
+    {
+      "date": "2026-08-26",
+      "time": "15:16",
+      "sym": "OKLO",
+      "qty": 51,
+      "pnl": 0.0,
+      "com": -1.2,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:34",
+      "sym": "CRM",
+      "qty": 4,
+      "pnl": 2358.02,
+      "com": 1.14,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:35",
+      "sym": "MRNA",
+      "qty": 20,
+      "pnl": -1748.47,
+      "com": 10.72,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:36",
+      "sym": "NVDA",
+      "qty": 50,
+      "pnl": -1166.64,
+      "com": 9.28,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:41",
+      "sym": "CRM",
+      "qty": 4,
+      "pnl": 3778.56,
+      "com": 1.17,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:45",
+      "sym": "CRM",
+      "qty": 15,
+      "pnl": 5194.05,
+      "com": 4.47,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:47",
+      "sym": "PLTR",
+      "qty": 5,
+      "pnl": 1071.89,
+      "com": 1.77,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:48",
+      "sym": "PLTR",
+      "qty": 2,
+      "pnl": 334.91,
+      "com": 0.55,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:49",
+      "sym": "NVDA",
+      "qty": 55,
+      "pnl": -1138.26,
+      "com": 26.85,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:56",
+      "sym": "CRM",
+      "qty": 15,
+      "pnl": 4367.81,
+      "com": 4.07,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "09:56",
+      "sym": "NOW",
+      "qty": 20,
+      "pnl": 1523.01,
+      "com": 7.48,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:01",
+      "sym": "ANET",
+      "qty": 4,
+      "pnl": -2.95,
+      "com": 0.76,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:08",
+      "sym": "ANET",
+      "qty": 26,
+      "pnl": -768.29,
+      "com": 7.06,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:10",
+      "sym": "CRM",
+      "qty": 10,
+      "pnl": 4663.67,
+      "com": 2.81,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:15",
+      "sym": "PLTR",
+      "qty": 23,
+      "pnl": 3205.94,
+      "com": 1.93,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:20",
+      "sym": "NVDA",
+      "qty": 65,
+      "pnl": -233.68,
+      "com": 11.33,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:24",
+      "sym": "CRM",
+      "qty": 2,
+      "pnl": 1313.15,
+      "com": 0.61,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:25",
+      "sym": "CRM",
+      "qty": 4,
+      "pnl": 2665.83,
+      "com": 1.19,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:25",
+      "sym": "CRM",
+      "qty": 14,
+      "pnl": 9189.15,
+      "com": 4.26,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:39",
+      "sym": "INTC",
+      "qty": 125,
+      "pnl": -972.03,
+      "com": 32.26,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:39",
+      "sym": "NOW",
+      "qty": 80,
+      "pnl": -1567.09,
+      "com": 22.25,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "10:40",
+      "sym": "NOW",
+      "qty": 25,
+      "pnl": 1109.55,
+      "com": 6.82,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "11:23",
+      "sym": "MSFT",
+      "qty": 40,
+      "pnl": -1021.54,
+      "com": 10.84,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "11:28",
+      "sym": "CRM",
+      "qty": 35,
+      "pnl": 3879.51,
+      "com": 9.43,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "11:37",
+      "sym": "INTC",
+      "qty": 80,
+      "pnl": -843.71,
+      "com": 22.32,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "13:06",
+      "sym": "ESU6",
+      "qty": 27,
+      "pnl": -413.64,
+      "com": 38.07,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "13:07",
+      "sym": "ESU6",
+      "qty": 3,
+      "pnl": -53.46,
+      "com": 4.23,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "13:30",
+      "sym": "NVDA",
+      "qty": 40,
+      "pnl": -532.62,
+      "com": 4.95,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "14:02",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": 1210.56,
+      "com": 4.72,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "14:07",
+      "sym": "CRM",
+      "qty": 11,
+      "pnl": 291.82,
+      "com": 3.39,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "14:07",
+      "sym": "CRM",
+      "qty": 4,
+      "pnl": 110.07,
+      "com": 1.14,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "14:28",
+      "sym": "CL",
+      "qty": 3,
+      "pnl": -314.16,
+      "com": 7.08,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "14:29",
+      "sym": "MSTR",
+      "qty": 100,
+      "pnl": -1462.93,
+      "com": 29.52,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "15:59",
+      "sym": "CRM",
+      "qty": 3,
+      "pnl": 160.32,
+      "com": 0.82,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "15:59",
+      "sym": "CRM",
+      "qty": 22,
+      "pnl": 1218.24,
+      "com": 8.87,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "23:08",
+      "sym": "CLV6",
+      "qty": 7,
+      "pnl": -1433.04,
+      "com": 16.52,
+      "expired": false
+    },
+    {
+      "date": "2026-08-27",
+      "time": "23:16",
+      "sym": "CLV6",
+      "qty": 5,
+      "pnl": -1023.6,
+      "com": 11.8,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "01:23",
+      "sym": "NQ",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 2.24,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:32",
+      "sym": "AMZN",
+      "qty": 65,
+      "pnl": -814.56,
+      "com": 26.8,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:43",
+      "sym": "NOW",
+      "qty": 70,
+      "pnl": -1233.84,
+      "com": 18.96,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:49",
+      "sym": "CRM",
+      "qty": 10,
+      "pnl": 1904.13,
+      "com": 4.15,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:52",
+      "sym": "NVDA",
+      "qty": 70,
+      "pnl": -2070.79,
+      "com": 36.7,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:54",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -55.08,
+      "com": 0.79,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:55",
+      "sym": "MU",
+      "qty": 29,
+      "pnl": -1691.14,
+      "com": 7.23,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "09:59",
+      "sym": "AMZN",
+      "qty": 60,
+      "pnl": -568.15,
+      "com": 11.4,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "10:03",
+      "sym": "NOW",
+      "qty": 59,
+      "pnl": -915.86,
+      "com": 14.91,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "10:04",
+      "sym": "NOW",
+      "qty": 6,
+      "pnl": -93.35,
+      "com": 1.75,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "10:05",
+      "sym": "CRM",
+      "qty": 40,
+      "pnl": 4963.16,
+      "com": 11.76,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "10:08",
+      "sym": "INTC",
+      "qty": 120,
+      "pnl": -1741.02,
+      "com": 37.8,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "12:54",
+      "sym": "AMZN",
+      "qty": 15,
+      "pnl": 1653.13,
+      "com": 4.1,
+      "expired": false
+    },
+    {
+      "date": "2026-08-28",
+      "time": "16:20",
+      "sym": "MSTR",
+      "qty": 60,
+      "pnl": -2160.0,
+      "com": 0.0,
+      "expired": true
+    },
+    {
+      "date": "2026-08-28",
+      "time": "16:20",
+      "sym": "PURR",
+      "qty": 100,
+      "pnl": -2500.0,
+      "com": 0.0,
+      "expired": true
+    },
+    {
+      "date": "2026-08-30",
+      "time": "18:26",
+      "sym": "CL",
+      "qty": 1,
+      "pnl": -274.72,
+      "com": 2.36,
+      "expired": false
+    },
+    {
+      "date": "2026-08-30",
+      "time": "18:39",
+      "sym": "CL",
+      "qty": 1,
+      "pnl": -274.72,
+      "com": 2.36,
+      "expired": false
+    },
+    {
+      "date": "2026-08-30",
+      "time": "21:43",
+      "sym": "ES",
+      "qty": 1,
+      "pnl": -17.82,
+      "com": 1.41,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "01:08",
+      "sym": "ES",
+      "qty": 7,
+      "pnl": -684.74,
+      "com": 9.87,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "01:56",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": -858.88,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "03:14",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 41.12,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "08:15",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 4741.12,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "08:15",
+      "sym": "ES",
+      "qty": 3,
+      "pnl": -143.46,
+      "com": 4.23,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "08:16",
+      "sym": "ES",
+      "qty": 5,
+      "pnl": -264.1,
+      "com": 7.05,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:07",
+      "sym": "CL",
+      "qty": 5,
+      "pnl": -2923.6,
+      "com": 11.8,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:13",
+      "sym": "ES",
+      "qty": 10,
+      "pnl": -713.2,
+      "com": 14.1,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:24",
+      "sym": "CL",
+      "qty": 1,
+      "pnl": 15.28,
+      "com": 2.36,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:31",
+      "sym": "ES",
+      "qty": 8,
+      "pnl": -300.06,
+      "com": 11.28,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:37",
+      "sym": "ES",
+      "qty": 8,
+      "pnl": 397.44,
+      "com": 11.28,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:38",
+      "sym": "AMZN",
+      "qty": 85,
+      "pnl": -1241.99,
+      "com": 7.95,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:50",
+      "sym": "TSLA",
+      "qty": 6,
+      "pnl": 553.2,
+      "com": 3.15,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "09:55",
+      "sym": "TSLA",
+      "qty": 4,
+      "pnl": 460.8,
+      "com": 2.1,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:06",
+      "sym": "MU",
+      "qty": 5,
+      "pnl": -296.64,
+      "com": 0.3,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:07",
+      "sym": "MU",
+      "qty": 11,
+      "pnl": -676.93,
+      "com": 2.99,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:20",
+      "sym": "TSLA",
+      "qty": 2,
+      "pnl": 336.62,
+      "com": 0.83,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:20",
+      "sym": "TSLA",
+      "qty": 8,
+      "pnl": 1267.82,
+      "com": 1.97,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:20",
+      "sym": "TSLA",
+      "qty": 40,
+      "pnl": -577.2,
+      "com": 11.67,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:21",
+      "sym": "TSLA",
+      "qty": 10,
+      "pnl": 1671.98,
+      "com": 5.26,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "10:26",
+      "sym": "NOW",
+      "qty": 50,
+      "pnl": -1281.75,
+      "com": 13.56,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:08",
+      "sym": "TSLA",
+      "qty": 18,
+      "pnl": 1082.08,
+      "com": 6.62,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:08",
+      "sym": "TSLA",
+      "qty": 7,
+      "pnl": 461.7,
+      "com": 3.68,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:25",
+      "sym": "TSLA",
+      "qty": 1,
+      "pnl": -23.77,
+      "com": 0.27,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:25",
+      "sym": "TSLA",
+      "qty": 49,
+      "pnl": -1008.6,
+      "com": 4.3,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:32",
+      "sym": "NOW",
+      "qty": 50,
+      "pnl": -324.84,
+      "com": 13.58,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:52",
+      "sym": "TSLA",
+      "qty": 4,
+      "pnl": -35.62,
+      "com": 1.73,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:52",
+      "sym": "TSLA",
+      "qty": 1,
+      "pnl": -8.02,
+      "com": 0.55,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "11:58",
+      "sym": "TSLA",
+      "qty": 30,
+      "pnl": -822.09,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "12:42",
+      "sym": "NOW",
+      "qty": 40,
+      "pnl": -464.51,
+      "com": 17.17,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "12:42",
+      "sym": "PLTR",
+      "qty": 20,
+      "pnl": -187.77,
+      "com": 5.45,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "12:46",
+      "sym": "AAPL",
+      "qty": 50,
+      "pnl": -719.01,
+      "com": 5.64,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "12:53",
+      "sym": "AAPL",
+      "qty": 55,
+      "pnl": -821.65,
+      "com": 28.5,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "13:19",
+      "sym": "TSLA",
+      "qty": 10,
+      "pnl": -245.99,
+      "com": 1.7,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "13:21",
+      "sym": "TSLA",
+      "qty": 15,
+      "pnl": -389.31,
+      "com": 7.87,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "13:56",
+      "sym": "TSLA",
+      "qty": 20,
+      "pnl": -275.13,
+      "com": 5.44,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "14:49",
+      "sym": "AMZN",
+      "qty": 100,
+      "pnl": 47.69,
+      "com": 18.39,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "15:01",
+      "sym": "TSLA",
+      "qty": 100,
+      "pnl": -877.13,
+      "com": 53.68,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "15:16",
+      "sym": "META",
+      "qty": 50,
+      "pnl": -1714.1,
+      "com": 13.56,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "15:56",
+      "sym": "NOW",
+      "qty": 30,
+      "pnl": -471.77,
+      "com": 8.15,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "15:58",
+      "sym": "IBIT",
+      "qty": 40,
+      "pnl": -21.54,
+      "com": 10.85,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "15:59",
+      "sym": "IBIT",
+      "qty": 39,
+      "pnl": 18.08,
+      "com": 10.49,
+      "expired": false
+    },
+    {
+      "date": "2026-08-31",
+      "time": "16:00",
+      "sym": "IBIT",
+      "qty": 1,
+      "pnl": 0.43,
+      "com": 0.3,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "01:12",
+      "sym": "CL",
+      "qty": 5,
+      "pnl": 5826.4,
+      "com": 11.8,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "04:14",
+      "sym": "NQ",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 2.24,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "04:58",
+      "sym": "CL",
+      "qty": 1,
+      "pnl": -4.72,
+      "com": 2.36,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "08:24",
+      "sym": "NQ",
+      "qty": 2,
+      "pnl": -69.64,
+      "com": 2.82,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:27",
+      "sym": "NQ",
+      "qty": 4,
+      "pnl": -159.28,
+      "com": 5.64,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:28",
+      "sym": "ES",
+      "qty": 8,
+      "pnl": 731.44,
+      "com": 11.28,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:31",
+      "sym": "QCOM",
+      "qty": 70,
+      "pnl": -2189.15,
+      "com": 45.0,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:36",
+      "sym": "NQ",
+      "qty": 4,
+      "pnl": -419.28,
+      "com": 5.64,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:37",
+      "sym": "ES",
+      "qty": 1,
+      "pnl": 26.43,
+      "com": 1.41,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:37",
+      "sym": "ES",
+      "qty": 9,
+      "pnl": 102.87,
+      "com": 12.69,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:37",
+      "sym": "MSTR",
+      "qty": 30,
+      "pnl": -2182.02,
+      "com": 12.64,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:37",
+      "sym": "MU",
+      "qty": 15,
+      "pnl": -1634.17,
+      "com": 7.16,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:38",
+      "sym": "NQ",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 2.24,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:44",
+      "sym": "NQ",
+      "qty": 11,
+      "pnl": -1109.02,
+      "com": 15.51,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:44",
+      "sym": "NQ",
+      "qty": 4,
+      "pnl": -367.28,
+      "com": 5.64,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:45",
+      "sym": "INTC",
+      "qty": 50,
+      "pnl": -894.52,
+      "com": 23.66,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:46",
+      "sym": "ES",
+      "qty": 2,
+      "pnl": 72.86,
+      "com": 2.82,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "09:50",
+      "sym": "AAPL",
+      "qty": 20,
+      "pnl": -203.8,
+      "com": 11.46,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:01",
+      "sym": "QQQ",
+      "qty": 60,
+      "pnl": -608.7,
+      "com": 38.27,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:06",
+      "sym": "CVX",
+      "qty": 10,
+      "pnl": -58.4,
+      "com": 4.23,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:07",
+      "sym": "AAPL",
+      "qty": 20,
+      "pnl": 1201.73,
+      "com": 13.93,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:08",
+      "sym": "AAPL",
+      "qty": 10,
+      "pnl": 560.82,
+      "com": 7.01,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:16",
+      "sym": "CVX",
+      "qty": 10,
+      "pnl": -308.4,
+      "com": 4.22,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:51",
+      "sym": "MRNA",
+      "qty": 25,
+      "pnl": -1177.49,
+      "com": 15.41,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:00",
+      "sym": "AAPL",
+      "qty": 48,
+      "pnl": 168.75,
+      "com": 20.48,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:01",
+      "sym": "AAPL",
+      "qty": 2,
+      "pnl": 7.01,
+      "com": 0.88,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:07",
+      "sym": "META",
+      "qty": 20,
+      "pnl": -636.8,
+      "com": 8.46,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:17",
+      "sym": "MU",
+      "qty": 18,
+      "pnl": -1243.58,
+      "com": 7.61,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:20",
+      "sym": "MSTR",
+      "qty": 33,
+      "pnl": -1050.68,
+      "com": 13.91,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:20",
+      "sym": "QQQ",
+      "qty": 50,
+      "pnl": -600.92,
+      "com": 25.56,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:26",
+      "sym": "META",
+      "qty": 25,
+      "pnl": -491.88,
+      "com": 10.54,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:42",
+      "sym": "META",
+      "qty": 10,
+      "pnl": -145.49,
+      "com": 4.22,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:43",
+      "sym": "META",
+      "qty": 40,
+      "pnl": -706.5,
+      "com": 21.4,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:51",
+      "sym": "AAPL",
+      "qty": 10,
+      "pnl": -12.07,
+      "com": 6.78,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:52",
+      "sym": "AAPL",
+      "qty": 4,
+      "pnl": 11.88,
+      "com": 2.0,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "11:55",
+      "sym": "META",
+      "qty": 5,
+      "pnl": -59.72,
+      "com": 2.11,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:03",
+      "sym": "MU",
+      "qty": 24,
+      "pnl": -818.3,
+      "com": 10.13,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:04",
+      "sym": "META",
+      "qty": 11,
+      "pnl": -362.37,
+      "com": 4.64,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:04",
+      "sym": "META",
+      "qty": 19,
+      "pnl": -607.38,
+      "com": 8.48,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:12",
+      "sym": "AAPL",
+      "qty": 30,
+      "pnl": -506.94,
+      "com": 11.08,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:16",
+      "sym": "MRNA",
+      "qty": 15,
+      "pnl": -237.59,
+      "com": 6.34,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:31",
+      "sym": "INTC",
+      "qty": 100,
+      "pnl": -911.05,
+      "com": 43.48,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:38",
+      "sym": "USO",
+      "qty": 45,
+      "pnl": -1484.76,
+      "com": 24.58,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:55",
+      "sym": "CL",
+      "qty": 1,
+      "pnl": 265.28,
+      "com": 2.36,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:58",
+      "sym": "ES",
+      "qty": 18,
+      "pnl": -635.76,
+      "com": 25.38,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "12:58",
+      "sym": "ES",
+      "qty": 2,
+      "pnl": -60.64,
+      "com": 2.82,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "13:09",
+      "sym": "CVX",
+      "qty": 40,
+      "pnl": -833.56,
+      "com": 16.86,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "13:09",
+      "sym": "ES",
+      "qty": 5,
+      "pnl": -51.6,
+      "com": 7.05,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "13:14",
+      "sym": "ES",
+      "qty": 16,
+      "pnl": -885.12,
+      "com": 22.56,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "13:14",
+      "sym": "ES",
+      "qty": 4,
+      "pnl": -201.28,
+      "com": 5.64,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "13:30",
+      "sym": "ES",
+      "qty": 30,
+      "pnl": -1224.6,
+      "com": 42.3,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "14:10",
+      "sym": "META",
+      "qty": 32,
+      "pnl": -540.94,
+      "com": 13.5,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "15:04",
+      "sym": "ES",
+      "qty": 30,
+      "pnl": -1959.6,
+      "com": 42.3,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "15:42",
+      "sym": "MU",
+      "qty": 33,
+      "pnl": -687.68,
+      "com": 13.91,
+      "expired": false
+    },
+    {
+      "date": "2026-09-01",
+      "time": "15:57",
+      "sym": "WMT",
+      "qty": 100,
+      "pnl": -929.36,
+      "com": 61.15,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "00:17",
+      "sym": "CL",
+      "qty": 10,
+      "pnl": 452.8,
+      "com": 23.6,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "00:19",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": 2890.56,
+      "com": 4.72,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "00:19",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": 2970.56,
+      "com": 4.72,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "00:19",
+      "sym": "NQ",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 2.24,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "04:42",
+      "sym": "NQ",
+      "qty": 1,
+      "pnl": 0.0,
+      "com": 2.24,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "05:42",
+      "sym": "NQ",
+      "qty": 2,
+      "pnl": -35.64,
+      "com": 2.82,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "05:43",
+      "sym": "NQ",
+      "qty": 2,
+      "pnl": -35.64,
+      "com": 2.82,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "07:22",
+      "sym": "GC",
+      "qty": 8,
+      "pnl": -760.16,
+      "com": 20.08,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "09:41",
+      "sym": "META",
+      "qty": 5,
+      "pnl": -201.27,
+      "com": 3.51,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "09:50",
+      "sym": "MRNA",
+      "qty": 5,
+      "pnl": -451.27,
+      "com": 2.93,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "09:51",
+      "sym": "MRNA",
+      "qty": 7,
+      "pnl": -630.63,
+      "com": 2.96,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:01",
+      "sym": "NVDA",
+      "qty": 15,
+      "pnl": -41.33,
+      "com": 6.32,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:05",
+      "sym": "META",
+      "qty": 5,
+      "pnl": 895.03,
+      "com": 2.21,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:20",
+      "sym": "META",
+      "qty": 6,
+      "pnl": 71.55,
+      "com": 3.14,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:20",
+      "sym": "META",
+      "qty": 7,
+      "pnl": 98.71,
+      "com": 2.43,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:20",
+      "sym": "META",
+      "qty": 2,
+      "pnl": 30.02,
+      "com": 0.88,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:37",
+      "sym": "NVDA",
+      "qty": 15,
+      "pnl": 584.9,
+      "com": 10.09,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:39",
+      "sym": "META",
+      "qty": 45,
+      "pnl": -901.94,
+      "com": 24.08,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:49",
+      "sym": "META",
+      "qty": 3,
+      "pnl": 12.48,
+      "com": 1.27,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:56",
+      "sym": "META",
+      "qty": 35,
+      "pnl": -904.36,
+      "com": 14.74,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:12",
+      "sym": "NVDA",
+      "qty": 10,
+      "pnl": 1601.64,
+      "com": 5.02,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:28",
+      "sym": "NVDA",
+      "qty": 5,
+      "pnl": 886.21,
+      "com": 2.12,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:28",
+      "sym": "NVDA",
+      "qty": 20,
+      "pnl": 3564.82,
+      "com": 8.5,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:30",
+      "sym": "NVDA",
+      "qty": 14,
+      "pnl": -269.91,
+      "com": 9.43,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:30",
+      "sym": "NVDA",
+      "qty": 21,
+      "pnl": -357.92,
+      "com": 9.19,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:33",
+      "sym": "INTC",
+      "qty": 50,
+      "pnl": -510.85,
+      "com": 21.06,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:34",
+      "sym": "NVDA",
+      "qty": 20,
+      "pnl": 2779.34,
+      "com": 13.98,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:39",
+      "sym": "INTC",
+      "qty": 30,
+      "pnl": -644.44,
+      "com": 20.56,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "11:52",
+      "sym": "NVDA",
+      "qty": 40,
+      "pnl": 807.88,
+      "com": 16.91,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "12:10",
+      "sym": "ASTS",
+      "qty": 45,
+      "pnl": -403.41,
+      "com": 23.99,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "12:40",
+      "sym": "NVDA",
+      "qty": 150,
+      "pnl": -1143.5,
+      "com": 41.95,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "15:15",
+      "sym": "CL",
+      "qty": 15,
+      "pnl": -948.3,
+      "com": 35.4,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "15:20",
+      "sym": "CL",
+      "qty": 5,
+      "pnl": -366.1,
+      "com": 11.8,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "15:21",
+      "sym": "META",
+      "qty": 5,
+      "pnl": -104.22,
+      "com": 1.79,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "15:38",
+      "sym": "META",
+      "qty": 20,
+      "pnl": -721.88,
+      "com": 12.19,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "15:57",
+      "sym": "SKHY",
+      "qty": 25,
+      "pnl": -230.54,
+      "com": 15.84,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "16:10",
+      "sym": "CL",
+      "qty": 3,
+      "pnl": -464.16,
+      "com": 7.08,
+      "expired": false
+    },
+    {
+      "date": "2026-09-02",
+      "time": "16:10",
+      "sym": "CL",
+      "qty": 1,
+      "pnl": -114.72,
+      "com": 2.36,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "07:05",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 931.12,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "07:07",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 771.12,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "07:09",
+      "sym": "CL",
+      "qty": 20,
+      "pnl": -2294.4,
+      "com": 47.2,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "08:21",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 2741.12,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "08:53",
+      "sym": "CL",
+      "qty": 18,
+      "pnl": -1884.96,
+      "com": 42.48,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "08:53",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": -738.88,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "08:53",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": -189.44,
+      "com": 4.72,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "09:03",
+      "sym": "GC",
+      "qty": 1,
+      "pnl": -121.69,
+      "com": 2.51,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "09:06",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": -498.88,
+      "com": 9.44,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "09:12",
+      "sym": "GC",
+      "qty": 2,
+      "pnl": -363.37,
+      "com": 5.02,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "09:34",
+      "sym": "TSLA",
+      "qty": 2,
+      "pnl": -89.54,
+      "com": 1.0,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "09:34",
+      "sym": "TSLA",
+      "qty": 18,
+      "pnl": -822.74,
+      "com": 7.91,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "09:58",
+      "sym": "AMZN",
+      "qty": 100,
+      "pnl": -1063.62,
+      "com": 36.67,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:11",
+      "sym": "CVX",
+      "qty": 60,
+      "pnl": -1753.72,
+      "com": 38.58,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:24",
+      "sym": "HOOD",
+      "qty": 8,
+      "pnl": 2266.72,
+      "com": 3.43,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:25",
+      "sym": "GOOGL",
+      "qty": 80,
+      "pnl": -1424.66,
+      "com": 28.2,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:29",
+      "sym": "TSLA",
+      "qty": 25,
+      "pnl": -55.01,
+      "com": 13.67,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:29",
+      "sym": "TSLA",
+      "qty": 5,
+      "pnl": -0.46,
+      "com": 2.19,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:51",
+      "sym": "HOOD",
+      "qty": 12,
+      "pnl": 4120.06,
+      "com": 5.15,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:51",
+      "sym": "IREN",
+      "qty": 15,
+      "pnl": 748.84,
+      "com": 6.33,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "11:04",
+      "sym": "SPCX",
+      "qty": 60,
+      "pnl": -1077.68,
+      "com": 33.91,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "11:11",
+      "sym": "HOOD",
+      "qty": 10,
+      "pnl": 3333.39,
+      "com": 4.29,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "11:37",
+      "sym": "AMZN",
+      "qty": 10,
+      "pnl": -18.5,
+      "com": 2.74,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "12:23",
+      "sym": "AMZN",
+      "qty": 60,
+      "pnl": -955.58,
+      "com": 21.01,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "12:28",
+      "sym": "IREN",
+      "qty": 65,
+      "pnl": 3439.98,
+      "com": 27.44,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "12:49",
+      "sym": "MSTR",
+      "qty": 20,
+      "pnl": 1720.95,
+      "com": 10.43,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "12:57",
+      "sym": "SPCX",
+      "qty": 20,
+      "pnl": 433.86,
+      "com": 13.57,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "13:42",
+      "sym": "MSTR",
+      "qty": 20,
+      "pnl": 2302.9,
+      "com": 8.48,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "13:46",
+      "sym": "NVDA",
+      "qty": 10,
+      "pnl": -57.73,
+      "com": 2.1,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "13:53",
+      "sym": "WMT",
+      "qty": 100,
+      "pnl": -770.93,
+      "com": 42.1,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "13:57",
+      "sym": "HOOD",
+      "qty": 40,
+      "pnl": -365.42,
+      "com": 19.99,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "14:57",
+      "sym": "NVDA",
+      "qty": 50,
+      "pnl": -1148.13,
+      "com": 19.96,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "15:21",
+      "sym": "INTC",
+      "qty": 100,
+      "pnl": -1277.08,
+      "com": 25.49,
+      "expired": false
+    },
+    {
+      "date": "2026-09-03",
+      "time": "15:59",
+      "sym": "SPCX",
+      "qty": 80,
+      "pnl": -100.75,
+      "com": 50.48,
+      "expired": false
+    }
+  ],
+  "tickers": [
+    "AAOI",
+    "AAPL",
+    "AMZN",
+    "ANET",
+    "ASTS",
+    "BABA",
+    "CL",
+    "CLV6",
+    "CRM",
+    "CSCO",
+    "CVX",
+    "ES",
+    "ESU6",
+    "GC",
+    "GCV6",
+    "GOOGL",
+    "HOOD",
+    "IBIT",
+    "INTC",
+    "IREN",
+    "META",
+    "MRNA",
+    "MSFT",
+    "MSTR",
+    "MU",
+    "NOW",
+    "NQ",
+    "NQU6",
+    "NU",
+    "NVDA",
+    "OKLO",
+    "PLTR",
+    "PURR",
+    "QCOM",
+    "QQQ",
+    "SKHY",
+    "SMCI",
+    "SPCX",
+    "TLT",
+    "TSLA",
+    "USO",
+    "WMT"
+  ],
+  "total_pnl": 1857.28,
+  "total_commission": 3384.67,
+  "since": "2026-08-24",
+  "first_date": "2026-08-24",
+  "last_date": "2026-09-03"
+}

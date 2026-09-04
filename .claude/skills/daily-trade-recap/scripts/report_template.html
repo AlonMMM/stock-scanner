@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trading Progress</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f9f9f7;
+    --card:           #ffffff;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --muted:          #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --net:            #2a78d6;
+    --gross:          #1baf7a;
+    --down:           #e34948;
+    --good:           #0ca30c;
+    --good-text:      #006300;
+    --critical:       #d03b3b;
+    --warning:        #fab219;
+    --chip-bg:        #f3f3f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:           #0d0d0d;
+      --card:           #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted:          #898781;
+      --grid:           #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --net:            #3987e5;
+      --gross:          #199e70;
+      --down:           #e66767;
+      --good:           #0ca30c;
+      --good-text:      #0ca30c;
+      --critical:       #d03b3b;
+      --warning:        #fab219;
+      --chip-bg:        #232322;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:           #0d0d0d;
+    --card:           #1a1a19;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted:          #898781;
+    --grid:           #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --net:            #3987e5;
+    --gross:          #199e70;
+    --down:           #e66767;
+    --good:           #0ca30c;
+    --good-text:      #0ca30c;
+    --critical:       #d03b3b;
+    --warning:        #fab219;
+    --chip-bg:        #232322;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin:0; background: var(--page); color: var(--text-primary);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; padding: 26px 18px 60px; }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+
+  header.top { margin-bottom: 20px; }
+  .eyebrow { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase;
+             letter-spacing: .06em; margin-bottom: 6px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: var(--text-secondary); font-size: 13.5px; }
+
+  section { margin-bottom: 28px; }
+  h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+       font-weight: 700; margin: 0 0 10px; padding-bottom: 7px; border-bottom: 1px solid var(--grid); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  @media (max-width: 760px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { padding: 13px 14px; }
+  .kpi .label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  .kpi .value { font-size: 19px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value.pos { color: var(--good-text); }
+  .kpi .value.neg { color: var(--down); }
+  .kpi .note { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  .callout { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--warning);
+             border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+  .callout:last-child { margin-bottom: 0; }
+  .callout strong { color: var(--text-primary); }
+
+  .chart-card { padding: 18px 18px 12px; }
+  .chart-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 10px; }
+  .legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--text-secondary); flex-wrap: wrap; }
+  .legend .item { display: flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .legend .swatch.net { background: var(--net); }
+  .legend .swatch.gross { background: var(--gross); }
+  .stat-line { font-size: 13px; color: var(--text-secondary); }
+  .stat-line b { font-variant-numeric: tabular-nums; }
+  .stat-line b.pos { color: var(--good-text); }
+  .stat-line b.neg { color: var(--down); }
+  svg#chart { width: 100%; height: 340px; display: block; overflow: visible; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+  .zero-line { stroke: var(--baseline); stroke-width: 1; stroke-dasharray: 3 3; }
+  .curve-line.net { fill: none; stroke: var(--net); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .curve-line.gross { fill: none; stroke: var(--gross); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .curve-dot.net { fill: var(--net); }
+  .curve-dot.gross { fill: var(--gross); }
+  .axis-label { fill: var(--muted); font-size: 10.5px; font-family: system-ui, sans-serif; }
+  .crosshair { stroke: var(--baseline); stroke-width: 1; opacity: 0; pointer-events: none; }
+  #tooltip {
+    position: absolute; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12.5px; pointer-events: none; opacity: 0; transition: opacity .08s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12); white-space: nowrap; z-index: 5;
+  }
+  #tooltip .d { color: var(--muted); font-size: 11px; }
+  #tooltip .v { font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  #tooltip .v.net { color: var(--net); }
+  #tooltip .v.gross { color: var(--gross); }
+  #chart-wrap { position: relative; }
+
+  .filter-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .filter-toolbar input[type=text] {
+    flex: 1; min-width: 160px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--page); color: var(--text-primary); font-size: 13px;
+  }
+  .filter-toolbar button {
+    padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--chip-bg);
+    color: var(--text-primary); font-size: 12.5px; cursor: pointer; font-weight: 600;
+  }
+  .filter-toolbar button:hover { filter: brightness(1.05); }
+  .ticker-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px;
+    max-height: 260px; overflow-y: auto; padding: 4px 2px;
+  }
+  .ticker-row {
+    display: flex; align-items: center; gap: 7px; padding: 6px 8px; border-radius: 7px;
+    background: var(--chip-bg); font-size: 12.5px; cursor: pointer; user-select: none;
+  }
+  .ticker-row input { accent-color: var(--net); cursor: pointer; }
+  .ticker-row .sym { font-weight: 700; flex: 1; }
+  .ticker-row .amt { font-variant-numeric: tabular-nums; font-size: 11.5px; }
+  .ticker-row .amt.pos { color: var(--good-text); }
+  .ticker-row .amt.neg { color: var(--down); }
+  .ticker-row.excluded { opacity: .45; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em;
+       font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--grid); }
+  tr:last-child td { border-bottom: none; }
+  .pnl.pos { color: var(--good-text); font-weight: 600; }
+  .pnl.neg { color: var(--down); font-weight: 600; }
+  .ticker { font-weight: 700; }
+  footer { margin-top: 30px; font-size: 11.5px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Daily Trade Recap</div>
+    <h1>Trading progress</h1>
+    <div class="sub" id="header-sub"></div>
+  </header>
+
+  <section id="notes-section"></section>
+
+  <section>
+    <h2 id="day-heading">Last trading day</h2>
+    <div class="kpi-row" id="kpi-row"></div>
+  </section>
+
+  <section>
+    <h2 id="ticker-heading">By ticker</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>Ticker</th><th>Net P&amp;L</th></tr></thead>
+        <tbody id="day-ticker-table"></tbody>
+      </table>
+    </div>
+    <div class="callout" id="cash-check-callout" style="margin-top:10px; border-left-color: var(--net); display:none;"></div>
+  </section>
+
+  <section>
+    <h2 id="curve-heading">Progress — cumulative P&amp;L, one point per trade</h2>
+    <div class="card chart-card">
+      <div class="chart-toolbar">
+        <div class="legend">
+          <div class="item"><span class="swatch net"></span>Net of commission</div>
+          <div class="item"><span class="swatch gross"></span>Before commission (adds commission back)</div>
+        </div>
+        <div class="stat-line">Total commission (all tickers): <b id="total-commission-val" class="neg">—</b></div>
+      </div>
+      <div class="chart-toolbar" style="margin-top:-4px;">
+        <div class="stat-line">Net: <b id="net-total-val">—</b></div>
+        <div class="stat-line">Gross: <b id="gross-total-val">—</b></div>
+        <div class="stat-line" id="excluded-note"></div>
+      </div>
+      <div id="chart-wrap">
+        <svg id="chart" viewBox="0 0 960 340" preserveAspectRatio="none"></svg>
+        <div id="tooltip"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sanitize tickers — untick to exclude from both lines above</h2>
+    <div class="card" style="padding: 14px 16px;">
+      <div class="filter-toolbar">
+        <input type="text" id="ticker-search" placeholder="Filter tickers…">
+        <button id="select-all">All</button>
+        <button id="select-none">None</button>
+        <button id="select-top-loss">Exclude biggest loser</button>
+        <button id="select-top-win">Exclude biggest winner</button>
+      </div>
+      <div class="ticker-grid" id="ticker-grid"></div>
+    </div>
+  </section>
+
+  <footer id="footer-note">Daily Trade Recap · exits derived from Interactive Brokers trade fills, not account NAV</footer>
+</div>
+
+<script>
+const DAY_RECAP = __DAY_RECAP_JSON__;
+const CURVE = __CURVE_JSON__;
+const NOTES = __NOTES_JSON__;
+
+function fmt(v) {
+  const sign = v < 0 ? '−' : '+';
+  return sign + '$' + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtShort(v) {
+  const sign = v < 0 ? '−' : '+';
+  const a = Math.abs(v);
+  return sign + '$' + (a >= 1000 ? (a/1000).toFixed(1) + 'k' : a.toFixed(0));
+}
+function esc(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// ---- header ----
+document.title = 'Trading Progress';
+document.getElementById('header-sub').innerHTML =
+  `Last trading day: <strong>${esc(DAY_RECAP.date)}</strong> &middot; progress curve ` +
+  `${esc(CURVE.first_date)} &ndash; ${esc(CURVE.last_date)}, ${CURVE.trades.length} trades across ${CURVE.tickers.length} tickers`;
+document.getElementById('day-heading').textContent = `Last trading day — ${DAY_RECAP.date}`;
+document.getElementById('ticker-heading').textContent = `${DAY_RECAP.date} by ticker`;
+document.getElementById('curve-heading').textContent =
+  `Progress since ${CURVE.first_date} — cumulative P&L, one point per trade`;
+
+// ---- notes (investigation callouts, supplied at render time) ----
+const notesSection = document.getElementById('notes-section');
+NOTES.forEach(n => {
+  const div = document.createElement('div');
+  div.className = 'callout';
+  div.style.borderLeftColor = n.tone === 'critical' ? 'var(--critical)' : 'var(--net)';
+  div.innerHTML = (n.title ? `<strong>${esc(n.title)}</strong> ` : '') + n.body;
+  notesSection.appendChild(div);
+});
+
+// ---- KPI row ----
+const kpiRow = document.getElementById('kpi-row');
+function kpi(label, value, cls, note) {
+  const div = document.createElement('div');
+  div.className = 'card kpi';
+  div.innerHTML = `<div class="label">${esc(label)}</div><div class="value ${cls||''}">${value}</div>` +
+    (note ? `<div class="note">${esc(note)}</div>` : '');
+  kpiRow.appendChild(div);
+}
+kpi('Net P&L', fmt(DAY_RECAP.net_pnl), DAY_RECAP.net_pnl >= 0 ? 'pos' : 'neg');
+kpi('Win rate', DAY_RECAP.win_rate != null ? (DAY_RECAP.win_rate * 100).toFixed(1) + '%' : '—', '',
+    `${DAY_RECAP.wins}W / ${DAY_RECAP.losses}L` + (DAY_RECAP.profit_factor ? `, profit factor ${DAY_RECAP.profit_factor}` : ''));
+kpi('Biggest win', DAY_RECAP.biggest_win ? `${DAY_RECAP.biggest_win[0]} ${fmt(DAY_RECAP.biggest_win[1])}` : '—', 'pos');
+kpi('Biggest loss', DAY_RECAP.biggest_loss ? `${DAY_RECAP.biggest_loss[0]} ${fmt(DAY_RECAP.biggest_loss[1])}` : '—', 'neg');
+kpi('Expiries', DAY_RECAP.expiries.count, '',
+    DAY_RECAP.expiries.count ? `$${DAY_RECAP.expiries.premium_lost.toLocaleString()} premium lost` : 'nothing expired worthless');
+kpi('Commission', fmt(-DAY_RECAP.commission), 'neg', 'sell leg only — already inside net P&L above');
+
+// ---- day ticker table ----
+const dayBody = document.getElementById('day-ticker-table');
+DAY_RECAP.by_ticker.forEach(([sym, pnl]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="ticker">${esc(sym)}</td><td class="pnl ${pnl>=0?'pos':'neg'}">${fmt(pnl)}</td>`;
+  dayBody.appendChild(tr);
+});
+if (DAY_RECAP.cash_check) {
+  const cc = DAY_RECAP.cash_check;
+  const gapAbs = Math.abs(cc.gap);
+  if (gapAbs > 1) {
+    const el = document.getElementById('cash-check-callout');
+    el.style.display = 'block';
+    el.innerHTML = `Cash-flow check: realized P&amp;L ${fmt(cc.realized)} vs. actual cash movement ` +
+      `${fmt(cc.cash_flow)} — a ${fmt(cc.gap)} gap. Worth a look if it doesn't match your own tally.`;
+  }
+}
+
+// ---- ticker sanitize checklist ----
+const totals = {};
+CURVE.tickers.forEach(t => { totals[t] = 0; });
+CURVE.trades.forEach(tr => { totals[tr.sym] += tr.pnl; });
+const sortedTickers = [...CURVE.tickers].sort((a,b) => Math.abs(totals[b]) - Math.abs(totals[a]));
+
+const included = new Set(CURVE.tickers);
+const grid = document.getElementById('ticker-grid');
+const rows = {};
+sortedTickers.forEach(sym => {
+  const row = document.createElement('label');
+  row.className = 'ticker-row';
+  row.innerHTML = `<input type="checkbox" checked data-sym="${esc(sym)}">
+    <span class="sym">${esc(sym)}</span><span class="amt ${totals[sym]>=0?'pos':'neg'}">${fmtShort(totals[sym])}</span>`;
+  const cb = row.querySelector('input');
+  cb.addEventListener('change', () => {
+    if (cb.checked) { included.add(sym); row.classList.remove('excluded'); }
+    else { included.delete(sym); row.classList.add('excluded'); }
+    render();
+  });
+  rows[sym] = row;
+  grid.appendChild(row);
+});
+
+document.getElementById('select-all').onclick = () => { CURVE.tickers.forEach(s => { included.add(s); rows[s].querySelector('input').checked = true; rows[s].classList.remove('excluded'); }); render(); };
+document.getElementById('select-none').onclick = () => { CURVE.tickers.forEach(s => { included.delete(s); rows[s].querySelector('input').checked = false; rows[s].classList.add('excluded'); }); render(); };
+document.getElementById('select-top-loss').onclick = () => {
+  const worst = sortedTickers.reduce((a,b) => totals[b] < totals[a] ? b : a, sortedTickers[0]);
+  included.delete(worst); rows[worst].querySelector('input').checked = false; rows[worst].classList.add('excluded'); render();
+};
+document.getElementById('select-top-win').onclick = () => {
+  const best = sortedTickers.reduce((a,b) => totals[b] > totals[a] ? b : a, sortedTickers[0]);
+  included.delete(best); rows[best].querySelector('input').checked = false; rows[best].classList.add('excluded'); render();
+};
+document.getElementById('ticker-search').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toUpperCase();
+  sortedTickers.forEach(sym => { rows[sym].style.display = sym.includes(q) ? '' : 'none'; });
+});
+
+document.getElementById('total-commission-val').textContent = '−' + fmt(CURVE.total_commission).slice(1);
+
+// ---- chart: two lines always on, net and gross (net + commission added back) ----
+const svg = document.getElementById('chart');
+const tooltip = document.getElementById('tooltip');
+const W = 960, H = 340, PAD_L = 56, PAD_R = 12, PAD_T = 14, PAD_B = 26;
+
+function series(mode) {
+  let running = 0;
+  return CURVE.trades.map(tr => {
+    if (included.has(tr.sym)) running += (mode === 'gross' ? tr.pnl + tr.com : tr.pnl);
+    return running;
+  });
+}
+
+function render() {
+  const net = series('net'), gross = series('gross');
+  const n = net.length;
+  const all = net.concat(gross);
+  const minV = Math.min(0, ...all), maxV = Math.max(0, ...all);
+  const range = (maxV - minV) || 1;
+  const x = i => n > 1 ? PAD_L + (i / (n - 1)) * (W - PAD_L - PAD_R) : PAD_L;
+  const y = v => PAD_T + (1 - (v - minV) / range) * (H - PAD_T - PAD_B);
+
+  let svgHtml = '';
+  const steps = 4;
+  for (let s = 0; s <= steps; s++) {
+    const v = minV + (range * s / steps);
+    const yy = y(v);
+    svgHtml += `<line class="grid-line" x1="${PAD_L}" x2="${W-PAD_R}" y1="${yy}" y2="${yy}"></line>`;
+    svgHtml += `<text class="axis-label" x="${PAD_L-8}" y="${yy+3}" text-anchor="end">${fmtShort(v)}</text>`;
+  }
+  const zy = y(0);
+  svgHtml += `<line class="zero-line" x1="${PAD_L}" x2="${W-PAD_R}" y1="${zy}" y2="${zy}"></line>`;
+
+  const dateFirstIdx = [];
+  let lastDate = null;
+  CURVE.trades.forEach((tr, i) => { if (tr.date !== lastDate) { dateFirstIdx.push(i); lastDate = tr.date; } });
+  const maxLabels = 10;
+  const labelStep = Math.max(1, Math.ceil(dateFirstIdx.length / maxLabels));
+  dateFirstIdx.forEach((idx, k) => {
+    if (k % labelStep !== 0) return;
+    svgHtml += `<text class="axis-label" x="${x(idx)}" y="${H-6}" text-anchor="middle">${esc(CURVE.trades[idx].date.slice(5))}</text>`;
+  });
+
+  function pathFor(vals) {
+    let d = '';
+    vals.forEach((v, i) => { d += (i===0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(v).toFixed(1) + ' '; });
+    return d;
+  }
+  svgHtml += `<path class="curve-line gross" d="${pathFor(gross)}"></path>`;
+  svgHtml += `<path class="curve-line net" d="${pathFor(net)}"></path>`;
+  if (n <= 120) {
+    net.forEach((v, i) => {
+      const excluded = !included.has(CURVE.trades[i].sym);
+      svgHtml += `<circle class="curve-dot net" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="2.2" ${excluded ? 'opacity="0.35"' : ''}></circle>`;
+    });
+  }
+  svgHtml += `<line class="crosshair" id="ch-line" x1="0" x2="0" y1="${PAD_T}" y2="${H-PAD_B}"></line>`;
+  svg.innerHTML = svgHtml;
+
+  const lastNet = net[net.length - 1], lastGross = gross[gross.length - 1];
+  const netEl = document.getElementById('net-total-val');
+  netEl.textContent = fmt(lastNet); netEl.className = lastNet >= 0 ? 'pos' : 'neg';
+  const grossEl = document.getElementById('gross-total-val');
+  grossEl.textContent = fmt(lastGross); grossEl.className = lastGross >= 0 ? 'pos' : 'neg';
+
+  const excludedCount = CURVE.tickers.length - included.size;
+  document.getElementById('excluded-note').textContent = excludedCount
+    ? `${excludedCount} ticker${excludedCount>1?'s':''} excluded · ${n} trades plotted` : `${n} trades plotted`;
+
+  const wrap = document.getElementById('chart-wrap');
+  svg.onmousemove = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) / rect.width * W;
+    let idx = Math.round((px - PAD_L) / (W - PAD_L - PAD_R) * (n - 1));
+    idx = Math.max(0, Math.min(n - 1, idx));
+    const cx = x(idx);
+    document.getElementById('ch-line').setAttribute('x1', cx);
+    document.getElementById('ch-line').setAttribute('x2', cx);
+    document.getElementById('ch-line').style.opacity = 1;
+    const tr = CURVE.trades[idx];
+    const excludedTag = included.has(tr.sym) ? '' : ' (excluded)';
+    tooltip.innerHTML = `<div class="d">${esc(tr.date)} ${esc(tr.time)} · ${esc(tr.sym)}${excludedTag}</div>` +
+      `<div class="v net">net: ${fmt(net[idx])}</div>` +
+      `<div class="v gross">gross: ${fmt(gross[idx])}</div>` +
+      `<div class="d">this trade: ${fmt(tr.pnl)} net, commission ${fmt(-tr.com)}</div>`;
+    tooltip.style.opacity = 1;
+    const wrapRect = wrap.getBoundingClientRect();
+    let left = (ev.clientX - wrapRect.left) + 14;
+    if (left + 190 > wrapRect.width) left = (ev.clientX - wrapRect.left) - 204;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = (ev.clientY - wrapRect.top) - 66 + 'px';
+  };
+  svg.onmouseleave = () => {
+    tooltip.style.opacity = 0;
+    const chLine = document.getElementById('ch-line');
+    if (chLine) chLine.style.opacity = 0;
+  };
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+{
+  "date": "2026-09-03",
+  "exits": 34,
+  "net_pnl": 5736.89,
+  "wins": 11,
+  "losses": 23,
+  "win_rate": 0.3235,
+  "profit_factor": 1.336,
+  "by_ticker": [
+    [
+      "HOOD",
+      9354.75
+    ],
+    [
+      "IREN",
+      4188.82
+    ],
+    [
+      "MSTR",
+      4023.85
+    ],
+    [
+      "GC",
+      -485.06
+    ],
+    [
+      "SPCX",
+      -744.57
+    ],
+    [
+      "WMT",
+      -770.93
+    ],
+    [
+      "TSLA",
+      -967.75
+    ],
+    [
+      "CL",
+      -1163.2
+    ],
+    [
+      "NVDA",
+      -1205.86
+    ],
+    [
+      "INTC",
+      -1277.08
+    ],
+    [
+      "GOOGL",
+      -1424.66
+    ],
+    [
+      "CVX",
+      -1753.72
+    ],
+    [
+      "AMZN",
+      -2037.7
+    ]
+  ],
+  "expiries": {
+    "count": 0,
+    "premium_lost": 0,
+    "tickers": []
+  },
+  "biggest_win": [
+    "HOOD",
+    4120.06
+  ],
+  "biggest_loss": [
+    "CL",
+    -2294.4
+  ],
+  "commission": 574.25,
+  "cash_check": {
+    "cash_flow": 4711.45,
+    "realized": 5736.89,
+    "gap": -1025.45
+  },
+  "trades": [
+    {
+      "time": "07:05",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 931.12,
+      "expired": false
+    },
+    {
+      "time": "07:07",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 771.12,
+      "expired": false
+    },
+    {
+      "time": "07:09",
+      "sym": "CL",
+      "qty": 20,
+      "pnl": -2294.4,
+      "expired": false
+    },
+    {
+      "time": "08:21",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": 2741.12,
+      "expired": false
+    },
+    {
+      "time": "08:53",
+      "sym": "CL",
+      "qty": 18,
+      "pnl": -1884.96,
+      "expired": false
+    },
+    {
+      "time": "08:53",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": -738.88,
+      "expired": false
+    },
+    {
+      "time": "08:53",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": -189.44,
+      "expired": false
+    },
+    {
+      "time": "09:03",
+      "sym": "GC",
+      "qty": 1,
+      "pnl": -121.69,
+      "expired": false
+    },
+    {
+      "time": "09:06",
+      "sym": "CL",
+      "qty": 4,
+      "pnl": -498.88,
+      "expired": false
+    },
+    {
+      "time": "09:12",
+      "sym": "GC",
+      "qty": 2,
+      "pnl": -363.37,
+      "expired": false
+    },
+    {
+      "time": "09:34",
+      "sym": "TSLA",
+      "qty": 2,
+      "pnl": -89.54,
+      "expired": false
+    },
+    {
+      "time": "09:34",
+      "sym": "TSLA",
+      "qty": 18,
+      "pnl": -822.74,
+      "expired": false
+    },
+    {
+      "time": "09:58",
+      "sym": "AMZN",
+      "qty": 100,
+      "pnl": -1063.62,
+      "expired": false
+    },
+    {
+      "time": "10:11",
+      "sym": "CVX",
+      "qty": 60,
+      "pnl": -1753.72,
+      "expired": false
+    },
+    {
+      "time": "10:24",
+      "sym": "HOOD",
+      "qty": 8,
+      "pnl": 2266.72,
+      "expired": false
+    },
+    {
+      "time": "10:25",
+      "sym": "GOOGL",
+      "qty": 80,
+      "pnl": -1424.66,
+      "expired": false
+    },
+    {
+      "time": "10:29",
+      "sym": "TSLA",
+      "qty": 25,
+      "pnl": -55.01,
+      "expired": false
+    },
+    {
+      "time": "10:29",
+      "sym": "TSLA",
+      "qty": 5,
+      "pnl": -0.46,
+      "expired": false
+    },
+    {
+      "time": "10:51",
+      "sym": "HOOD",
+      "qty": 12,
+      "pnl": 4120.06,
+      "expired": false
+    },
+    {
+      "time": "10:51",
+      "sym": "IREN",
+      "qty": 15,
+      "pnl": 748.84,
+      "expired": false
+    },
+    {
+      "time": "11:04",
+      "sym": "SPCX",
+      "qty": 60,
+      "pnl": -1077.68,
+      "expired": false
+    },
+    {
+      "time": "11:11",
+      "sym": "HOOD",
+      "qty": 10,
+      "pnl": 3333.39,
+      "expired": false
+    },
+    {
+      "time": "11:37",
+      "sym": "AMZN",
+      "qty": 10,
+      "pnl": -18.5,
+      "expired": false
+    },
+    {
+      "time": "12:23",
+      "sym": "AMZN",
+      "qty": 60,
+      "pnl": -955.58,
+      "expired": false
+    },
+    {
+      "time": "12:28",
+      "sym": "IREN",
+      "qty": 65,
+      "pnl": 3439.98,
+      "expired": false
+    },
+    {
+      "time": "12:49",
+      "sym": "MSTR",
+      "qty": 20,
+      "pnl": 1720.95,
+      "expired": false
+    },
+    {
+      "time": "12:57",
+      "sym": "SPCX",
+      "qty": 20,
+      "pnl": 433.86,
+      "expired": false
+    },
+    {
+      "time": "13:42",
+      "sym": "MSTR",
+      "qty": 20,
+      "pnl": 2302.9,
+      "expired": false
+    },
+    {
+      "time": "13:46",
+      "sym": "NVDA",
+      "qty": 10,
+      "pnl": -57.73,
+      "expired": false
+    },
+    {
+      "time": "13:53",
+      "sym": "WMT",
+      "qty": 100,
+      "pnl": -770.93,
+      "expired": false
+    },
+    {
+      "time": "13:57",
+      "sym": "HOOD",
+      "qty": 40,
+      "pnl": -365.42,
+      "expired": false
+    },
+    {
+      "time": "14:57",
+      "sym": "NVDA",
+      "qty": 50,
+      "pnl": -1148.13,
+      "expired": false
+    },
+    {
+      "time": "15:21",
+      "sym": "INTC",
+      "qty": 100,
+      "pnl": -1277.08,
+      "expired": false
+    },
+    {
+      "time": "15:59",
+      "sym": "SPCX",
+      "qty": 80,
+      "pnl": -100.75,
+      "expired": false
+    }
+  ]
+}

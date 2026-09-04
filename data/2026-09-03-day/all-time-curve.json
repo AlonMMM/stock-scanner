@@ -1,6 +1,294 @@
 {
   "trades": [
     {
+      "date": "2026-08-24",
+      "time": "00:02",
+      "sym": "CL",
+      "qty": 2,
+      "pnl": -449.44,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "00:03",
+      "sym": "NQU6",
+      "qty": 6,
+      "pnl": 0.0,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "01:36",
+      "sym": "NQU6",
+      "qty": 1,
+      "pnl": 37.18,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "04:20",
+      "sym": "NQU6",
+      "qty": 8,
+      "pnl": -902.56,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "07:40",
+      "sym": "NQU6",
+      "qty": 5,
+      "pnl": -289.1,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:33",
+      "sym": "MU",
+      "qty": 7,
+      "pnl": 3251.16,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:35",
+      "sym": "MRNA",
+      "qty": 11,
+      "pnl": -830.77,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:40",
+      "sym": "MU",
+      "qty": 3,
+      "pnl": 1948.34,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:48",
+      "sym": "NVDA",
+      "qty": 55,
+      "pnl": 339.23,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:52",
+      "sym": "MU",
+      "qty": 5,
+      "pnl": 4746.96,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "09:54",
+      "sym": "IBIT",
+      "qty": 100,
+      "pnl": -99.64,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:12",
+      "sym": "GCV6",
+      "qty": 5,
+      "pnl": -1275.1,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:14",
+      "sym": "ANET",
+      "qty": 46,
+      "pnl": -1410.54,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:14",
+      "sym": "ANET",
+      "qty": 5,
+      "pnl": -155.47,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:21",
+      "sym": "MU",
+      "qty": 15,
+      "pnl": 11383.52,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:21",
+      "sym": "QQQ",
+      "qty": 80,
+      "pnl": -928.47,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:30",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -86.04,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:32",
+      "sym": "MU",
+      "qty": 2,
+      "pnl": -285.08,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:32",
+      "sym": "MU",
+      "qty": 7,
+      "pnl": -983.84,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:32",
+      "sym": "MU",
+      "qty": 10,
+      "pnl": -1375.6,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "10:41",
+      "sym": "BABA",
+      "qty": 50,
+      "pnl": -586.41,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "11:04",
+      "sym": "AAOI",
+      "qty": 25,
+      "pnl": -481.53,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "11:13",
+      "sym": "MU",
+      "qty": 25,
+      "pnl": -662.05,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "11:29",
+      "sym": "MU",
+      "qty": 20,
+      "pnl": -1151.05,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "12:40",
+      "sym": "CRM",
+      "qty": 70,
+      "pnl": -947.68,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "12:46",
+      "sym": "MU",
+      "qty": 18,
+      "pnl": -793.97,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:08",
+      "sym": "CLV6",
+      "qty": 20,
+      "pnl": -1964.4,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:13",
+      "sym": "MU",
+      "qty": 18,
+      "pnl": -495.71,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:14",
+      "sym": "AMZN",
+      "qty": 50,
+      "pnl": 87.32,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "13:14",
+      "sym": "GOOGL",
+      "qty": 80,
+      "pnl": -528.86,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:13",
+      "sym": "MU",
+      "qty": 33,
+      "pnl": -488.37,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:13",
+      "sym": "TLT",
+      "qty": 210,
+      "pnl": -773.26,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:36",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -23.32,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:37",
+      "sym": "MU",
+      "qty": 1,
+      "pnl": -29.62,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "14:37",
+      "sym": "MU",
+      "qty": 28,
+      "pnl": -874.71,
+      "expired": false
+    },
+    {
+      "date": "2026-08-24",
+      "time": "15:19",
+      "sym": "CRM",
+      "qty": 2,
+      "pnl": -4.91,
+      "expired": false
+    },
+    {
       "date": "2026-08-25",
       "time": "09:37",
       "sym": "AAPL",
@@ -2050,10 +2338,12 @@
     }
   ],
   "tickers": [
+    "AAOI",
     "AAPL",
     "AMZN",
     "ANET",
     "ASTS",
+    "BABA",
     "CL",
     "CLV6",
     "CRM",
@@ -2062,6 +2352,7 @@
     "ES",
     "ESU6",
     "GC",
+    "GCV6",
     "GOOGL",
     "HOOD",
     "IBIT",
@@ -2074,6 +2365,7 @@
     "MU",
     "NOW",
     "NQ",
+    "NQU6",
     "NU",
     "NVDA",
     "OKLO",
@@ -2084,12 +2376,13 @@
     "SKHY",
     "SMCI",
     "SPCX",
+    "TLT",
     "TSLA",
     "USO",
     "WMT"
   ],
-  "total_pnl": -4917.82,
-  "since": "2026-08-25",
-  "first_date": "2026-08-25",
+  "total_pnl": -2001.61,
+  "since": "2026-08-24",
+  "first_date": "2026-08-24",
   "last_date": "2026-09-03"
 }

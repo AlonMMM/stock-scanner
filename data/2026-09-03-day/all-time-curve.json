@@ -138,38 +138,6 @@
     },
     {
       "date": "2026-08-26",
-      "time": "00:00",
-      "sym": "CRM",
-      "qty": 70,
-      "pnl": -1680.0,
-      "expired": true
-    },
-    {
-      "date": "2026-08-26",
-      "time": "00:00",
-      "sym": "MSTR",
-      "qty": 90,
-      "pnl": -2983.0,
-      "expired": true
-    },
-    {
-      "date": "2026-08-26",
-      "time": "00:00",
-      "sym": "NU",
-      "qty": 390,
-      "pnl": -3990.0,
-      "expired": true
-    },
-    {
-      "date": "2026-08-26",
-      "time": "00:00",
-      "sym": "OKLO",
-      "qty": 65,
-      "pnl": -2145.0,
-      "expired": true
-    },
-    {
-      "date": "2026-08-26",
       "time": "10:40",
       "sym": "INTC",
       "qty": 125,
@@ -2120,7 +2088,7 @@
     "USO",
     "WMT"
   ],
-  "total_pnl": -15715.82,
+  "total_pnl": -4917.82,
   "since": "2026-08-25",
   "first_date": "2026-08-25",
   "last_date": "2026-09-03"

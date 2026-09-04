@@ -96,12 +96,18 @@ def holding_times(all_trades, tz):
             for k, v in acc.items() if v[1]}
 
 
-def build_exits(trades, tz):
+def build_exits(trades, tz, drop_expiry=None, expiry_day=None):
     """Apply the standing filter chain and fold fills into exit rows.
 
     Same defaults as weekly-trades: share trades dropped, worthless-expiry rows
     kept and charged their full premium, restart artefacts dropped, only SELL
     legs kept (one row per exit).
+
+    `drop_expiry`/`expiry_day` mirror weekly-trades' flags of the same name: a
+    price-0 sell against a lot that was genuinely open looks identical whether an
+    option expired worthless or the (paper) account was reset and the position
+    just vanished — nothing in the feed tells the two apart, only the account
+    holder does. Rows named here are dropped outright rather than charged a loss.
     """
     holds = holding_times(trades, tz)
     rows = [t for t in trades if t["sec_type"] != "STK"]
@@ -111,6 +117,11 @@ def build_exits(trades, tz):
         info = holds.get((t["symbol"], dt.strftime("%Y-%m-%d %H:%M"), t["price"])) or {}
         return info.get("qty", 0) > 0
     rows = [t for t in rows if t["price"] != 0 or closed_something(t)]
+    if drop_expiry:
+        gone, gday = set(drop_expiry), expiry_day
+        rows = [t for t in rows
+                if not (t["price"] == 0 and t["symbol"] in gone
+                        and session_time(t["trade_time"], tz).date().isoformat() == gday)]
     rows = [t for t in rows if t["side"] == "SELL"]
 
     merged = collections.defaultdict(
@@ -235,10 +246,16 @@ def main():
     p.add_argument("--tz-offset", type=int, default=-4)
     p.add_argument("--since", help="YYYY-MM-DD — only include curve trades on/after this "
                                     "date (e.g. the account's last reset or funding change)")
+    p.add_argument("--drop-expiry", type=lambda s: [x.strip().upper() for x in s.split(",") if x.strip()],
+                    help="SYM[,SYM] — price-0 rows for these symbols on --expiry-day are a "
+                         "reset/vanished position, not a real expiry, and are dropped outright")
+    p.add_argument("--expiry-day", help="YYYY-MM-DD, required with --drop-expiry")
     args = p.parse_args()
+    if args.drop_expiry and not args.expiry_day:
+        sys.exit("--drop-expiry needs --expiry-day")
 
     trades = load_trades(args.trades_json)
-    exits = build_exits(trades, args.tz_offset)
+    exits = build_exits(trades, args.tz_offset, drop_expiry=args.drop_expiry, expiry_day=args.expiry_day)
     if not exits:
         sys.exit("no exits found in the file — nothing to recap")
 

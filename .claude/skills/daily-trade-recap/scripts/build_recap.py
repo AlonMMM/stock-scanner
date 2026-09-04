@@ -228,10 +228,15 @@ def all_time_curve(exits, since=None):
     if since:
         rows = [e for e in rows if e["date"] >= since]
     tickers = sorted({e["sym"] for e in rows})
+    # `pnl` is IBKR's realized_pnl, already net of commission on both legs — `com` is the
+    # sell leg's commission, kept alongside so the client can add it back for a
+    # before-commission (gross) view. Same convention as weekly-trades: don't subtract
+    # `com` again, it's already inside `pnl`.
     trades = [{"date": e["date"], "time": e["time"], "sym": e["sym"], "qty": e["qty"],
-               "pnl": e["pnl"], "expired": e["expired"]} for e in rows]
+               "pnl": e["pnl"], "com": e["com"], "expired": e["expired"]} for e in rows]
     return {"trades": trades, "tickers": tickers,
             "total_pnl": round(sum(e["pnl"] for e in rows), 2),
+            "total_commission": round(sum(e["com"] for e in rows), 2),
             "since": since,
             "first_date": rows[0]["date"] if rows else None,
             "last_date": rows[-1]["date"] if rows else None}

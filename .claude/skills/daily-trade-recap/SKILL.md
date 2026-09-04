@@ -77,6 +77,14 @@ trade's own pnl, and the running cumulative total). Put the day-recap numbers fr
 3 in a small card above or beside the chart so the page is a complete standing artifact,
 not just the chart.
 
+Give it a **net / before-commission toggle**. Each trade in `all-time-curve.json` carries
+both `pnl` (IBKR's `realized_pnl`, already net of commission — see `weekly-trades`' notes
+on this) and `com` (that trade's commission). Net view sums `pnl`; before-commission
+(gross) view sums `pnl + com` — commission is a cost already subtracted, so adding it back
+shows what the trades made before fees, not double-charging it. Surface the total
+commission paid (`total_commission` in the curve JSON, or the day's `commission` field in
+the day recap) as its own KPI too, not just folded into the toggle.
+
 **5. Publish it as an Artifact**, not a static file — the whole point of "sanitize a
 ticker from the graph" is that the user interacts with it after delivery. If a prior
 run's artifact URL is saved (see step 6), read it first and republish to the same URL

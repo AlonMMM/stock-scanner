@@ -335,15 +335,6 @@
     },
     {
       "date": "2026-08-25",
-      "time": "09:54",
-      "sym": "IBIT",
-      "qty": 200,
-      "pnl": -2998.1,
-      "com": 105.8,
-      "expired": false
-    },
-    {
-      "date": "2026-08-25",
       "time": "09:55",
       "sym": "MSTR",
       "qty": 45,
@@ -439,15 +430,6 @@
       "qty": 60,
       "pnl": -333.45,
       "com": 17.42,
-      "expired": false
-    },
-    {
-      "date": "2026-08-25",
-      "time": "13:11",
-      "sym": "IBIT",
-      "qty": 125,
-      "pnl": -860.79,
-      "com": 27.24,
       "expired": false
     },
     {
@@ -2673,8 +2655,8 @@
     "USO",
     "WMT"
   ],
-  "total_pnl": -2001.61,
-  "total_commission": 3517.71,
+  "total_pnl": 1857.28,
+  "total_commission": 3384.67,
   "since": "2026-08-24",
   "first_date": "2026-08-24",
   "last_date": "2026-09-03"

@@ -96,7 +96,7 @@ def holding_times(all_trades, tz):
             for k, v in acc.items() if v[1]}
 
 
-def build_exits(trades, tz, drop_expiry=None, expiry_day=None):
+def build_exits(trades, tz, drop_expiry=None, expiry_day=None, drop_carry=None, carry_day=None):
     """Apply the standing filter chain and fold fills into exit rows.
 
     Same defaults as weekly-trades: share trades dropped, worthless-expiry rows
@@ -108,6 +108,14 @@ def build_exits(trades, tz, drop_expiry=None, expiry_day=None):
     option expired worthless or the (paper) account was reset and the position
     just vanished — nothing in the feed tells the two apart, only the account
     holder does. Rows named here are dropped outright rather than charged a loss.
+
+    `drop_carry`/`carry_day` also mirror weekly-trades: a real, nonzero-price exit
+    whose cost basis traces back to a lot opened before the window being reported
+    on (e.g. a position carried into a reset week from before it) is a real trade,
+    but not one this window should take credit or blame for. Named symbols are
+    dropped entirely on `carry_day`, the same blunt "drop every exit of SYM that
+    day" weekly-trades uses — there's no reliable way to tell which specific fills
+    trace to the stale lot without doing that.
     """
     holds = holding_times(trades, tz)
     rows = [t for t in trades if t["sec_type"] != "STK"]
@@ -122,6 +130,11 @@ def build_exits(trades, tz, drop_expiry=None, expiry_day=None):
         rows = [t for t in rows
                 if not (t["price"] == 0 and t["symbol"] in gone
                         and session_time(t["trade_time"], tz).date().isoformat() == gday)]
+    if drop_carry:
+        carry, cday = set(drop_carry), carry_day
+        rows = [t for t in rows
+                if not (t["symbol"] in carry
+                        and session_time(t["trade_time"], tz).date().isoformat() == cday)]
     rows = [t for t in rows if t["side"] == "SELL"]
 
     merged = collections.defaultdict(
@@ -255,12 +268,20 @@ def main():
                     help="SYM[,SYM] — price-0 rows for these symbols on --expiry-day are a "
                          "reset/vanished position, not a real expiry, and are dropped outright")
     p.add_argument("--expiry-day", help="YYYY-MM-DD, required with --drop-expiry")
+    p.add_argument("--drop-carry", type=lambda s: [x.strip().upper() for x in s.split(",") if x.strip()],
+                    help="SYM[,SYM] — drop every exit of these symbols on --carry-day; use for a "
+                         "real trade whose cost basis traces back to a lot opened before the "
+                         "window being reported on (e.g. carried into a reset week from before it)")
+    p.add_argument("--carry-day", help="YYYY-MM-DD, required with --drop-carry")
     args = p.parse_args()
     if args.drop_expiry and not args.expiry_day:
         sys.exit("--drop-expiry needs --expiry-day")
+    if args.drop_carry and not args.carry_day:
+        sys.exit("--drop-carry needs --carry-day")
 
     trades = load_trades(args.trades_json)
-    exits = build_exits(trades, args.tz_offset, drop_expiry=args.drop_expiry, expiry_day=args.expiry_day)
+    exits = build_exits(trades, args.tz_offset, drop_expiry=args.drop_expiry, expiry_day=args.expiry_day,
+                         drop_carry=args.drop_carry, carry_day=args.carry_day)
     if not exits:
         sys.exit("no exits found in the file — nothing to recap")
 

@@ -1,0 +1,21 @@
+[
+  {
+    "title": "Starts Monday Aug 24, 2026 —",
+    "body": "the start of the trading week the reset happened in, one day earlier than where IBKR's own performance tracking (<code>get_pa_performance_all_periods</code>) begins (Aug 25). Aug 24 checked clean — no write-off pattern, real trades, +$2,916 that day.",
+    "tone": "info"
+  },
+  {
+    "title": "Found and removed: a reset write-off, not real trades.",
+    "body": "At exactly 2026-08-26 00:00 (a single synthetic timestamp), CRM, MSTR (×2 lots), NU (×2 lots), NVDA (×2 lots) and OKLO were all written off at price $0 against positions that were genuinely open — the same artefact <code>weekly-trades</code> already documented for the prior week (CRM/NU/NVDA that time too). Checked the entire dataset for any other multi-symbol same-timestamp batch: this is the only one. That alone was −$10,798.",
+    "tone": "critical"
+  },
+  {
+    "title": "Found and removed: an IBIT position carried in from before the window.",
+    "body": "The IBIT exits on 2026-08-25 traced their cost basis back to lots opened Aug 21 and Aug 24 — a real trade, but one whose entry predates the week being measured, so it isn't this week's decision to take credit or blame for. Dropped (−$3,859 removed from the curve, mirroring <code>weekly-trades</code>' <code>--drop-carry</code>).",
+    "tone": "critical"
+  },
+  {
+    "title": "Net vs. gross:",
+    "body": "commission on this window ($3,384.67) is bigger than the net result — before commission the same trades made more. Both lines are on the chart below; the gap between them at any point is exactly the cumulative commission to date."
+  }
+]

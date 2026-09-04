@@ -51,9 +51,20 @@ python3 <this-skill-dir>/scripts/build_recap.py <path-to-trades-json> <output-di
 
 It writes `day-recap.json` (the most recent trading day only) and
 `all-time-curve.json` (one point per exit — a *trade*, not a calendar day — from
-`--since` onward, chronologically ordered, ticker included on each) to `<output-dir>`,
-and prints both to stdout. Omit `--since` only if there is no known reset boundary; the
-script then uses every exit it was given.
+`--since` onward, chronologically ordered, ticker and commission included on each) to
+`<output-dir>`, and prints both to stdout. Omit `--since` only if there is no known
+reset boundary; the script then uses every exit it was given.
+
+Two more filters exist for exactly the cases weekly-trades already named, because the
+same account hits the same two problems: `--drop-expiry SYM[,SYM] --expiry-day
+YYYY-MM-DD` for a price-0 row that is a reset/vanished position rather than a real
+expiry (nothing in the feed tells them apart — only the account holder does), and
+`--drop-carry SYM[,SYM] --carry-day YYYY-MM-DD` for a real, nonzero-price exit whose
+cost basis traces back to a lot opened *before* the window being reported on (e.g. a
+position carried in from before a reset week) — a real trade, but not one that window
+should get credit or blame for. Both are opt-in and blunt (they drop every matching
+exit on that day), so only apply them on the account holder's say-so, the same way
+weekly-trades treats them as a judgement call rather than a default.
 
 **3. Report the day.** Quote from `day-recap.json` rather than re-deriving anything:
 net P&L, win rate, profit factor, the per-ticker split, biggest win and biggest loss,
@@ -62,28 +73,38 @@ and the expiries block (worthless-expiry premium is real money lost that IBKR's 
 most recent trading day was not literally yesterday (a weekend, a holiday, or a quiet
 day with no fills), say which day it actually is before reporting on it.
 
-**4. Build the progress chart.** Read the `dataviz` skill before writing it — this is a
-single cumulative-P&L line (not one line per ticker; per-ticker color-coding isn't the
-point here, the running total is) with a ticker checklist as the filter row above it,
-per `interaction.md`'s "filters in one row above the charts." Each point is one trade
-from `all-time-curve.json`'s `trades` list, in order — not one point per day — so a busy
-session shows up as a run of points, not a single flat step. Walk the list client-side
-and add each trade's pnl to a running total only if its ticker is still checked
-(contribute 0, don't drop the point, for an excluded ticker's trade — the x-axis stays
-the same length as tickers toggle, only the line's shape changes). Space points by trade
-index, not by date, and label the x-axis sparsely (a handful of date ticks) rather than
-one label per point. Give the chart a hover tooltip per point (date, time, ticker, that
-trade's own pnl, and the running cumulative total). Put the day-recap numbers from step
-3 in a small card above or beside the chart so the page is a complete standing artifact,
-not just the chart.
+**4. Render the report — one command, no HTML to write by hand.**
 
-Give it a **net / before-commission toggle**. Each trade in `all-time-curve.json` carries
-both `pnl` (IBKR's `realized_pnl`, already net of commission — see `weekly-trades`' notes
-on this) and `com` (that trade's commission). Net view sums `pnl`; before-commission
-(gross) view sums `pnl + com` — commission is a cost already subtracted, so adding it back
-shows what the trades made before fees, not double-charging it. Surface the total
-commission paid (`total_commission` in the curve JSON, or the day's `commission` field in
-the day recap) as its own KPI too, not just folded into the toggle.
+```bash
+python3 <this-skill-dir>/scripts/render_report.py \
+    <output-dir>/day-recap.json <output-dir>/all-time-curve.json <output-dir>/trading-progress.html \
+    [--notes <output-dir>/notes.json]
+```
+
+This is a plain, self-contained script — stdlib only, no MCP tools, no Claude — that
+drops the two JSON files from step 2 into `report_template.html` (next to it in the same
+directory) and writes the finished page. It always renders: the KPI row and per-ticker
+table from `day-recap.json`; a ticker checklist (the "sanitize" control — unchecking a
+symbol removes it from both lines below, contributing 0 rather than dropping the point,
+so the x-axis stays the same length); and **two lines on one chart, always both
+visible** — net of commission and before commission (net + that trade's `com` added
+back), same axis, a legend, the gap between them at any point being the cumulative
+commission to date — one point per trade in `all-time-curve.json`'s `trades` list, not
+one per day, so a busy session reads as a run of points. All of that is mechanical; if
+the `dataviz` skill's rules and this file's script ever disagree on a chart detail,
+change the template, don't reason around it inline.
+
+The one thing the script does *not* generate is the investigation narrative — a reset
+write-off found and dropped, a carried position excluded, that kind of finding belongs
+to this specific run's story, not to a template. Write it as a small JSON array (see the
+module docstring in `render_report.py` for the shape) and pass it as `--notes`; each
+entry renders as a callout above the KPI row, in order. No `--notes` is a fine, valid
+call for a clean run with nothing to flag.
+
+Because the whole pipeline from here is `build_recap.py` → `render_report.py`, both
+plain Python with no dependency on this skill or on Claude, it can be re-run by hand
+any time there's a trades JSON on disk — getting that JSON in the first place is the
+one step that still needs the IBKR connector.
 
 **5. Publish it as an Artifact**, not a static file — the whole point of "sanitize a
 ticker from the graph" is that the user interacts with it after delivery. If a prior
@@ -91,16 +112,17 @@ run's artifact URL is saved (see step 6), read it first and republish to the sam
 so the link stays stable; otherwise publish new and save the URL.
 
 **6. Save it.** If working in the account holder's `stock-scanner` repo, write
-`day-recap.json` and `all-time-curve.json` to `data/<YYYY-MM-DD>-day/`, and keep the
-published artifact's URL in `data/all-time-progress-artifact-url.txt` (create it on the
-first run, overwrite nothing else) so the next run updates the same page instead of
-publishing a new one. Outside that repo, hand the files over directly.
+`day-recap.json`, `all-time-curve.json` and (if used) `notes.json` to
+`data/<YYYY-MM-DD>-day/`, and keep the published artifact's URL in
+`data/all-time-progress-artifact-url.txt` (create it on the first run, overwrite nothing
+else) so the next run updates the same page instead of publishing a new one. Outside
+that repo, hand the files over directly.
 
 ## What this deliberately does not do
 
-- No week-start guessing, no `--tickers`/`--drop-carry` filters, no xlsx — this is a
-  smaller, faster tool than `weekly-trades` for a narrower question. If the user wants
-  the full weekly workbook, hand off to that skill instead of trying to stretch this one.
+- No week-start guessing, no `--tickers` filter, no xlsx — this is a smaller, faster
+  tool than `weekly-trades` for a narrower question. If the user wants the full weekly
+  workbook, hand off to that skill instead of trying to stretch this one.
 - The progress chart is built from realized exits the trade feed can see, not from
   account NAV — it will not match `get_pa_performance_all_periods` exactly, since that
   series is time-weighted-return-based and reacts to deposits/withdrawals. Don't present

@@ -200,19 +200,30 @@ def day_summary(exits, day, all_trades, tz):
 
 # ------------------------------------------------------------- all-time curve ---
 
-def all_time_curve(exits):
-    """Per-day, per-ticker net P&L — the client sums whichever tickers stay checked."""
-    dates = sorted({e["date"] for e in exits})
-    tickers = sorted({e["sym"] for e in exits})
-    by_ticker = {
-        sym: [round(sum(e["pnl"] for e in exits if e["sym"] == sym and e["date"] == d), 2)
-              for d in dates]
-        for sym in tickers
-    }
-    return {"dates": dates, "tickers": tickers, "by_ticker": by_ticker,
-            "total_pnl": round(sum(e["pnl"] for e in exits), 2),
-            "first_date": dates[0] if dates else None,
-            "last_date": dates[-1] if dates else None}
+def all_time_curve(exits, since=None):
+    """One point per exit (trade), in chronological order, since `since` if given.
+
+    Per-day was the first cut of this, but it hides how a session actually unfolded —
+    a day's number is really N separate decisions. The client walks this list in order
+    and sums the pnl of whichever tickers stay checked, contributing 0 (not skipping the
+    point) for an excluded ticker's trade so the x-axis stays stable as tickers toggle.
+
+    `since` exists because trade history and IBKR's own performance tracking do not
+    always agree on when the account "started" — a reset, a funding change, a paper
+    account wipe. Pass the boundary the account holder confirmed; this function does not
+    guess it.
+    """
+    rows = sorted(exits, key=lambda e: (e["date"], e["time"]))
+    if since:
+        rows = [e for e in rows if e["date"] >= since]
+    tickers = sorted({e["sym"] for e in rows})
+    trades = [{"date": e["date"], "time": e["time"], "sym": e["sym"], "qty": e["qty"],
+               "pnl": e["pnl"], "expired": e["expired"]} for e in rows]
+    return {"trades": trades, "tickers": tickers,
+            "total_pnl": round(sum(e["pnl"] for e in rows), 2),
+            "since": since,
+            "first_date": rows[0]["date"] if rows else None,
+            "last_date": rows[-1]["date"] if rows else None}
 
 
 # -------------------------------------------------------------------- main ---
@@ -222,6 +233,8 @@ def main():
     p.add_argument("trades_json")
     p.add_argument("outdir")
     p.add_argument("--tz-offset", type=int, default=-4)
+    p.add_argument("--since", help="YYYY-MM-DD — only include curve trades on/after this "
+                                    "date (e.g. the account's last reset or funding change)")
     args = p.parse_args()
 
     trades = load_trades(args.trades_json)
@@ -231,7 +244,7 @@ def main():
 
     last_day = max(e["date"] for e in exits)
     recap = day_summary(exits, last_day, trades, args.tz_offset)
-    curve = all_time_curve(exits)
+    curve = all_time_curve(exits, since=args.since)
 
     os.makedirs(args.outdir, exist_ok=True)
     with open(os.path.join(args.outdir, "day-recap.json"), "w", encoding="utf-8") as fh:

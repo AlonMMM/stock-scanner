@@ -33,16 +33,27 @@ complete. (There is no single call that goes back further — `get_account_trade
 out at the four most recent completed quarters plus YTD — so a multi-year account's
 true all-time curve would need those quarter calls merged in too, deduped by trade ID.)
 
+**1b. Find the reset boundary.** `accounts.account.start` from that same
+`get_pa_performance_all_periods` call is also the honest start of "all time" — it is
+where IBKR's own performance tracking begins, which is not always the date of the
+earliest row in the trade feed (a paper-account reset or a funding change can leave
+older rows sitting in the feed that no longer reflect the account's current balance).
+Pass that date as `--since` in step 2 rather than defaulting to whatever the trade feed
+happens to contain. If the account holder names a different reset date, use that
+instead — they know their own account history better than either API does.
+
 **2. Run the script.**
 
 ```bash
-python3 <this-skill-dir>/scripts/build_recap.py <path-to-trades-json> <output-dir>
+python3 <this-skill-dir>/scripts/build_recap.py <path-to-trades-json> <output-dir> \
+    --since <reset-date-from-step-1b>
 ```
 
 It writes `day-recap.json` (the most recent trading day only) and
-`all-time-curve.json` (every exit in the file, as a per-day, per-ticker P&L matrix —
-the client sums whichever tickers stay checked) to `<output-dir>`, and prints both to
-stdout.
+`all-time-curve.json` (one point per exit — a *trade*, not a calendar day — from
+`--since` onward, chronologically ordered, ticker included on each) to `<output-dir>`,
+and prints both to stdout. Omit `--since` only if there is no known reset boundary; the
+script then uses every exit it was given.
 
 **3. Report the day.** Quote from `day-recap.json` rather than re-deriving anything:
 net P&L, win rate, profit factor, the per-ticker split, biggest win and biggest loss,
@@ -54,13 +65,17 @@ day with no fills), say which day it actually is before reporting on it.
 **4. Build the progress chart.** Read the `dataviz` skill before writing it — this is a
 single cumulative-P&L line (not one line per ticker; per-ticker color-coding isn't the
 point here, the running total is) with a ticker checklist as the filter row above it,
-per `interaction.md`'s "filters in one row above the charts." Unchecking a ticker
-removes its contribution from the cumulative sum and the line redraws — all client-side
-against the embedded `all-time-curve.json` data, no server round-trip. Default: every
-ticker checked. Give the chart a hover tooltip (date, cumulative P&L, and which tickers
-are currently excluded if any are). Put the day-recap numbers from step 3 in a small
-card above or beside the chart so the page is a complete standing artifact, not just
-the chart.
+per `interaction.md`'s "filters in one row above the charts." Each point is one trade
+from `all-time-curve.json`'s `trades` list, in order — not one point per day — so a busy
+session shows up as a run of points, not a single flat step. Walk the list client-side
+and add each trade's pnl to a running total only if its ticker is still checked
+(contribute 0, don't drop the point, for an excluded ticker's trade — the x-axis stays
+the same length as tickers toggle, only the line's shape changes). Space points by trade
+index, not by date, and label the x-axis sparsely (a handful of date ticks) rather than
+one label per point. Give the chart a hover tooltip per point (date, time, ticker, that
+trade's own pnl, and the running cumulative total). Put the day-recap numbers from step
+3 in a small card above or beside the chart so the page is a complete standing artifact,
+not just the chart.
 
 **5. Publish it as an Artifact**, not a static file — the whole point of "sanitize a
 ticker from the graph" is that the user interacts with it after delivery. If a prior

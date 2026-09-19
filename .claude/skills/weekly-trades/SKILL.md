@@ -126,11 +126,16 @@ This report intentionally does **not** narrate the filter chain, the audit-recon
 table, or what got dropped and why — the account holder does not want that in the report
 he reads every week; that belongs in `data/<week>/README.md` instead (see below). It does
 always explain commissions plainly (net P&L already nets both legs; the figures shown are
-for context, not a further deduction) and always plots every exit as its own point on a
-**real time axis** — x is the actual exit timestamp, not an evenly-spaced index within the
-day, so a burst of trades minutes apart reads as a cluster and a quiet stretch reads as
-empty space — sized by premium (log scale: an outright futures trade's notional dwarfs an
-option's premium) and colored by win/loss.
+for context, not a further deduction).
+
+The main chart is a **cumulative P&L curve, not a scatter of each trade's own result** — a
+scatter of raw per-trade P&L doesn't read as "profit over time" even with a real time axis,
+because a curve needs a running total, not independent points floating around zero. X is
+the actual exit timestamp (real time, not an evenly-spaced index within the day, so a burst
+of trades minutes apart moves the line in a cluster and a quiet stretch is flat); Y is the
+running total after each exit; every exit still gets its own point on the line, colored by
+whether that individual trade won or lost, so the per-trade detail survives inside the
+week's trajectory. Area fill is green above zero and red below it.
 
 If a restart write-off needs excluding and its date differs from another symbol's on the
 same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes

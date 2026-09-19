@@ -202,62 +202,69 @@ def trade_dt(t):
 
 
 def render_scatter(trades):
-    """Every exit as one point, x = actual clock time (not day-bucketed index) —
-    a burst of ten trades in ten minutes should look like a cluster, not get spread
-    evenly across a day's slot the way an index-based x-axis would draw it."""
+    """The week's running P&L over time: a proper profit/loss curve, not a scatter of
+    each trade's own result. X is the actual exit timestamp (linear, real time — a
+    burst of trades minutes apart clusters; a quiet stretch shows as empty space); Y
+    is the CUMULATIVE total after that exit. Every trade still gets its own point on
+    the line, colored by whether that individual trade was a win or a loss, so the
+    per-trade detail survives inside the running total."""
     W, H = 700, 340
     padL, padR, padT, padB = 54, 16, 14, 36
     plotW, plotH = W - padL - padR, H - padT - padB
 
-    times = [trade_dt(t) for t in trades]
+    ordered = sorted(trades, key=trade_dt)
+    times = [trade_dt(t) for t in ordered]
     tmin, tmax = (min(times), max(times)) if times else (None, None)
     trange = (tmax - tmin).total_seconds() if times and tmax > tmin else 1
 
     def x_of(dt):
         return padL + plotW * (dt - tmin).total_seconds() / trange
 
-    vals = [t["net_pnl_usd"] for t in trades]
-    vmax = max(0, max(vals)) if vals else 1
-    vmin = min(0, min(vals)) if vals else -1
+    running = []
+    total = 0.0
+    for t in ordered:
+        total += t["net_pnl_usd"]
+        running.append(total)
+
+    vmax = max(0, max(running)) if running else 1
+    vmin = min(0, min(running)) if running else -1
     vrange = (vmax - vmin) or 1
 
     def y_of(v):
         return padT + plotH * (vmax - v) / vrange
 
-    # Log scale: an outright futures trade's notional (CL, ~$100k+) sits three orders
-    # of magnitude above a typical option's premium ($100s-$1,000s) — a linear scale
-    # would render every option-sized dot at the same minimum size.
-    import math
-    log_prems = [math.log10(max(t["premium_paid_usd"], 1)) for t in trades] or [0]
-    pmin, pmax = min(log_prems), max(log_prems)
-
-    def r_of(p):
-        lp = math.log10(max(p, 1))
-        if pmax <= pmin:
-            return 5.0
-        frac = (lp - pmin) / (pmax - pmin)
-        return 3.0 + 7.0 * frac
-
     zero_y = y_of(0)
+    pts = [(x_of(dt), y_of(cum)) for dt, cum in zip(times, running)]
+
+    # Start the line/fill at (first point's x, $0) so the very first trade's own
+    # result is visible as a segment, not skipped.
+    line_pts = [(pts[0][0], zero_y)] + pts if pts else []
+    poly = " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts)
+    fill = " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts)
+    fill = "{:.1f},{:.1f} ".format(line_pts[0][0], zero_y) + fill + \
+        " {:.1f},{:.1f}".format(line_pts[-1][0], zero_y) if line_pts else ""
+
     circles = []
-    for t, dt in zip(trades, times):
+    for t, (cx, cy), cum in zip(ordered, pts, running):
         v = t["net_pnl_usd"]
-        cx, cy = x_of(dt), y_of(v)
         color = "var(--pos)" if v >= 0 else "var(--neg)"
         circles.append(
-            '<circle class="bar" cx="{:.1f}" cy="{:.1f}" r="{:.1f}" fill="{}" '
-            'fill-opacity="0.82"><title>{} {} {} — {} ({} premium, {})</title>'
-            '</circle>'.format(
-                cx, cy, r_of(t["premium_paid_usd"]), color,
-                esc(t["ticker"]), t["date"], t.get("time_session", ""),
-                money(v, sign=True), money(t["premium_paid_usd"]),
-                hold_label(t.get("hold_minutes"))))
+            '<circle class="bar" cx="{:.1f}" cy="{:.1f}" r="3.2" fill="{}" '
+            'fill-opacity="0.9"><title>{} {} {} — {} this trade, {} running total</title>'
+            '</circle>'.format(cx, cy, color, esc(t["ticker"]), t["date"],
+                                t.get("time_session", ""), money(v, sign=True), money(cum, sign=True)))
 
-    # Day-boundary gridlines at each date's first trade — positioned by real elapsed
-    # time, so a quiet evening/weekend gap actually shows as empty space on the axis.
+    end_label = ""
+    if pts:
+        ex, ey = pts[-1]
+        end_color = "var(--pos)" if running[-1] >= 0 else "var(--neg)"
+        end_label = ('<circle cx="{:.1f}" cy="{:.1f}" r="4.5" fill="{}"></circle>'
+                     '<text class="end-lab" x="{:.1f}" y="{:.1f}" text-anchor="end">{}</text>'
+                     ).format(ex, ey, end_color, ex - 6, ey - 8, money(running[-1], sign=True))
+
     daylines, daylabels = [], []
     seen = set()
-    for t, dt in zip(trades, times):
+    for t, dt in zip(ordered, times):
         if t["date"] in seen:
             continue
         seen.add(t["date"])
@@ -269,18 +276,29 @@ def render_scatter(trades):
                          .format(max(gx, padL), H - 6, wd, t["date"][5:]))
 
     return """
-    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Every trade as one point, by time">
+    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Cumulative P&amp;L over the week">
+      <defs>
+        <clipPath id="cuPos"><rect x="0" y="0" width="{W}" height="{zy:.1f}"></rect></clipPath>
+        <clipPath id="cuNeg"><rect x="0" y="{zy:.1f}" width="{W}" height="{H}"></rect></clipPath>
+      </defs>
       <line class="grid-line" x1="{pl}" y1="{zy:.1f}" x2="{rx}" y2="{zy:.1f}"></line>
       <text class="tick" x="{rxlab}" y="{zylab:.1f}">$0</text>
       {daylines}
+      <polygon points="{fill}" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>
+      <polygon points="{fill}" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>
+      <polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"
+        stroke-linecap="round" points="{poly}"></polyline>
       {circles}
+      {end_label}
       <line class="axis-line" x1="{pl}" y1="{ax}" x2="{rx}" y2="{ax}"></line>
       {daylabels}
     </svg>
     """.format(W=W, H=H, pl=padL, rx=W - padR, rxlab=W - padR + 4,
                zy=zero_y, zylab=zero_y + 3.5, ax=H - padB,
+               fill=fill, poly=poly,
                daylines="\n      ".join(daylines),
-               circles="\n      ".join(circles), daylabels="\n      ".join(daylabels))
+               circles="\n      ".join(circles), daylabels="\n      ".join(daylabels),
+               end_label=end_label)
 
 
 # -------------------------------------------------------------- hold tiles --
@@ -614,6 +632,7 @@ TEMPLATE = r"""<title>{title}</title>
   .axis-line {{ stroke: var(--rule-2); stroke-width: 1; }}
   .tick {{ font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-3); }}
   .val-lab {{ font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--ink); font-weight: 600; }}
+  .end-lab {{ font-family: "IBM Plex Mono", monospace; font-size: 11.5px; fill: var(--ink); font-weight: 700; }}
   .row-lab {{ font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 600; fill: var(--ink); }}
   .bar {{ transition: opacity .12s ease; }} .bar:hover {{ opacity: .72; }}
   .legend {{ display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.83rem; color: var(--ink-2); }}
@@ -697,18 +716,19 @@ TEMPLATE = r"""<title>{title}</title>
   </div>
 
   <section>
-    <div class="sec-head"><h2>Every trade</h2><span class="tag">{n_exits} points</span></div>
-    <p>One point per exit, positioned by its actual exit time — not evenly spaced within a day, so a
-      burst of trades minutes apart shows up as a cluster. Size follows premium risked; color follows win or loss.</p>
+    <div class="sec-head"><h2>P&amp;L over time</h2><span class="tag">{n_exits} exits</span></div>
+    <p>Running total across the week, plotted on real time — not evenly spaced within a day, so a
+      burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat. Every exit
+      is still its own point on the line, colored by whether that individual trade won or lost.</p>
     <div class="figure">
       <div class="chart-scroll">{scatter_svg}</div>
       <div class="legend">
-        <span><i class="dotswatch" style="background:var(--pos)"></i> Win</span>
-        <span><i class="dotswatch" style="background:var(--neg)"></i> Loss</span>
-        <span>Dot size &middot; premium risked</span>
+        <span><i class="dotswatch" style="background:var(--pos)"></i> Winning trade</span>
+        <span><i class="dotswatch" style="background:var(--neg)"></i> Losing trade</span>
+        <span>Line &middot; cumulative P&amp;L</span>
         <span>X-axis &middot; actual time</span>
       </div>
-      <div class="cap"><b>Every filtered exit this week.</b> Hover a point for ticker, time, result and hold.</div>
+      <div class="cap"><b>Cumulative P&amp;L, {n_exits} exits.</b> Hover a point for that trade's own result and the running total right after it.</div>
     </div>
   </section>
 

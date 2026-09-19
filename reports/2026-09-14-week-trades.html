@@ -76,6 +76,7 @@
   .axis-line { stroke: var(--rule-2); stroke-width: 1; }
   .tick { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-3); }
   .val-lab { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--ink); font-weight: 600; }
+  .end-lab { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; fill: var(--ink); font-weight: 700; }
   .row-lab { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 600; fill: var(--ink); }
   .bar { transition: opacity .12s ease; } .bar:hover { opacity: .72; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.83rem; color: var(--ink-2); }
@@ -159,123 +160,133 @@
   </div>
 
   <section>
-    <div class="sec-head"><h2>Every trade</h2><span class="tag">103 points</span></div>
-    <p>One point per exit, positioned by its actual exit time — not evenly spaced within a day, so a
-      burst of trades minutes apart shows up as a cluster. Size follows premium risked; color follows win or loss.</p>
+    <div class="sec-head"><h2>P&amp;L over time</h2><span class="tag">103 exits</span></div>
+    <p>Running total across the week, plotted on real time — not evenly spaced within a day, so a
+      burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat. Every exit
+      is still its own point on the line, colored by whether that individual trade won or lost.</p>
     <div class="figure">
       <div class="chart-scroll">
-    <svg viewBox="0 0 700 340" role="img" aria-label="Every trade as one point, by time">
-      <line class="grid-line" x1="54" y1="194.1" x2="684" y2="194.1"></line>
-      <text class="tick" x="688" y="197.6">$0</text>
+    <svg viewBox="0 0 700 340" role="img" aria-label="Cumulative P&amp;L over the week">
+      <defs>
+        <clipPath id="cuPos"><rect x="0" y="0" width="700" height="14.0"></rect></clipPath>
+        <clipPath id="cuNeg"><rect x="0" y="14.0" width="700" height="340"></rect></clipPath>
+      </defs>
+      <line class="grid-line" x1="54" y1="14.0" x2="684" y2="14.0"></line>
+      <text class="tick" x="688" y="17.5">$0</text>
       <line class="grid-line" x1="54.0" y1="14" x2="54.0" y2="304"></line>
       <line class="grid-line" x1="145.0" y1="14" x2="145.0" y2="304"></line>
       <line class="grid-line" x1="249.6" y1="14" x2="249.6" y2="304"></line>
       <line class="grid-line" x1="357.6" y1="14" x2="357.6" y2="304"></line>
       <line class="grid-line" x1="493.7" y1="14" x2="493.7" y2="304"></line>
       <line class="grid-line" x1="613.6" y1="14" x2="613.6" y2="304"></line>
-      <circle class="bar" cx="54.0" cy="202.0" r="9.6" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-13 18:06 — -$134 ($308,384 premium, 0m hold)</title></circle>
-      <circle class="bar" cx="54.0" cy="193.2" r="8.8" fill="var(--pos)" fill-opacity="0.82"><title>CL 2026-09-13 18:06 — +$15 ($102,795 premium, 0m hold)</title></circle>
-      <circle class="bar" cx="55.3" cy="220.4" r="8.8" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-13 18:21 — -$445 ($103,255 premium, 11m hold)</title></circle>
-      <circle class="bar" cx="55.3" cy="218.6" r="8.8" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-13 18:21 — -$415 ($103,255 premium, 11m hold)</title></circle>
-      <circle class="bar" cx="145.0" cy="194.1" r="8.8" fill="var(--pos)" fill-opacity="0.82"><title>CL 2026-09-14 11:06 — $0 ($102,140 premium, unknown hold)</title></circle>
-      <circle class="bar" cx="146.6" cy="205.4" r="6.2" fill="var(--neg)" fill-opacity="0.82"><title>PLTR 2026-09-14 11:24 — -$191 ($1,941 premium, 10m hold)</title></circle>
-      <circle class="bar" cx="147.3" cy="225.5" r="5.7" fill="var(--neg)" fill-opacity="0.82"><title>MSFT 2026-09-14 11:31 — -$531 ($981 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="150.7" cy="252.9" r="8.8" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-14 12:10 — -$995 ($103,165 premium, 56m hold)</title></circle>
-      <circle class="bar" cx="154.3" cy="185.6" r="4.0" fill="var(--pos)" fill-opacity="0.82"><title>MSFT 2026-09-14 12:50 — +$143 ($76 premium, 6m hold)</title></circle>
-      <circle class="bar" cx="154.5" cy="173.5" r="4.6" fill="var(--pos)" fill-opacity="0.82"><title>MSFT 2026-09-14 12:52 — +$347 ($178 premium, 9m hold)</title></circle>
-      <circle class="bar" cx="154.7" cy="172.1" r="5.5" fill="var(--pos)" fill-opacity="0.82"><title>MSFT 2026-09-14 12:54 — +$372 ($768 premium, 10m hold)</title></circle>
-      <circle class="bar" cx="164.3" cy="196.5" r="5.2" fill="var(--neg)" fill-opacity="0.82"><title>IBIT 2026-09-14 14:42 — -$40 ($440 premium, 16m hold)</title></circle>
-      <circle class="bar" cx="171.1" cy="196.2" r="5.3" fill="var(--neg)" fill-opacity="0.82"><title>GOOGL 2026-09-14 15:58 — -$36 ($506 premium, 1m hold)</title></circle>
-      <circle class="bar" cx="249.6" cy="258.5" r="9.3" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-15 06:38 — -$1,089 ($207,529 premium, 142m hold)</title></circle>
-      <circle class="bar" cx="261.1" cy="250.5" r="8.8" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-15 08:47 — -$955 ($103,015 premium, 16m hold)</title></circle>
-      <circle class="bar" cx="265.3" cy="280.5" r="6.3" fill="var(--neg)" fill-opacity="0.82"><title>IBIT 2026-09-15 09:34 — -$1,462 ($2,212 premium, 1148m hold)</title></circle>
-      <circle class="bar" cx="265.3" cy="260.7" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>MSTR 2026-09-15 09:34 — -$1,126 ($1,726 premium, 1383m hold)</title></circle>
-      <circle class="bar" cx="266.4" cy="304.0" r="6.6" fill="var(--neg)" fill-opacity="0.82"><title>GOOGL 2026-09-15 09:46 — -$1,859 ($3,539 premium, unknown hold)</title></circle>
-      <circle class="bar" cx="266.6" cy="107.1" r="8.8" fill="var(--pos)" fill-opacity="0.82"><title>CL 2026-09-15 09:48 — +$1,470 ($101,810 premium, 48m hold)</title></circle>
-      <circle class="bar" cx="268.2" cy="226.4" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>META 2026-09-15 10:06 — -$546 ($1,834 premium, 22m hold)</title></circle>
-      <circle class="bar" cx="268.2" cy="196.7" r="4.5" fill="var(--neg)" fill-opacity="0.82"><title>META 2026-09-15 10:06 — -$45 ($159 premium, 22m hold)</title></circle>
-      <circle class="bar" cx="268.4" cy="273.9" r="6.2" fill="var(--neg)" fill-opacity="0.82"><title>WIX 2026-09-15 10:09 — -$1,351 ($1,951 premium, 1401m hold)</title></circle>
-      <circle class="bar" cx="270.0" cy="214.1" r="5.8" fill="var(--neg)" fill-opacity="0.82"><title>ES 2026-09-15 10:27 — -$339 ($1,202 premium, 4m hold)</title></circle>
-      <circle class="bar" cx="271.4" cy="194.1" r="10.0" fill="var(--pos)" fill-opacity="0.82"><title>NQ 2026-09-15 10:42 — $0 ($585,605 premium, unknown hold)</title></circle>
-      <circle class="bar" cx="272.7" cy="239.2" r="6.2" fill="var(--neg)" fill-opacity="0.82"><title>CRWD 2026-09-15 10:57 — -$763 ($1,963 premium, 70m hold)</title></circle>
-      <circle class="bar" cx="272.9" cy="205.8" r="6.2" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-15 10:59 — -$198 ($2,118 premium, 21m hold)</title></circle>
-      <circle class="bar" cx="276.6" cy="267.8" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-15 11:40 — -$1,247 ($1,747 premium, 40m hold)</title></circle>
-      <circle class="bar" cx="276.6" cy="14.0" r="9.3" fill="var(--pos)" fill-opacity="0.82"><title>CL 2026-09-15 11:41 — +$3,046 ($205,574 premium, 39m hold)</title></circle>
-      <circle class="bar" cx="294.1" cy="199.1" r="4.3" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-15 14:57 — -$85 ($125 premium, 165m hold)</title></circle>
-      <circle class="bar" cx="298.5" cy="224.4" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>QCOM 2026-09-15 15:46 — -$514 ($1,459 premium, 112m hold)</title></circle>
-      <circle class="bar" cx="330.2" cy="217.1" r="9.3" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-15 21:41 — -$389 ($210,669 premium, 537m hold)</title></circle>
-      <circle class="bar" cx="357.6" cy="257.3" r="9.3" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-16 02:48 — -$1,069 ($209,369 premium, 813m hold)</title></circle>
-      <circle class="bar" cx="365.9" cy="230.1" r="9.3" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-16 04:21 — -$609 ($209,169 premium, 906m hold)</title></circle>
-      <circle class="bar" cx="367.6" cy="197.3" r="8.8" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-16 04:40 — -$55 ($104,755 premium, 924m hold)</title></circle>
-      <circle class="bar" cx="375.3" cy="250.5" r="8.8" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-16 06:07 — -$955 ($104,755 premium, 1012m hold)</title></circle>
-      <circle class="bar" cx="393.6" cy="193.9" r="3.7" fill="var(--pos)" fill-opacity="0.82"><title>INTC 2026-09-16 09:32 — +$2 ($52 premium, 2m hold)</title></circle>
-      <circle class="bar" cx="393.7" cy="250.4" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>CVX 2026-09-16 09:33 — -$952 ($1,702 premium, 1392m hold)</title></circle>
-      <circle class="bar" cx="394.0" cy="201.9" r="5.4" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-16 09:36 — -$132 ($592 premium, 6m hold)</title></circle>
-      <circle class="bar" cx="394.1" cy="196.2" r="4.8" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-16 09:37 — -$37 ($257 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="394.3" cy="270.3" r="9.3" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-16 09:39 — -$1,289 ($208,389 premium, 1224m hold)</title></circle>
-      <circle class="bar" cx="394.6" cy="235.3" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>AAPL 2026-09-16 09:43 — -$698 ($1,738 premium, 12m hold)</title></circle>
-      <circle class="bar" cx="395.1" cy="250.2" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-16 09:48 — -$949 ($1,789 premium, 17m hold)</title></circle>
-      <circle class="bar" cx="395.9" cy="184.4" r="6.0" fill="var(--pos)" fill-opacity="0.82"><title>SPCX 2026-09-16 09:57 — +$164 ($1,456 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="422.7" cy="194.1" r="10.0" fill="var(--pos)" fill-opacity="0.82"><title>NQ 2026-09-16 14:58 — $0 ($584,850 premium, unknown hold)</title></circle>
-      <circle class="bar" cx="425.8" cy="207.5" r="6.2" fill="var(--neg)" fill-opacity="0.82"><title>ES 2026-09-16 15:32 — -$227 ($1,967 premium, 23m hold)</title></circle>
-      <circle class="bar" cx="426.9" cy="247.1" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>CRWD 2026-09-16 15:45 — -$896 ($1,846 premium, 1722m hold)</title></circle>
-      <circle class="bar" cx="427.0" cy="239.3" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>SMCI 2026-09-16 15:46 — -$765 ($1,465 premium, 149m hold)</title></circle>
-      <circle class="bar" cx="493.7" cy="206.7" r="10.0" fill="var(--neg)" fill-opacity="0.82"><title>NQ 2026-09-17 04:13 — -$214 ($590,259 premium, 16m hold)</title></circle>
-      <circle class="bar" cx="522.0" cy="34.7" r="10.0" fill="var(--pos)" fill-opacity="0.82"><title>NQ 2026-09-17 09:31 — +$2,696 ($591,219 premium, 248m hold)</title></circle>
-      <circle class="bar" cx="522.7" cy="227.6" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>TSLA 2026-09-17 09:38 — -$568 ($1,423 premium, 8m hold)</title></circle>
-      <circle class="bar" cx="522.8" cy="194.8" r="3.0" fill="var(--neg)" fill-opacity="0.82"><title>IREN 2026-09-17 09:39 — -$12 ($17 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="522.9" cy="278.1" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>IREN 2026-09-17 09:41 — -$1,421 ($1,619 premium, 10m hold)</title></circle>
-      <circle class="bar" cx="523.2" cy="202.6" r="5.5" fill="var(--neg)" fill-opacity="0.82"><title>NVDA 2026-09-17 09:44 — -$143 ($713 premium, 3m hold)</title></circle>
-      <circle class="bar" cx="526.9" cy="228.1" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>TSLA 2026-09-17 10:25 — -$576 ($1,726 premium, 28m hold)</title></circle>
-      <circle class="bar" cx="527.0" cy="215.7" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>MU 2026-09-17 10:27 — -$365 ($1,377 premium, 54m hold)</title></circle>
-      <circle class="bar" cx="528.1" cy="199.8" r="5.6" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-17 10:39 — -$96 ($816 premium, 11m hold)</title></circle>
-      <circle class="bar" cx="528.7" cy="187.2" r="6.0" fill="var(--pos)" fill-opacity="0.82"><title>NVDA 2026-09-17 10:46 — +$117 ($1,493 premium, 62m hold)</title></circle>
-      <circle class="bar" cx="531.1" cy="210.2" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-17 11:12 — -$273 ($1,413 premium, 27m hold)</title></circle>
-      <circle class="bar" cx="531.1" cy="196.1" r="5.7" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-17 11:12 — -$34 ($994 premium, 43m hold)</title></circle>
-      <circle class="bar" cx="534.2" cy="214.9" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>SMCI 2026-09-17 11:47 — -$352 ($1,352 premium, 67m hold)</title></circle>
-      <circle class="bar" cx="537.6" cy="240.7" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>MRNA 2026-09-17 12:25 — -$789 ($1,264 premium, 78m hold)</title></circle>
-      <circle class="bar" cx="540.0" cy="196.8" r="4.3" fill="var(--neg)" fill-opacity="0.82"><title>HPE 2026-09-17 12:52 — -$46 ($118 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="540.0" cy="200.4" r="4.9" fill="var(--neg)" fill-opacity="0.82"><title>HPE 2026-09-17 12:52 — -$107 ($315 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="540.1" cy="206.4" r="5.5" fill="var(--neg)" fill-opacity="0.82"><title>HPE 2026-09-17 12:53 — -$209 ($741 premium, 8m hold)</title></circle>
-      <circle class="bar" cx="541.0" cy="227.9" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>GOOGL 2026-09-17 13:03 — -$573 ($1,773 premium, 105m hold)</title></circle>
-      <circle class="bar" cx="541.3" cy="154.4" r="5.0" fill="var(--pos)" fill-opacity="0.82"><title>OKLO 2026-09-17 13:07 — +$671 ($329 premium, 110m hold)</title></circle>
-      <circle class="bar" cx="541.4" cy="74.8" r="5.7" fill="var(--pos)" fill-opacity="0.82"><title>OKLO 2026-09-17 13:08 — +$2,018 ($982 premium, 111m hold)</title></circle>
-      <circle class="bar" cx="543.5" cy="220.5" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-17 13:32 — -$447 ($1,847 premium, 2468m hold)</title></circle>
-      <circle class="bar" cx="551.1" cy="238.0" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>INTC 2026-09-17 14:57 — -$743 ($1,535 premium, 139m hold)</title></circle>
-      <circle class="bar" cx="554.1" cy="221.0" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>MSTR 2026-09-17 15:30 — -$455 ($1,490 premium, 158m hold)</title></circle>
-      <circle class="bar" cx="555.6" cy="194.4" r="4.1" fill="var(--neg)" fill-opacity="0.82"><title>META 2026-09-17 15:47 — -$5 ($87 premium, 0m hold)</title></circle>
-      <circle class="bar" cx="555.6" cy="192.4" r="6.0" fill="var(--pos)" fill-opacity="0.82"><title>META 2026-09-17 15:47 — +$28 ($1,472 premium, 7m hold)</title></circle>
-      <circle class="bar" cx="556.1" cy="229.7" r="6.0" fill="var(--neg)" fill-opacity="0.82"><title>NVO 2026-09-17 15:53 — -$602 ($1,502 premium, 35m hold)</title></circle>
-      <circle class="bar" cx="556.6" cy="203.6" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>AAPL 2026-09-17 15:58 — -$161 ($1,281 premium, 26m hold)</title></circle>
-      <circle class="bar" cx="568.3" cy="182.8" r="9.3" fill="var(--pos)" fill-opacity="0.82"><title>CL 2026-09-17 18:09 — +$191 ($201,929 premium, 2122m hold)</title></circle>
-      <circle class="bar" cx="613.6" cy="193.8" r="8.5" fill="var(--pos)" fill-opacity="0.82"><title>MNQ 2026-09-18 02:37 — +$5 ($59,812 premium, 1m hold)</title></circle>
-      <circle class="bar" cx="623.6" cy="139.3" r="10.0" fill="var(--pos)" fill-opacity="0.82"><title>NQ 2026-09-18 04:29 — +$926 ($597,059 premium, 150m hold)</title></circle>
-      <circle class="bar" cx="623.7" cy="206.1" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>ES 2026-09-18 04:30 — -$203 ($1,228 premium, 108m hold)</title></circle>
-      <circle class="bar" cx="629.9" cy="238.4" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>NQ 2026-09-18 05:40 — -$749 ($1,805 premium, 68m hold)</title></circle>
-      <circle class="bar" cx="638.6" cy="237.5" r="10.0" fill="var(--neg)" fill-opacity="0.82"><title>NQ 2026-09-18 07:17 — -$734 ($597,339 premium, 58m hold)</title></circle>
-      <circle class="bar" cx="642.9" cy="260.8" r="9.2" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-18 08:05 — -$1,129 ($192,509 premium, 2086m hold)</title></circle>
-      <circle class="bar" cx="650.7" cy="233.8" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>META 2026-09-18 09:33 — -$672 ($1,302 premium, 1066m hold)</title></circle>
-      <circle class="bar" cx="652.7" cy="102.3" r="5.5" fill="var(--pos)" fill-opacity="0.82"><title>MSTR 2026-09-18 09:55 — +$1,551 ($684 premium, 19m hold)</title></circle>
-      <circle class="bar" cx="653.1" cy="123.1" r="4.9" fill="var(--pos)" fill-opacity="0.82"><title>HOOD 2026-09-18 10:00 — +$1,201 ($279 premium, 1080m hold)</title></circle>
-      <circle class="bar" cx="653.5" cy="55.4" r="5.4" fill="var(--pos)" fill-opacity="0.82"><title>HOOD 2026-09-18 10:04 — +$2,346 ($644 premium, 1084m hold)</title></circle>
-      <circle class="bar" cx="653.5" cy="181.8" r="3.8" fill="var(--pos)" fill-opacity="0.82"><title>HOOD 2026-09-18 10:04 — +$208 ($56 premium, 1085m hold)</title></circle>
-      <circle class="bar" cx="656.2" cy="201.6" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>SNDK 2026-09-18 10:35 — -$127 ($1,362 premium, 40m hold)</title></circle>
-      <circle class="bar" cx="656.9" cy="131.9" r="4.7" fill="var(--pos)" fill-opacity="0.82"><title>MSTR 2026-09-18 10:42 — +$1,052 ($228 premium, 66m hold)</title></circle>
-      <circle class="bar" cx="657.0" cy="96.0" r="5.0" fill="var(--pos)" fill-opacity="0.82"><title>MSTR 2026-09-18 10:43 — +$1,659 ($365 premium, 67m hold)</title></circle>
-      <circle class="bar" cx="657.0" cy="169.1" r="4.1" fill="var(--pos)" fill-opacity="0.82"><title>MSTR 2026-09-18 10:43 — +$422 ($92 premium, 67m hold)</title></circle>
-      <circle class="bar" cx="659.0" cy="235.6" r="5.9" fill="var(--neg)" fill-opacity="0.82"><title>SNDK 2026-09-18 11:06 — -$703 ($1,403 premium, 13m hold)</title></circle>
-      <circle class="bar" cx="663.9" cy="196.5" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>HOOD 2026-09-18 12:01 — -$41 ($1,752 premium, 106m hold)</title></circle>
-      <circle class="bar" cx="663.9" cy="194.1" r="3.4" fill="var(--pos)" fill-opacity="0.82"><title>HOOD 2026-09-18 12:01 — +$0 ($30 premium, 106m hold)</title></circle>
-      <circle class="bar" cx="664.2" cy="232.9" r="5.7" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-18 12:04 — -$657 ($1,017 premium, 1299m hold)</title></circle>
-      <circle class="bar" cx="664.3" cy="220.0" r="5.5" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-18 12:05 — -$438 ($678 premium, 189m hold)</title></circle>
-      <circle class="bar" cx="666.4" cy="230.1" r="9.2" fill="var(--neg)" fill-opacity="0.82"><title>CL 2026-09-18 12:29 — -$609 ($193,109 premium, 181m hold)</title></circle>
-      <circle class="bar" cx="670.8" cy="241.2" r="6.1" fill="var(--neg)" fill-opacity="0.82"><title>SNDK 2026-09-18 13:18 — -$798 ($1,698 premium, 26m hold)</title></circle>
-      <circle class="bar" cx="670.9" cy="202.5" r="5.6" fill="var(--neg)" fill-opacity="0.82"><title>HOOD 2026-09-18 13:19 — -$143 ($793 premium, 49m hold)</title></circle>
-      <circle class="bar" cx="671.1" cy="170.4" r="5.3" fill="var(--pos)" fill-opacity="0.82"><title>MSTR 2026-09-18 13:21 — +$400 ($500 premium, 210m hold)</title></circle>
-      <circle class="bar" cx="671.2" cy="216.2" r="5.8" fill="var(--neg)" fill-opacity="0.82"><title>HOOD 2026-09-18 13:23 — -$374 ($1,109 premium, 54m hold)</title></circle>
-      <circle class="bar" cx="678.2" cy="33.9" r="6.0" fill="var(--pos)" fill-opacity="0.82"><title>MSTR 2026-09-18 14:41 — +$2,710 ($1,490 premium, 290m hold)</title></circle>
-      <circle class="bar" cx="682.5" cy="200.5" r="5.2" fill="var(--neg)" fill-opacity="0.82"><title>MU 2026-09-18 15:29 — -$108 ($438 premium, 47m hold)</title></circle>
-      <circle class="bar" cx="684.0" cy="201.8" r="5.7" fill="var(--neg)" fill-opacity="0.82"><title>IBIT 2026-09-18 15:46 — -$131 ($976 premium, 21m hold)</title></circle>
+      <polygon points="54.0,14.0 54.0,14.0 54.0,15.7 54.0,15.5 55.3,21.1 55.3,26.4 145.0,26.4 146.6,28.8 147.3,35.6 150.7,48.2 154.3,46.4 154.5,42.0 154.7,37.3 164.3,37.8 171.1,38.2 249.6,52.0 261.1,64.1 265.3,82.7 265.3,97.0 266.4,120.6 266.6,101.9 268.2,108.8 268.2,109.4 268.4,126.6 270.0,130.9 271.4,130.9 272.7,140.5 272.9,143.0 276.6,158.9 276.6,120.2 294.1,121.3 298.5,127.8 330.2,132.8 357.6,146.3 365.9,154.1 367.6,154.8 375.3,166.9 393.6,166.8 393.7,178.9 394.0,180.6 394.1,181.1 394.3,197.4 394.6,206.3 395.1,218.3 395.9,216.2 422.7,216.2 425.8,219.1 426.9,230.5 427.0,240.2 493.7,242.9 522.0,208.7 522.7,215.9 522.8,216.1 522.9,234.1 523.2,235.9 526.9,243.2 527.0,247.8 528.1,249.1 528.7,247.6 531.1,251.0 531.1,251.5 534.2,255.9 537.6,265.9 540.0,266.5 540.0,267.9 540.1,270.5 541.0,277.8 541.3,269.3 541.4,243.7 543.5,249.4 551.1,258.8 554.1,264.6 555.6,264.6 555.6,264.3 556.1,271.9 556.6,274.0 568.3,271.6 613.6,271.5 623.6,259.8 623.7,262.3 629.9,271.8 638.6,281.1 642.9,295.5 650.7,304.0 652.7,284.3 653.1,269.1 653.5,239.3 653.5,236.7 656.2,238.3 656.9,225.0 657.0,203.9 657.0,198.6 659.0,207.5 663.9,208.0 663.9,208.0 664.2,216.3 664.3,221.9 666.4,229.6 670.8,239.7 670.9,241.5 671.1,236.5 671.2,241.2 678.2,206.8 682.5,208.2 684.0,209.9 684.0,14.0" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>
+      <polygon points="54.0,14.0 54.0,14.0 54.0,15.7 54.0,15.5 55.3,21.1 55.3,26.4 145.0,26.4 146.6,28.8 147.3,35.6 150.7,48.2 154.3,46.4 154.5,42.0 154.7,37.3 164.3,37.8 171.1,38.2 249.6,52.0 261.1,64.1 265.3,82.7 265.3,97.0 266.4,120.6 266.6,101.9 268.2,108.8 268.2,109.4 268.4,126.6 270.0,130.9 271.4,130.9 272.7,140.5 272.9,143.0 276.6,158.9 276.6,120.2 294.1,121.3 298.5,127.8 330.2,132.8 357.6,146.3 365.9,154.1 367.6,154.8 375.3,166.9 393.6,166.8 393.7,178.9 394.0,180.6 394.1,181.1 394.3,197.4 394.6,206.3 395.1,218.3 395.9,216.2 422.7,216.2 425.8,219.1 426.9,230.5 427.0,240.2 493.7,242.9 522.0,208.7 522.7,215.9 522.8,216.1 522.9,234.1 523.2,235.9 526.9,243.2 527.0,247.8 528.1,249.1 528.7,247.6 531.1,251.0 531.1,251.5 534.2,255.9 537.6,265.9 540.0,266.5 540.0,267.9 540.1,270.5 541.0,277.8 541.3,269.3 541.4,243.7 543.5,249.4 551.1,258.8 554.1,264.6 555.6,264.6 555.6,264.3 556.1,271.9 556.6,274.0 568.3,271.6 613.6,271.5 623.6,259.8 623.7,262.3 629.9,271.8 638.6,281.1 642.9,295.5 650.7,304.0 652.7,284.3 653.1,269.1 653.5,239.3 653.5,236.7 656.2,238.3 656.9,225.0 657.0,203.9 657.0,198.6 659.0,207.5 663.9,208.0 663.9,208.0 664.2,216.3 664.3,221.9 666.4,229.6 670.8,239.7 670.9,241.5 671.1,236.5 671.2,241.2 678.2,206.8 682.5,208.2 684.0,209.9 684.0,14.0" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>
+      <polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"
+        stroke-linecap="round" points="54.0,14.0 54.0,15.7 54.0,15.5 55.3,21.1 55.3,26.4 145.0,26.4 146.6,28.8 147.3,35.6 150.7,48.2 154.3,46.4 154.5,42.0 154.7,37.3 164.3,37.8 171.1,38.2 249.6,52.0 261.1,64.1 265.3,82.7 265.3,97.0 266.4,120.6 266.6,101.9 268.2,108.8 268.2,109.4 268.4,126.6 270.0,130.9 271.4,130.9 272.7,140.5 272.9,143.0 276.6,158.9 276.6,120.2 294.1,121.3 298.5,127.8 330.2,132.8 357.6,146.3 365.9,154.1 367.6,154.8 375.3,166.9 393.6,166.8 393.7,178.9 394.0,180.6 394.1,181.1 394.3,197.4 394.6,206.3 395.1,218.3 395.9,216.2 422.7,216.2 425.8,219.1 426.9,230.5 427.0,240.2 493.7,242.9 522.0,208.7 522.7,215.9 522.8,216.1 522.9,234.1 523.2,235.9 526.9,243.2 527.0,247.8 528.1,249.1 528.7,247.6 531.1,251.0 531.1,251.5 534.2,255.9 537.6,265.9 540.0,266.5 540.0,267.9 540.1,270.5 541.0,277.8 541.3,269.3 541.4,243.7 543.5,249.4 551.1,258.8 554.1,264.6 555.6,264.6 555.6,264.3 556.1,271.9 556.6,274.0 568.3,271.6 613.6,271.5 623.6,259.8 623.7,262.3 629.9,271.8 638.6,281.1 642.9,295.5 650.7,304.0 652.7,284.3 653.1,269.1 653.5,239.3 653.5,236.7 656.2,238.3 656.9,225.0 657.0,203.9 657.0,198.6 659.0,207.5 663.9,208.0 663.9,208.0 664.2,216.3 664.3,221.9 666.4,229.6 670.8,239.7 670.9,241.5 671.1,236.5 671.2,241.2 678.2,206.8 682.5,208.2 684.0,209.9"></polyline>
+      <circle class="bar" cx="54.0" cy="15.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-13 18:06 — -$134 this trade, -$134 running total</title></circle>
+      <circle class="bar" cx="54.0" cy="15.5" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-13 18:06 — +$15 this trade, -$119 running total</title></circle>
+      <circle class="bar" cx="55.3" cy="21.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-13 18:21 — -$445 this trade, -$564 running total</title></circle>
+      <circle class="bar" cx="55.3" cy="26.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-13 18:21 — -$415 this trade, -$978 running total</title></circle>
+      <circle class="bar" cx="145.0" cy="26.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-14 11:06 — $0 this trade, -$978 running total</title></circle>
+      <circle class="bar" cx="146.6" cy="28.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>PLTR 2026-09-14 11:24 — -$191 this trade, -$1,169 running total</title></circle>
+      <circle class="bar" cx="147.3" cy="35.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MSFT 2026-09-14 11:31 — -$531 this trade, -$1,701 running total</title></circle>
+      <circle class="bar" cx="150.7" cy="48.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-14 12:10 — -$995 this trade, -$2,695 running total</title></circle>
+      <circle class="bar" cx="154.3" cy="46.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSFT 2026-09-14 12:50 — +$143 this trade, -$2,552 running total</title></circle>
+      <circle class="bar" cx="154.5" cy="42.0" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSFT 2026-09-14 12:52 — +$347 this trade, -$2,205 running total</title></circle>
+      <circle class="bar" cx="154.7" cy="37.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSFT 2026-09-14 12:54 — +$372 this trade, -$1,833 running total</title></circle>
+      <circle class="bar" cx="164.3" cy="37.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IBIT 2026-09-14 14:42 — -$40 this trade, -$1,873 running total</title></circle>
+      <circle class="bar" cx="171.1" cy="38.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>GOOGL 2026-09-14 15:58 — -$36 this trade, -$1,909 running total</title></circle>
+      <circle class="bar" cx="249.6" cy="52.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 06:38 — -$1,089 this trade, -$2,998 running total</title></circle>
+      <circle class="bar" cx="261.1" cy="64.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 08:47 — -$955 this trade, -$3,953 running total</title></circle>
+      <circle class="bar" cx="265.3" cy="82.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IBIT 2026-09-15 09:34 — -$1,462 this trade, -$5,415 running total</title></circle>
+      <circle class="bar" cx="265.3" cy="97.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MSTR 2026-09-15 09:34 — -$1,126 this trade, -$6,541 running total</title></circle>
+      <circle class="bar" cx="266.4" cy="120.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>GOOGL 2026-09-15 09:46 — -$1,859 this trade, -$8,401 running total</title></circle>
+      <circle class="bar" cx="266.6" cy="101.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-15 09:48 — +$1,470 this trade, -$6,931 running total</title></circle>
+      <circle class="bar" cx="268.2" cy="108.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-15 10:06 — -$546 this trade, -$7,477 running total</title></circle>
+      <circle class="bar" cx="268.2" cy="109.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-15 10:06 — -$45 this trade, -$7,522 running total</title></circle>
+      <circle class="bar" cx="268.4" cy="126.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>WIX 2026-09-15 10:09 — -$1,351 this trade, -$8,873 running total</title></circle>
+      <circle class="bar" cx="270.0" cy="130.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>ES 2026-09-15 10:27 — -$339 this trade, -$9,212 running total</title></circle>
+      <circle class="bar" cx="271.4" cy="130.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-15 10:42 — $0 this trade, -$9,212 running total</title></circle>
+      <circle class="bar" cx="272.7" cy="140.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CRWD 2026-09-15 10:57 — -$763 this trade, -$9,975 running total</title></circle>
+      <circle class="bar" cx="272.9" cy="143.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 10:59 — -$198 this trade, -$10,173 running total</title></circle>
+      <circle class="bar" cx="276.6" cy="158.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 11:40 — -$1,247 this trade, -$11,420 running total</title></circle>
+      <circle class="bar" cx="276.6" cy="120.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-15 11:41 — +$3,046 this trade, -$8,375 running total</title></circle>
+      <circle class="bar" cx="294.1" cy="121.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 14:57 — -$85 this trade, -$8,460 running total</title></circle>
+      <circle class="bar" cx="298.5" cy="127.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>QCOM 2026-09-15 15:46 — -$514 this trade, -$8,973 running total</title></circle>
+      <circle class="bar" cx="330.2" cy="132.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 21:41 — -$389 this trade, -$9,363 running total</title></circle>
+      <circle class="bar" cx="357.6" cy="146.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 02:48 — -$1,069 this trade, -$10,432 running total</title></circle>
+      <circle class="bar" cx="365.9" cy="154.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 04:21 — -$609 this trade, -$11,041 running total</title></circle>
+      <circle class="bar" cx="367.6" cy="154.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 04:40 — -$55 this trade, -$11,096 running total</title></circle>
+      <circle class="bar" cx="375.3" cy="166.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 06:07 — -$955 this trade, -$12,051 running total</title></circle>
+      <circle class="bar" cx="393.6" cy="166.8" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>INTC 2026-09-16 09:32 — +$2 this trade, -$12,048 running total</title></circle>
+      <circle class="bar" cx="393.7" cy="178.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CVX 2026-09-16 09:33 — -$952 this trade, -$13,001 running total</title></circle>
+      <circle class="bar" cx="394.0" cy="180.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-16 09:36 — -$132 this trade, -$13,133 running total</title></circle>
+      <circle class="bar" cx="394.1" cy="181.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-16 09:37 — -$37 this trade, -$13,169 running total</title></circle>
+      <circle class="bar" cx="394.3" cy="197.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 09:39 — -$1,289 this trade, -$14,459 running total</title></circle>
+      <circle class="bar" cx="394.6" cy="206.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>AAPL 2026-09-16 09:43 — -$698 this trade, -$15,156 running total</title></circle>
+      <circle class="bar" cx="395.1" cy="218.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-16 09:48 — -$949 this trade, -$16,105 running total</title></circle>
+      <circle class="bar" cx="395.9" cy="216.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>SPCX 2026-09-16 09:57 — +$164 this trade, -$15,941 running total</title></circle>
+      <circle class="bar" cx="422.7" cy="216.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-16 14:58 — $0 this trade, -$15,941 running total</title></circle>
+      <circle class="bar" cx="425.8" cy="219.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>ES 2026-09-16 15:32 — -$227 this trade, -$16,168 running total</title></circle>
+      <circle class="bar" cx="426.9" cy="230.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CRWD 2026-09-16 15:45 — -$896 this trade, -$17,064 running total</title></circle>
+      <circle class="bar" cx="427.0" cy="240.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SMCI 2026-09-16 15:46 — -$765 this trade, -$17,829 running total</title></circle>
+      <circle class="bar" cx="493.7" cy="242.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NQ 2026-09-17 04:13 — -$214 this trade, -$18,044 running total</title></circle>
+      <circle class="bar" cx="522.0" cy="208.7" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-17 09:31 — +$2,696 this trade, -$15,348 running total</title></circle>
+      <circle class="bar" cx="522.7" cy="215.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>TSLA 2026-09-17 09:38 — -$568 this trade, -$15,916 running total</title></circle>
+      <circle class="bar" cx="522.8" cy="216.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IREN 2026-09-17 09:39 — -$12 this trade, -$15,928 running total</title></circle>
+      <circle class="bar" cx="522.9" cy="234.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IREN 2026-09-17 09:41 — -$1,421 this trade, -$17,349 running total</title></circle>
+      <circle class="bar" cx="523.2" cy="235.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NVDA 2026-09-17 09:44 — -$143 this trade, -$17,493 running total</title></circle>
+      <circle class="bar" cx="526.9" cy="243.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>TSLA 2026-09-17 10:25 — -$576 this trade, -$18,068 running total</title></circle>
+      <circle class="bar" cx="527.0" cy="247.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MU 2026-09-17 10:27 — -$365 this trade, -$18,433 running total</title></circle>
+      <circle class="bar" cx="528.1" cy="249.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 10:39 — -$96 this trade, -$18,530 running total</title></circle>
+      <circle class="bar" cx="528.7" cy="247.6" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NVDA 2026-09-17 10:46 — +$117 this trade, -$18,413 running total</title></circle>
+      <circle class="bar" cx="531.1" cy="251.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 11:12 — -$273 this trade, -$18,686 running total</title></circle>
+      <circle class="bar" cx="531.1" cy="251.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 11:12 — -$34 this trade, -$18,720 running total</title></circle>
+      <circle class="bar" cx="534.2" cy="255.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SMCI 2026-09-17 11:47 — -$352 this trade, -$19,073 running total</title></circle>
+      <circle class="bar" cx="537.6" cy="265.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MRNA 2026-09-17 12:25 — -$789 this trade, -$19,861 running total</title></circle>
+      <circle class="bar" cx="540.0" cy="266.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HPE 2026-09-17 12:52 — -$46 this trade, -$19,908 running total</title></circle>
+      <circle class="bar" cx="540.0" cy="267.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HPE 2026-09-17 12:52 — -$107 this trade, -$20,015 running total</title></circle>
+      <circle class="bar" cx="540.1" cy="270.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HPE 2026-09-17 12:53 — -$209 this trade, -$20,224 running total</title></circle>
+      <circle class="bar" cx="541.0" cy="277.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>GOOGL 2026-09-17 13:03 — -$573 this trade, -$20,797 running total</title></circle>
+      <circle class="bar" cx="541.3" cy="269.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>OKLO 2026-09-17 13:07 — +$671 this trade, -$20,126 running total</title></circle>
+      <circle class="bar" cx="541.4" cy="243.7" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>OKLO 2026-09-17 13:08 — +$2,018 this trade, -$18,108 running total</title></circle>
+      <circle class="bar" cx="543.5" cy="249.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-17 13:32 — -$447 this trade, -$18,555 running total</title></circle>
+      <circle class="bar" cx="551.1" cy="258.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 14:57 — -$743 this trade, -$19,299 running total</title></circle>
+      <circle class="bar" cx="554.1" cy="264.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MSTR 2026-09-17 15:30 — -$455 this trade, -$19,754 running total</title></circle>
+      <circle class="bar" cx="555.6" cy="264.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-17 15:47 — -$5 this trade, -$19,759 running total</title></circle>
+      <circle class="bar" cx="555.6" cy="264.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>META 2026-09-17 15:47 — +$28 this trade, -$19,730 running total</title></circle>
+      <circle class="bar" cx="556.1" cy="271.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NVO 2026-09-17 15:53 — -$602 this trade, -$20,333 running total</title></circle>
+      <circle class="bar" cx="556.6" cy="274.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>AAPL 2026-09-17 15:58 — -$161 this trade, -$20,494 running total</title></circle>
+      <circle class="bar" cx="568.3" cy="271.6" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-17 18:09 — +$191 this trade, -$20,303 running total</title></circle>
+      <circle class="bar" cx="613.6" cy="271.5" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MNQ 2026-09-18 02:37 — +$5 this trade, -$20,299 running total</title></circle>
+      <circle class="bar" cx="623.6" cy="259.8" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-18 04:29 — +$926 this trade, -$19,373 running total</title></circle>
+      <circle class="bar" cx="623.7" cy="262.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>ES 2026-09-18 04:30 — -$203 this trade, -$19,576 running total</title></circle>
+      <circle class="bar" cx="629.9" cy="271.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NQ 2026-09-18 05:40 — -$749 this trade, -$20,325 running total</title></circle>
+      <circle class="bar" cx="638.6" cy="281.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NQ 2026-09-18 07:17 — -$734 this trade, -$21,060 running total</title></circle>
+      <circle class="bar" cx="642.9" cy="295.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 08:05 — -$1,129 this trade, -$22,189 running total</title></circle>
+      <circle class="bar" cx="650.7" cy="304.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-18 09:33 — -$672 this trade, -$22,861 running total</title></circle>
+      <circle class="bar" cx="652.7" cy="284.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 09:55 — +$1,551 this trade, -$21,310 running total</title></circle>
+      <circle class="bar" cx="653.1" cy="269.1" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 10:00 — +$1,201 this trade, -$20,109 running total</title></circle>
+      <circle class="bar" cx="653.5" cy="239.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 10:04 — +$2,346 this trade, -$17,763 running total</title></circle>
+      <circle class="bar" cx="653.5" cy="236.7" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 10:04 — +$208 this trade, -$17,555 running total</title></circle>
+      <circle class="bar" cx="656.2" cy="238.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SNDK 2026-09-18 10:35 — -$127 this trade, -$17,682 running total</title></circle>
+      <circle class="bar" cx="656.9" cy="225.0" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 10:42 — +$1,052 this trade, -$16,630 running total</title></circle>
+      <circle class="bar" cx="657.0" cy="203.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 10:43 — +$1,659 this trade, -$14,971 running total</title></circle>
+      <circle class="bar" cx="657.0" cy="198.6" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 10:43 — +$422 this trade, -$14,548 running total</title></circle>
+      <circle class="bar" cx="659.0" cy="207.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SNDK 2026-09-18 11:06 — -$703 this trade, -$15,252 running total</title></circle>
+      <circle class="bar" cx="663.9" cy="208.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HOOD 2026-09-18 12:01 — -$41 this trade, -$15,292 running total</title></circle>
+      <circle class="bar" cx="663.9" cy="208.0" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 12:01 — +$0 this trade, -$15,292 running total</title></circle>
+      <circle class="bar" cx="664.2" cy="216.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 12:04 — -$657 this trade, -$15,949 running total</title></circle>
+      <circle class="bar" cx="664.3" cy="221.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 12:05 — -$438 this trade, -$16,387 running total</title></circle>
+      <circle class="bar" cx="666.4" cy="229.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 12:29 — -$609 this trade, -$16,996 running total</title></circle>
+      <circle class="bar" cx="670.8" cy="239.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SNDK 2026-09-18 13:18 — -$798 this trade, -$17,794 running total</title></circle>
+      <circle class="bar" cx="670.9" cy="241.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HOOD 2026-09-18 13:19 — -$143 this trade, -$17,937 running total</title></circle>
+      <circle class="bar" cx="671.1" cy="236.5" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 13:21 — +$400 this trade, -$17,537 running total</title></circle>
+      <circle class="bar" cx="671.2" cy="241.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HOOD 2026-09-18 13:23 — -$374 this trade, -$17,911 running total</title></circle>
+      <circle class="bar" cx="678.2" cy="206.8" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 14:41 — +$2,710 this trade, -$15,202 running total</title></circle>
+      <circle class="bar" cx="682.5" cy="208.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MU 2026-09-18 15:29 — -$108 this trade, -$15,310 running total</title></circle>
+      <circle class="bar" cx="684.0" cy="209.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IBIT 2026-09-18 15:46 — -$131 this trade, -$15,440 running total</title></circle>
+      <circle cx="684.0" cy="209.9" r="4.5" fill="var(--neg)"></circle><text class="end-lab" x="678.0" y="201.9" text-anchor="end">-$15,440</text>
       <line class="axis-line" x1="54" y1="304" x2="684" y2="304"></line>
       <text class="tick" x="54.0" y="334" text-anchor="start">Sun 09-13</text>
       <text class="tick" x="145.0" y="334" text-anchor="start">Mon 09-14</text>
@@ -286,12 +297,12 @@
     </svg>
     </div>
       <div class="legend">
-        <span><i class="dotswatch" style="background:var(--pos)"></i> Win</span>
-        <span><i class="dotswatch" style="background:var(--neg)"></i> Loss</span>
-        <span>Dot size &middot; premium risked</span>
+        <span><i class="dotswatch" style="background:var(--pos)"></i> Winning trade</span>
+        <span><i class="dotswatch" style="background:var(--neg)"></i> Losing trade</span>
+        <span>Line &middot; cumulative P&amp;L</span>
         <span>X-axis &middot; actual time</span>
       </div>
-      <div class="cap"><b>Every filtered exit this week.</b> Hover a point for ticker, time, result and hold.</div>
+      <div class="cap"><b>Cumulative P&amp;L, 103 exits.</b> Hover a point for that trade's own result and the running total right after it.</div>
     </div>
   </section>
 

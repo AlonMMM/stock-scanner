@@ -80,6 +80,19 @@ def hold_label(minutes):
     return "{}m hold".format(int(round(minutes)))
 
 
+def hold_hours_label(minutes):
+    if minutes is None or minutes == "":
+        return "unknown hold"
+    h = minutes / 60.0
+    return "{:.1f}h".format(h) if h >= 1 else "{}m".format(int(round(minutes)))
+
+
+def price(v):
+    """A per-contract/per-share price, not a dollar total — money() rounds to
+    whole dollars, which erases everything about a $0.05-$1.30 option quote."""
+    return "${:.3f}".format(v) if abs(v) < 1 else "${:.2f}".format(v)
+
+
 # -------------------------------------------------------------- daily bars --
 
 def render_daily(by_day):
@@ -183,20 +196,25 @@ def render_tickers(by_ticker, top_n=6):
 
 # -------------------------------------------------------- per-trade scatter
 
+def trade_dt(t):
+    return datetime.datetime.strptime("{} {}".format(t["date"], t["time_session"]),
+                                       "%Y-%m-%d %H:%M")
+
+
 def render_scatter(trades):
-    """Every exit as one point — the literal per-trade view, not an aggregate."""
+    """Every exit as one point, x = actual clock time (not day-bucketed index) —
+    a burst of ten trades in ten minutes should look like a cluster, not get spread
+    evenly across a day's slot the way an index-based x-axis would draw it."""
     W, H = 700, 340
     padL, padR, padT, padB = 54, 16, 14, 36
     plotW, plotH = W - padL - padR, H - padT - padB
 
-    by_day = collections.OrderedDict()
-    for t in trades:
-        by_day.setdefault(t["date"], []).append(t)
-    days = list(by_day.items())
-    n_days = max(len(days), 1)
-    gap = 20
-    usable = plotW - gap * (n_days - 1)
-    total_n = max(len(trades), 1)
+    times = [trade_dt(t) for t in trades]
+    tmin, tmax = (min(times), max(times)) if times else (None, None)
+    trange = (tmax - tmin).total_seconds() if times and tmax > tmin else 1
+
+    def x_of(dt):
+        return padL + plotW * (dt - tmin).total_seconds() / trange
 
     vals = [t["net_pnl_usd"] for t in trades]
     vmax = max(0, max(vals)) if vals else 1
@@ -221,42 +239,47 @@ def render_scatter(trades):
         return 3.0 + 7.0 * frac
 
     zero_y = y_of(0)
-    circles, daylabels = [], []
-    x = padL
-    for date, rows in days:
-        w = usable * (len(rows) / total_n)
-        xs = [x + w / 2] if len(rows) == 1 else [
-            x + w * (i / (len(rows) - 1)) for i in range(len(rows))]
-        for t, cx in zip(rows, xs):
-            v = t["net_pnl_usd"]
-            cy = y_of(v)
-            color = "var(--pos)" if v >= 0 else "var(--neg)"
-            circles.append(
-                '<circle class="bar" cx="{:.1f}" cy="{:.1f}" r="{:.1f}" fill="{}" '
-                'fill-opacity="0.82"><title>{} {} {} — {} ({} premium, {})</title>'
-                '</circle>'.format(
-                    cx, cy, r_of(t["premium_paid_usd"]), color,
-                    esc(t["ticker"]), t["date"], t.get("time_session", ""),
-                    money(v, sign=True), money(t["premium_paid_usd"]),
-                    hold_label(t.get("hold_minutes"))))
-        try:
-            wd = datetime.date.fromisoformat(date).strftime("%a")
-        except ValueError:
-            wd = ""
-        daylabels.append('<text class="tick" x="{:.1f}" y="{}" text-anchor="middle">{} {}</text>'
-                         .format(x + w / 2, H - 6, wd, date[5:]))
-        x += w + gap
+    circles = []
+    for t, dt in zip(trades, times):
+        v = t["net_pnl_usd"]
+        cx, cy = x_of(dt), y_of(v)
+        color = "var(--pos)" if v >= 0 else "var(--neg)"
+        circles.append(
+            '<circle class="bar" cx="{:.1f}" cy="{:.1f}" r="{:.1f}" fill="{}" '
+            'fill-opacity="0.82"><title>{} {} {} — {} ({} premium, {})</title>'
+            '</circle>'.format(
+                cx, cy, r_of(t["premium_paid_usd"]), color,
+                esc(t["ticker"]), t["date"], t.get("time_session", ""),
+                money(v, sign=True), money(t["premium_paid_usd"]),
+                hold_label(t.get("hold_minutes"))))
+
+    # Day-boundary gridlines at each date's first trade — positioned by real elapsed
+    # time, so a quiet evening/weekend gap actually shows as empty space on the axis.
+    daylines, daylabels = [], []
+    seen = set()
+    for t, dt in zip(trades, times):
+        if t["date"] in seen:
+            continue
+        seen.add(t["date"])
+        gx = x_of(dt)
+        daylines.append('<line class="grid-line" x1="{0:.1f}" y1="{1}" x2="{0:.1f}" y2="{2}"></line>'
+                        .format(gx, padT, H - padB))
+        wd = dt.strftime("%a")
+        daylabels.append('<text class="tick" x="{:.1f}" y="{}" text-anchor="start">{} {}</text>'
+                         .format(max(gx, padL), H - 6, wd, t["date"][5:]))
 
     return """
-    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Every trade as one point">
+    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Every trade as one point, by time">
       <line class="grid-line" x1="{pl}" y1="{zy:.1f}" x2="{rx}" y2="{zy:.1f}"></line>
       <text class="tick" x="{rxlab}" y="{zylab:.1f}">$0</text>
+      {daylines}
       {circles}
       <line class="axis-line" x1="{pl}" y1="{ax}" x2="{rx}" y2="{ax}"></line>
       {daylabels}
     </svg>
     """.format(W=W, H=H, pl=padL, rx=W - padR, rxlab=W - padR + 4,
                zy=zero_y, zylab=zero_y + 3.5, ax=H - padB,
+               daylines="\n      ".join(daylines),
                circles="\n      ".join(circles), daylabels="\n      ".join(daylabels))
 
 
@@ -311,6 +334,146 @@ def render_burn(slices):
         "n_losing": len(losing),
         "total_burn": total_burn,
     }
+
+
+# ---------------------------------------------------------- biggest losses --
+
+CLS_LABEL = {"תוך יום": "Intraday", "אוברנייט": "Overnight",
+             "מחוץ לשעות": "Off-hours", "פקיעה": "Expiry", "unknown": "Unclassified"}
+
+
+def _burn_index(burn_slices):
+    idx = collections.defaultdict(list)
+    for s in burn_slices or []:
+        idx[(s["sym"], s["day"], s["time"])].append(s)
+    return idx
+
+
+def _classify_opt(t, idx):
+    """cls/stop/expired come from the matching burn-slice when one exists (exact
+    mechanics: intraday/overnight/off-hours/expiry, whether a STOP order fired).
+    Without burn data (or no match — a multi-lot exit can miss the key), fall back
+    to a hold-time heuristic; stop/expired are then simply unknown, not False."""
+    matches = idx.get((t["ticker"], t["date"], t["time_session"]))
+    if matches:
+        cls = matches[0]["cls"]
+        return cls, any(m.get("stop") for m in matches), any(m.get("expired") for m in matches)
+    hold = t.get("hold_minutes")
+    if hold in (None, ""):
+        return "unknown", None, None
+    return ("אוברנייט" if hold >= 300 else "תוך יום"), None, None
+
+
+def _price_arc(all_trades, ticker, sec_type):
+    """The ticker's own first-entry-to-last-exit price move across the whole week,
+    from every fill (not just the losses) — what a repeated directional bet was
+    actually fighting, or riding."""
+    rows = sorted([t for t in all_trades if t["ticker"] == ticker and t["sec_type"] == sec_type],
+                  key=trade_dt)
+    if not rows:
+        return None
+    first, last = rows[0]["entry_price"], rows[-1]["exit_price"]
+    if not first:
+        return None
+    return first, last, 100 * (last - first) / first
+
+
+def render_big_losses(all_trades, burn_slices, threshold=750):
+    big = sorted([t for t in all_trades if t["net_pnl_usd"] < -threshold],
+                 key=lambda t: t["net_pnl_usd"])
+    if not big:
+        return None
+    total_loss = sum(t["net_pnl_usd"] for t in all_trades if t["net_pnl_usd"] < 0)
+    total_big = sum(t["net_pnl_usd"] for t in big)
+    share = (total_big / total_loss) if total_loss else 0
+
+    sections = []
+
+    # -- outright futures: a point-move loss, not option premium decay --
+    futs = [t for t in big if t["sec_type"] == "FUT"]
+    if futs:
+        rows = []
+        n_long = n_short = 0
+        for t in futs:
+            side = "long" if t["exit_price"] < t["entry_price"] else "short"
+            n_long += side == "long"
+            n_short += side == "short"
+            rows.append(
+                '<tr><td class="tkr">{t}</td><td>{d} {tm}</td><td>{side}</td>'
+                '<td class="num">{en}&rarr;{ex}</td><td class="num neg">{pnl}</td>'
+                '<td class="num">{hold}</td></tr>'.format(
+                    t=esc(t["ticker"]), d=t["date"], tm=t["time_session"], side=side,
+                    en=price(t["entry_price"]), ex=price(t["exit_price"]),
+                    pnl=money(t["net_pnl_usd"], sign=True), hold=hold_hours_label(t.get("hold_minutes"))))
+        arcs = []
+        for tkr in sorted(set(t["ticker"] for t in futs)):
+            arc = _price_arc(all_trades, tkr, "FUT")
+            if arc:
+                arcs.append("{} moved {} &rarr; {} ({:+.1f}%) across the week".format(
+                    esc(tkr), price(arc[0]), price(arc[1]), arc[2]))
+        majority = "long" if n_long >= n_short else "short"
+        sections.append("""
+    <div class="loss-group">
+      <h3>Outright futures &mdash; {n} losses, {total}</h3>
+      <p class="cap">Point losses on the futures contract itself, not option premium decay.
+        {maj} of these {n} were {majdir} positions. {arcs}</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Ticker</th><th>Exit</th><th>Side</th>
+        <th style="text-align:right">Entry&rarr;Exit</th><th style="text-align:right">Loss</th>
+        <th style="text-align:right">Held</th></tr></thead><tbody>{rows}</tbody></table></div>
+    </div>""".format(n=len(futs), total=money(total_big_sub(futs), sign=True),
+                      maj=(n_long if majority == "long" else n_short), majdir=majority,
+                      arcs=" ".join(arcs), rows="\n".join(rows)))
+
+    # -- options: bucketed by what the closing slice actually was --
+    opts = [t for t in big if t["sec_type"] in ("OPT", "FOP")]
+    if opts:
+        idx = _burn_index(burn_slices)
+        buckets = collections.OrderedDict()
+        for t in opts:
+            cls, stop, expired = _classify_opt(t, idx)
+            buckets.setdefault(cls, []).append((t, stop, expired))
+        for cls, items in buckets.items():
+            rows = []
+            for t, stop, expired in items:
+                stop_lab = ("stop order" if stop else ("expired" if expired else
+                            ("no stop tag" if stop is False else "unclassified")))
+                rows.append(
+                    '<tr><td class="tkr">{t}</td><td>{d} {tm}</td>'
+                    '<td class="num">{en}&rarr;{ex}</td><td class="num neg">{pnl}</td>'
+                    '<td class="num">{pct}</td><td class="num">{hold}</td><td>{stopl}</td></tr>'
+                    .format(t=esc(t["ticker"]), d=t["date"], tm=t["time_session"],
+                            en=price(t["entry_price"]), ex=price(t["exit_price"]),
+                            pnl=money(t["net_pnl_usd"], sign=True),
+                            pct=pct(t["pct_of_premium"]) if t.get("pct_of_premium") not in (None, "") else "&mdash;",
+                            hold=hold_hours_label(t.get("hold_minutes")), stopl=stop_lab))
+            grp_total = sum(t["net_pnl_usd"] for t, _, _ in items)
+            n_stopped = sum(1 for _, s, _ in items if s)
+            avg_pct = (sum(t["pct_of_premium"] for t, _, _ in items
+                       if t.get("pct_of_premium") not in (None, "")) / len(items)) if items else 0
+            stop_note = (" {} of these fired an actual stop order.".format(n_stopped)
+                        if n_stopped else "")
+            sections.append("""
+    <div class="loss-group">
+      <h3>{label} options &mdash; {n} losses, {total}</h3>
+      <p class="cap">Average {avgpct} of premium lost.{stopnote}</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Ticker</th><th>Exit</th>
+        <th style="text-align:right">Entry&rarr;Exit</th><th style="text-align:right">Loss</th>
+        <th style="text-align:right">% premium</th><th style="text-align:right">Held</th><th>Exit type</th></tr></thead>
+        <tbody>{rows}</tbody></table></div>
+    </div>""".format(label=CLS_LABEL.get(cls, cls), n=len(items), total=money(grp_total, sign=True),
+                      avgpct=pct(avg_pct), stopnote=stop_note, rows="\n".join(rows)))
+
+    return {
+        "html": "\n".join(sections),
+        "n": len(big),
+        "total": total_big,
+        "share": share,
+        "threshold": threshold,
+    }
+
+
+def total_big_sub(rows):
+    return sum(t["net_pnl_usd"] for t in rows)
 
 
 # --------------------------------------------------------------- commission
@@ -482,6 +645,9 @@ TEMPLATE = r"""<title>{title}</title>
   .burnrow .track {{ position: relative; height: 20px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }}
   .burnrow .fill {{ position: absolute; inset-block: 0; left: 0; background: var(--neg); opacity: 0.8; border-radius: 3px 0 0 3px; }}
   .burnrow .pct {{ font-family: "IBM Plex Mono", monospace; font-size: 0.86rem; font-weight: 700; text-align: right; }}
+  .loss-group {{ display: flex; flex-direction: column; gap: 8px; }}
+  .loss-group h3 {{ font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.05rem; margin: 0; }}
+  .loss-group .cap {{ font-size: 0.85rem; color: var(--ink-2); margin: 0; max-width: 74ch; }}
   .rules {{ display: flex; flex-direction: column; gap: 10px; }}
   .rule-row {{ display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--rule);
     border-radius: 4px; padding: 12px 16px; }}
@@ -532,13 +698,15 @@ TEMPLATE = r"""<title>{title}</title>
 
   <section>
     <div class="sec-head"><h2>Every trade</h2><span class="tag">{n_exits} points</span></div>
-    <p>One point per exit, grouped by day. Size follows premium risked; color follows win or loss.</p>
+    <p>One point per exit, positioned by its actual exit time — not evenly spaced within a day, so a
+      burst of trades minutes apart shows up as a cluster. Size follows premium risked; color follows win or loss.</p>
     <div class="figure">
       <div class="chart-scroll">{scatter_svg}</div>
       <div class="legend">
         <span><i class="dotswatch" style="background:var(--pos)"></i> Win</span>
         <span><i class="dotswatch" style="background:var(--neg)"></i> Loss</span>
         <span>Dot size &middot; premium risked</span>
+        <span>X-axis &middot; actual time</span>
       </div>
       <div class="cap"><b>Every filtered exit this week.</b> Hover a point for ticker, time, result and hold.</div>
     </div>
@@ -574,6 +742,8 @@ TEMPLATE = r"""<title>{title}</title>
   </section>
 
   {burn_section}
+
+  {big_losses_section}
 
   <section>
     <div class="sec-head"><h2>Commissions</h2><span class="tag">{n_exits} exits</span></div>
@@ -643,15 +813,18 @@ def build(args):
     else:
         burn_section = ""
 
-    if rules:
-        rules_block = dict(
-            rules_rows=rules["rows"], rules_unchecked=rules["unchecked"],
-            n_checked=rules["n_checked"],
-            n_rules=rules["n_checked"] + rules["n_unchecked"],
-            n_unchecked=rules["n_unchecked"], account=money(rules_json["account"]))
-        rules_html = TEMPLATE  # placeholder, filled below via format
+    big = render_big_losses(trades, burn_slices, threshold=args.loss_threshold)
+    if big:
+        big_losses_section = """
+  <section>
+    <div class="sec-head"><h2>Biggest losses explained</h2><span class="tag">over {thresh}</span></div>
+    <p>{n} exits lost more than {thresh} each, {total} total &mdash; {share} of the week's gross loss.
+      Grouped by what actually happened to the position, not just by size.</p>
+    <div style="display:flex;flex-direction:column;gap:24px">{rows}</div>
+  </section>""".format(thresh=money(big["threshold"]), n=big["n"], total=money(big["total"], sign=True),
+                        share="{:.0f}%".format(abs(big["share"]) * 100), rows=big["html"])
     else:
-        rules_block = None
+        big_losses_section = ""
 
     cheap_note = ""
     if rules_json:
@@ -677,6 +850,7 @@ def build(args):
         ticker_svg=ticker_svg, ticker_table=ticker_table,
         hold_tiles=hold_tiles,
         burn_section=burn_section,
+        big_losses_section=big_losses_section,
         comm_total=money(comm["total"]), comm_n=comm["n"], comm_avg=money(comm["avg"]),
         comm_rate=pct(comm["rate"], digits=2),
         opt_comm=money(comm["opt_comm"]), opt_prem=money(summary["option_premium"]),
@@ -706,6 +880,8 @@ def main():
     ap.add_argument("--trades", required=True)
     ap.add_argument("--rules")
     ap.add_argument("--burn")
+    ap.add_argument("--loss-threshold", type=float, default=750,
+                    help="flag exits that lost more than this in the 'Biggest losses' section")
     ap.add_argument("--out", required=True)
     ap.add_argument("--label", help="e.g. 'Sep 14-18, 2026' — defaults to the summary's week_start")
     ap.add_argument("--title", default="Trade Week Ledger")

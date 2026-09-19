@@ -103,22 +103,34 @@ python3 <this-skill-dir>/scripts/check_rules.py <path-to-trades-json> --rules do
 **5. Build the HTML report.** `scripts/build_report.py` turns the week's summary, the
 filtered CSV, the rules check and the burn-slices output into one self-contained report —
 KPIs, every exit as an individual point (not just aggregates), day and ticker breakdowns,
-hold-time buckets, premium burn, a commission section, and the rules check:
+hold-time buckets, premium burn, the biggest losses explained, a commission section, and
+the rules check:
 
 ```bash
 python3 <this-skill-dir>/scripts/build_report.py \
     --summary summary.json --trades trades-filtered.csv \
     --rules rules.json --burn burn-slices.json \
-    --out report.html --label "Sep 14-18, 2026"
+    --out report.html --label "Sep 14-18, 2026" [--loss-threshold 750]
 ```
 
-`--rules` and `--burn` are optional; the report degrades gracefully without them. This
-report intentionally does **not** narrate the filter chain, the audit-reconciliation
+`--rules` and `--burn` are optional; the report degrades gracefully without them.
+`--loss-threshold` (default 750) drives the "Biggest losses explained" section: every exit
+that lost more than it, grouped by what actually happened — outright futures (a point-move
+loss, not premium decay, reported with the ticker's own week-long price arc and whether the
+losses were long or short), overnight options (theta plus, usually, an adverse move by the
+next open), and intraday options split by whether an actual stop order fired. This needs no
+per-week tuning; it reads straight from the filtered CSV plus whichever slice/rules data is
+available and degrades to a hold-time heuristic when `--burn` is omitted.
+
+This report intentionally does **not** narrate the filter chain, the audit-reconciliation
 table, or what got dropped and why — the account holder does not want that in the report
 he reads every week; that belongs in `data/<week>/README.md` instead (see below). It does
 always explain commissions plainly (net P&L already nets both legs; the figures shown are
-for context, not a further deduction) and always plots every exit as its own point, sized
-by premium and colored by win/loss — an aggregate chart alone was not enough to see it.
+for context, not a further deduction) and always plots every exit as its own point on a
+**real time axis** — x is the actual exit timestamp, not an evenly-spaced index within the
+day, so a burst of trades minutes apart reads as a cluster and a quiet stretch reads as
+empty space — sized by premium (log scale: an outright futures trade's notional dwarfs an
+option's premium) and colored by win/loss.
 
 If a restart write-off needs excluding and its date differs from another symbol's on the
 same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes

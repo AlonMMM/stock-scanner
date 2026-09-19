@@ -1,0 +1,552 @@
+<title>Trade Week Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --bg:        #f5f6f8;
+    --surface:   #ffffff;
+    --surface-2: #eef0f4;
+    --ink:       #12151b;
+    --ink-2:     #4b5563;
+    --ink-3:     #7c8698;
+    --rule:      #e2e5eb;
+    --rule-2:    #c9cedb;
+    --pos:       #059669;
+    --neg:       #dc2626;
+    --accent:    #b8790a;
+    --accent-ink:#7a5006;
+    --warnbg:    #fdf3df;
+    --warnrule:  #e8c583;
+    --warnink:   #6b4a08;
+    --failbg:    #fdecec;
+    --failrule:  #f3b9b9;
+    --failink:   #8a1f1f;
+    --passbg:    #e9f7f0;
+    --passrule:  #a9dfc4;
+    --passink:   #0f5132;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:        #0a0c10;
+      --surface:   #12151b;
+      --surface-2: #1a1e26;
+      --ink:       #eef1f5;
+      --ink-2:     #a6afc0;
+      --ink-3:     #707a8c;
+      --rule:      #232833;
+      --rule-2:    #333b4a;
+      --pos:       #34d399;
+      --neg:       #f87171;
+      --accent:    #f0b342;
+      --accent-ink:#f0b342;
+      --warnbg:    #241b0e;
+      --warnrule:  #5c431a;
+      --warnink:   #f0c674;
+      --failbg:    #2a1616;
+      --failrule:  #6b2a2a;
+      --failink:   #f5a3a3;
+      --passbg:    #10261c;
+      --passrule:  #2c5941;
+      --passink:   #7fd6ab;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:        #0a0c10;
+    --surface:   #12151b;
+    --surface-2: #1a1e26;
+    --ink:       #eef1f5;
+    --ink-2:     #a6afc0;
+    --ink-3:     #707a8c;
+    --rule:      #232833;
+    --rule-2:    #333b4a;
+    --pos:       #34d399;
+    --neg:       #f87171;
+    --accent:    #f0b342;
+    --accent-ink:#f0b342;
+    --warnbg:    #241b0e;
+    --warnrule:  #5c431a;
+    --warnink:   #f0c674;
+    --failbg:    #2a1616;
+    --failrule:  #6b2a2a;
+    --failink:   #f5a3a3;
+    --passbg:    #10261c;
+    --passrule:  #2c5941;
+    --passink:   #7fd6ab;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); }
+
+  .page {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---------- masthead ---------- */
+  .masthead { display: flex; flex-direction: column; gap: 12px; border-bottom: 2px solid var(--ink); padding-bottom: 22px; }
+  .masthead .kicker { font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
+  .masthead h1 { font-family: "Fraunces", Georgia, serif; font-optical-sizing: auto; font-size: clamp(2rem, 5.2vw, 2.9rem); line-height: 1.08; margin: 0; font-weight: 600; text-wrap: balance; }
+  .masthead h1 .fig { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .masthead .dek { color: var(--ink-2); font-size: 1.02rem; max-width: 66ch; }
+  .stamp { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.82rem; color: var(--ink-3); }
+  .stamp b { color: var(--ink-2); font-weight: 600; }
+
+  /* ---------- kpi ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .kpi { background: var(--surface); padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .kpi .lab { font-size: 0.76rem; color: var(--ink-3); font-weight: 600; letter-spacing: 0.02em; }
+  .kpi .val { font-family: "IBM Plex Mono", monospace; font-size: 1.9rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; }
+  .kpi .sub { font-size: 0.82rem; color: var(--ink-2); }
+  .pos { color: var(--pos); }
+  .neg { color: var(--neg); }
+
+  /* ---------- sections ---------- */
+  section { display: flex; flex-direction: column; gap: 16px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--rule-2); padding-bottom: 9px; }
+  .sec-head h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.4rem; margin: 0; }
+  .sec-head .tag { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-inline-start: auto; white-space: nowrap; }
+  section > p { margin: 0; max-width: 70ch; color: var(--ink-2); }
+  section > p strong, li strong, td strong { color: var(--ink); font-weight: 700; }
+
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 20px 22px; }
+
+  /* ---------- callout ---------- */
+  .callout { background: var(--warnbg); border: 1px solid var(--warnrule); border-radius: 4px; padding: 18px 20px; color: var(--warnink); display: flex; flex-direction: column; gap: 8px; }
+  .callout .ctitle { font-weight: 700; font-size: 1rem; display: flex; align-items: baseline; gap: 10px; }
+  .callout .ctitle .big { font-family: "IBM Plex Mono", monospace; font-size: 1.2rem; }
+  .callout p { margin: 0; color: var(--warnink); opacity: 0.92; max-width: 72ch; }
+  .callout table { margin-top: 6px; }
+  .callout table td, .callout table th { color: var(--warnink); border-bottom-color: var(--warnrule); }
+
+  /* ---------- charts ---------- */
+  .figure { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .figure .cap { font-size: 0.85rem; color: var(--ink-2); }
+  .figure .cap b { color: var(--ink); font-weight: 700; }
+  .chart-scroll { overflow-x: auto; }
+  .chart-scroll svg { display: block; min-width: 480px; width: 100%; height: auto; }
+  .grid-line { stroke: var(--rule); stroke-width: 1; }
+  .axis-line { stroke: var(--rule-2); stroke-width: 1; }
+  .tick { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-3); }
+  .val-lab { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .row-lab { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 600; fill: var(--ink); }
+  .bar { transition: opacity .12s ease; }
+  .bar:hover { opacity: .72; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.83rem; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 13px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  /* ---------- tables ---------- */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.87rem; }
+  th, td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--rule); }
+  thead th { background: var(--surface-2); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  td.tkr { font-family: "IBM Plex Mono", monospace; font-weight: 700; }
+
+  details.tabledisc summary { cursor: pointer; font-size: 0.85rem; color: var(--ink-2); padding: 4px 0; font-weight: 600; }
+  details.tabledisc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  details.tabledisc[open] summary { margin-bottom: 10px; }
+
+  /* ---------- hold buckets ---------- */
+  .buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .bucket { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 15px 16px; display: flex; flex-direction: column; gap: 5px; }
+  .bucket .b-lab { font-size: 0.78rem; color: var(--ink-3); font-weight: 600; }
+  .bucket .b-val { font-family: "IBM Plex Mono", monospace; font-size: 1.35rem; font-weight: 600; }
+  .bucket .b-sub { font-size: 0.79rem; color: var(--ink-2); }
+  .bucket .b-guard { font-size: 0.76rem; color: var(--ink-3); border-top: 1px dashed var(--rule-2); padding-top: 7px; margin-top: 2px; }
+  .bucket .b-guard b { color: var(--ink-2); }
+
+  /* ---------- burn bars ---------- */
+  .burnrows { display: flex; flex-direction: column; gap: 14px; }
+  .burnrow { display: grid; grid-template-columns: 96px 1fr 96px; align-items: center; gap: 14px; }
+  .burnrow .b-name { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
+  .burnrow .b-name span { display: block; font-size: 0.74rem; color: var(--ink-3); font-weight: 400; }
+  .burnrow .track { position: relative; height: 20px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .burnrow .fill { position: absolute; inset-block: 0; left: 0; background: var(--neg); opacity: 0.8; border-radius: 3px 0 0 3px; }
+  .burnrow .pct { font-family: "IBM Plex Mono", monospace; font-size: 0.86rem; font-weight: 700; text-align: right; }
+
+  /* ---------- rules ---------- */
+  .rules { display: flex; flex-direction: column; gap: 10px; }
+  .rule-row { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 12px 16px; }
+  .rule-row.fail { background: var(--failbg); border-color: var(--failrule); }
+  .rule-row.check { background: var(--warnbg); border-color: var(--warnrule); }
+  .rule-row.pass { background: var(--passbg); border-color: var(--passrule); }
+  .rule-row.note { background: var(--surface-2); }
+  .pill { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 20px; flex: 0 0 auto; white-space: nowrap; margin-top: 2px; }
+  .rule-row.fail .pill { background: var(--failrule); color: var(--failink); }
+  .rule-row.check .pill { background: var(--warnrule); color: var(--warnink); }
+  .rule-row.pass .pill { background: var(--passrule); color: var(--passink); }
+  .rule-row.note .pill { background: var(--rule-2); color: var(--ink-2); }
+  .rule-body { display: flex; flex-direction: column; gap: 3px; font-size: 0.88rem; }
+  .rule-row.fail .rule-body { color: var(--failink); }
+  .rule-row.check .rule-body { color: var(--warnink); }
+  .rule-row.pass .rule-body { color: var(--passink); }
+  .rule-row.note .rule-body { color: var(--ink-2); }
+  .rule-body .r-t { font-weight: 700; }
+  .rule-body .r-c { font-size: 0.82rem; opacity: 0.85; }
+
+  ul.notes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  ul.notes li { padding-inline-start: 14px; border-inline-start: 2px solid var(--rule-2); color: var(--ink-2); max-width: 72ch; font-size: 0.88rem; }
+
+  footer.foot { border-top: 1px solid var(--rule); padding-top: 18px; font-size: 0.82rem; color: var(--ink-3); display: flex; flex-direction: column; gap: 8px; max-width: 74ch; }
+  footer.foot code { font-family: "IBM Plex Mono", monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.8em; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="kicker">Weekly Options Ledger &middot; IBKR Paper Account</div>
+    <h1>A <span class="fig neg">&minus;$15,440</span> week, not the <span class="fig neg">&minus;$853,505</span> the raw feed showed</h1>
+    <p class="dek">103 filtered exits across 27 tickers. The gap between those two numbers is $837,505 of phantom premium &mdash; two positions the account restart wiped out, dressed up by IBKR as ordinary expiries. Excluded below; see the callout.</p>
+    <div class="stamp">
+      <span>Trading week <b>Sep 14&ndash;18, 2026</b></span>
+      <span>Source <b>Interactive Brokers</b> &middot; <span class="mono">get_account_trades DAYS_7</span></span>
+      <span>553 raw trades &rarr; <b>103 exits</b></span>
+    </div>
+  </header>
+
+  <!-- ============ KPI ============ -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="lab">Net P&amp;L</div>
+      <div class="val neg">&minus;$15,440</div>
+      <div class="sub">after commissions &middot; 103 exits</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Win rate</div>
+      <div class="val">25%</div>
+      <div class="sub">26 wins &middot; 74 losses</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Profit factor</div>
+      <div class="val">0.61</div>
+      <div class="sub">gross win &divide; gross loss</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Return on premium</div>
+      <div class="val neg">&minus;14.9%</div>
+      <div class="sub">$85,398 option premium deployed</div>
+    </div>
+  </div>
+
+  <!-- ============ RESTART CALLOUT ============ -->
+  <section>
+    <div class="callout">
+      <div class="ctitle">&#9888; <span class="big mono">$837,505</span> of phantom premium excluded &mdash; account restart, not real trades</div>
+      <p>Two rows in the raw feed are synthetic <code class="mono">SELL &hellip; 0 Limit</code> write-offs against positions that were genuinely open &mdash; the exact shape IBKR uses for a real worthless expiry. Nothing in the feed tells the two apart. Confirmed with the account owner: the account restarted about a week before this pull, and both are the restart erasing open positions, not trading losses.</p>
+      <table>
+        <thead><tr><th>Symbol</th><th>Contracts</th><th>Written off</th><th>Order type</th><th>Would-be charge</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">CL</td><td class="num">13</td><td class="num">2026-09-16</td><td class="num">LIMIT, price 0</td><td class="num">$837,000</td></tr>
+          <tr><td class="mono">AAPL</td><td class="num">30</td><td class="num">2026-09-18</td><td class="num">LIMIT, price 0</td><td class="num">$1,065</td></tr>
+        </tbody>
+      </table>
+      <p>Left in, the CL row alone would be 95% of the week's entire gross loss against a week where every other line item runs in the low thousands &mdash; the restart signature, not a trade. Both are dropped entirely rather than charged as expiries. CL's <em>real</em>, tradeable result this week still stands: &minus;$8,488, the worst ticker in the book even with the write-off gone.</p>
+    </div>
+  </section>
+
+  <!-- ============ DAILY ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>By day</h2>
+      <span class="tag">Sep 13&ndash;18</span>
+    </div>
+    <p>One red day dominates: Wednesday alone accounts for 55% of the week's loss. Friday is the only day that closed green.</p>
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 640 300" role="img" aria-labelledby="dayT dayD">
+          <title id="dayT">Daily realised P&amp;L, Sep 13&ndash;18</title>
+          <desc id="dayD">Six days of realised P&amp;L: five losing days from -$930 to -$8,467, one winning day of +$4,863 on Friday.</desc>
+          <line class="grid-line" x1="10" y1="92.5" x2="630" y2="92.5"></line>
+          <text class="tick" x="634" y="96" text-anchor="start">$0</text>
+
+          <rect class="bar" x="10.0" y="92.5" width="91.7" height="16.6" fill="var(--neg)" rx="2"></rect>
+          <rect class="bar" x="115.7" y="92.5" width="91.7" height="15.8" fill="var(--neg)" rx="2"></rect>
+          <rect class="bar" x="221.3" y="92.5" width="91.7" height="126.4" fill="var(--neg)" rx="2"></rect>
+          <rect class="bar" x="327.0" y="92.5" width="91.7" height="143.5" fill="var(--neg)" rx="2"></rect>
+          <rect class="bar" x="432.7" y="92.5" width="91.7" height="42.0" fill="var(--neg)" rx="2"></rect>
+          <rect class="bar" x="538.3" y="10.0" width="91.7" height="82.5" fill="var(--pos)" rx="2"></rect>
+
+          <text class="val-lab" x="55.8" y="122.1" text-anchor="middle">&minus;978</text>
+          <text class="val-lab" x="161.5" y="121.3" text-anchor="middle">&minus;931</text>
+          <text class="val-lab" x="267.2" y="231.9" text-anchor="middle">&minus;7,454</text>
+          <text class="val-lab" x="372.8" y="249.0" text-anchor="middle">&minus;8,467</text>
+          <text class="val-lab" x="478.5" y="147.5" text-anchor="middle">&minus;2,474</text>
+          <text class="val-lab" x="584.2" y="23.0" text-anchor="middle">+4,863</text>
+
+          <line class="axis-line" x1="10" y1="266" x2="630" y2="266"></line>
+          <text class="tick" x="55.8" y="282" text-anchor="middle">Sun 13</text>
+          <text class="tick" x="161.5" y="282" text-anchor="middle">Mon 14</text>
+          <text class="tick" x="267.2" y="282" text-anchor="middle">Tue 15</text>
+          <text class="tick" x="372.8" y="282" text-anchor="middle">Wed 16</text>
+          <text class="tick" x="478.5" y="282" text-anchor="middle">Thu 17</text>
+          <text class="tick" x="584.2" y="282" text-anchor="middle">Fri 18</text>
+        </svg>
+      </div>
+      <div class="cap"><b>Realised P&amp;L per session.</b> Already net of commissions on both legs. Wednesday's loss is real trading, not the excluded restart write-offs &mdash; those landed after-hours and are already out of this chart.</div>
+    </div>
+  </section>
+
+  <!-- ============ TICKERS ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>By ticker</h2>
+      <span class="tag">27 names traded</span>
+    </div>
+    <p>Six winners, six losers, ranked by size. CL is the week's worst name by a wide margin &mdash; and that's <em>after</em> removing its restart write-off.</p>
+    <div class="figure">
+      <div class="chart-scroll">
+        <svg viewBox="0 0 640 436" role="img" aria-labelledby="tkT tkD">
+          <title id="tkT">Top winners and losers by ticker</title>
+          <desc id="tkD">MSTR led with +$6,213; CL trailed with -$8,488, out of 27 tickers traded this week.</desc>
+          <line class="axis-line" x1="384.0" y1="4" x2="384.0" y2="420" stroke="var(--rule-2)"></line>
+
+          <rect class="bar" x="384.0" y="10.0" width="186.0" height="24" fill="var(--pos)" rx="2"></rect>
+          <text class="row-lab" x="130" y="26.5">MSTR</text>
+          <text class="val-lab" x="578" y="26.5">+6,213</text>
+
+          <rect class="bar" x="384.0" y="44.0" width="95.7" height="24" fill="var(--pos)" rx="2"></rect>
+          <text class="row-lab" x="130" y="60.5">HOOD</text>
+          <text class="val-lab" x="488" y="60.5">+3,197</text>
+
+          <rect class="bar" x="384.0" y="78.0" width="80.5" height="24" fill="var(--pos)" rx="2"></rect>
+          <text class="row-lab" x="130" y="94.5">OKLO</text>
+          <text class="val-lab" x="473" y="94.5">+2,688</text>
+
+          <rect class="bar" x="384.0" y="112.0" width="57.6" height="24" fill="var(--pos)" rx="2"></rect>
+          <text class="row-lab" x="130" y="128.5">NQ</text>
+          <text class="val-lab" x="450" y="128.5">+1,923</text>
+
+          <rect class="bar" x="384.0" y="146.0" width="9.9" height="24" fill="var(--pos)" rx="2"></rect>
+          <text class="row-lab" x="130" y="162.5">MSFT</text>
+          <text class="val-lab" x="402" y="162.5">+331</text>
+
+          <rect class="bar" x="384.0" y="180.0" width="4.9" height="24" fill="var(--pos)" rx="2"></rect>
+          <text class="row-lab" x="130" y="196.5">SPCX</text>
+          <text class="val-lab" x="397" y="196.5">+164</text>
+
+          <rect class="bar" x="335.3" y="214.0" width="48.7" height="24" fill="var(--neg)" rx="2"></rect>
+          <text class="row-lab" x="130" y="230.5">SNDK</text>
+          <text class="val-lab" x="326" y="230.5" text-anchor="end">&minus;1,628</text>
+
+          <rect class="bar" x="335.2" y="248.0" width="48.9" height="24" fill="var(--neg)" rx="2"></rect>
+          <text class="row-lab" x="130" y="264.5">IBIT</text>
+          <text class="val-lab" x="326" y="264.5" text-anchor="end">&minus;1,633</text>
+
+          <rect class="bar" x="334.4" y="282.0" width="49.7" height="24" fill="var(--neg)" rx="2"></rect>
+          <text class="row-lab" x="130" y="298.5">CRWD</text>
+          <text class="val-lab" x="325" y="298.5" text-anchor="end">&minus;1,660</text>
+
+          <rect class="bar" x="316.4" y="316.0" width="67.7" height="24" fill="var(--neg)" rx="2"></rect>
+          <text class="row-lab" x="130" y="332.5">INTC</text>
+          <text class="val-lab" x="307" y="332.5" text-anchor="end">&minus;2,261</text>
+
+          <rect class="bar" x="310.2" y="350.0" width="73.9" height="24" fill="var(--neg)" rx="2"></rect>
+          <text class="row-lab" x="130" y="366.5">GOOGL</text>
+          <text class="val-lab" x="301" y="366.5" text-anchor="end">&minus;2,468</text>
+
+          <rect class="bar" x="130.0" y="384.0" width="254.0" height="24" fill="var(--neg)" rx="2"></rect>
+          <text class="row-lab" x="130" y="400.5" fill="var(--surface)">CL</text>
+          <text class="val-lab" x="145" y="400.5" fill="var(--surface)">&minus;8,488</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--pos)"></i> Winners</span>
+        <span><i class="swatch" style="background:var(--neg)"></i> Losers</span>
+      </div>
+      <div class="cap"><b>Top 6 winners, top 6 losers of 27 tickers traded.</b> Full 27-ticker breakdown below.</div>
+    </div>
+
+    <details class="tabledisc">
+      <summary>Show all 27 tickers</summary>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Ticker</th><th style="text-align:right">Net P&amp;L</th></tr></thead>
+          <tbody>
+            <tr><td class="tkr">MSTR</td><td class="num pos">+$6,213.16</td></tr>
+            <tr><td class="tkr">HOOD</td><td class="num pos">+$3,196.98</td></tr>
+            <tr><td class="tkr">OKLO</td><td class="num pos">+$2,688.49</td></tr>
+            <tr><td class="tkr">NQ</td><td class="num pos">+$1,922.96</td></tr>
+            <tr><td class="tkr">MSFT</td><td class="num pos">+$330.79</td></tr>
+            <tr><td class="tkr">SPCX</td><td class="num pos">+$164.28</td></tr>
+            <tr><td class="tkr">MNQ</td><td class="num pos">+$4.78</td></tr>
+            <tr><td class="tkr">NVDA</td><td class="num neg">&minus;$26.85</td></tr>
+            <tr><td class="tkr">PLTR</td><td class="num neg">&minus;$190.84</td></tr>
+            <tr><td class="tkr">HPE</td><td class="num neg">&minus;$362.43</td></tr>
+            <tr><td class="tkr">MU</td><td class="num neg">&minus;$473.15</td></tr>
+            <tr><td class="tkr">QCOM</td><td class="num neg">&minus;$513.61</td></tr>
+            <tr><td class="tkr">NVO</td><td class="num neg">&minus;$602.20</td></tr>
+            <tr><td class="tkr">ES</td><td class="num neg">&minus;$769.22</td></tr>
+            <tr><td class="tkr">MRNA</td><td class="num neg">&minus;$788.84</td></tr>
+            <tr><td class="tkr">AAPL</td><td class="num neg">&minus;$858.91</td></tr>
+            <tr><td class="tkr">CVX</td><td class="num neg">&minus;$952.31</td></tr>
+            <tr><td class="tkr">SMCI</td><td class="num neg">&minus;$1,117.81</td></tr>
+            <tr><td class="tkr">TSLA</td><td class="num neg">&minus;$1,143.52</td></tr>
+            <tr><td class="tkr">META</td><td class="num neg">&minus;$1,239.90</td></tr>
+            <tr><td class="tkr">WIX</td><td class="num neg">&minus;$1,350.82</td></tr>
+            <tr><td class="tkr">IREN</td><td class="num neg">&minus;$1,433.29</td></tr>
+            <tr><td class="tkr">SNDK</td><td class="num neg">&minus;$1,628.06</td></tr>
+            <tr><td class="tkr">IBIT</td><td class="num neg">&minus;$1,633.32</td></tr>
+            <tr><td class="tkr">CRWD</td><td class="num neg">&minus;$1,659.68</td></tr>
+            <tr><td class="tkr">INTC</td><td class="num neg">&minus;$2,261.21</td></tr>
+            <tr><td class="tkr">GOOGL</td><td class="num neg">&minus;$2,467.69</td></tr>
+            <tr><td class="tkr">CL</td><td class="num neg">&minus;$8,488.16</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ HOLD TIME ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>By hold time</h2>
+      <span class="tag">the cut IBKR can't give you</span>
+    </div>
+    <p>Every bucket is shown with its largest name pulled back out &mdash; a single outsized position routinely flips a bucket's apparent edge.</p>
+    <div class="buckets">
+      <div class="bucket">
+        <div class="b-lab">&le; 5 minutes</div>
+        <div class="b-val neg mono">&minus;$635</div>
+        <div class="b-sub">8 exits &middot; $2,559 premium &middot; 3 wins &middot; &minus;20% on premium</div>
+        <div class="b-guard">Without <b>CL</b> (largest): <span class="mono neg">&minus;$650</span></div>
+      </div>
+      <div class="bucket">
+        <div class="b-lab">5&ndash;30 minutes</div>
+        <div class="b-val neg mono">&minus;$8,117</div>
+        <div class="b-sub">34 exits &middot; $31,994 premium &middot; 6 wins &middot; &minus;19% on premium</div>
+        <div class="b-guard">Without <b>MSTR</b> (largest): <span class="mono neg">&minus;$9,668</span></div>
+      </div>
+      <div class="bucket">
+        <div class="b-lab">30&ndash;120 minutes</div>
+        <div class="b-val pos mono">+$1,740</div>
+        <div class="b-sub">27 exits &middot; $25,439 premium &middot; 9 wins &middot; &minus;4% on premium</div>
+        <div class="b-guard">Without <b>CL</b> (largest): <span class="mono neg">&minus;$1,306</span></div>
+      </div>
+      <div class="bucket">
+        <div class="b-lab">2&ndash;8 hours</div>
+        <div class="b-val pos mono">+$2,545</div>
+        <div class="b-sub">11 exits &middot; $7,284 premium &middot; 4 wins &middot; +9% on premium</div>
+        <div class="b-guard">Without <b>MSTR</b> (largest): <span class="mono neg">&minus;$164</span></div>
+      </div>
+      <div class="bucket">
+        <div class="b-lab">Overnight</div>
+        <div class="b-val neg mono">&minus;$9,114</div>
+        <div class="b-sub">19 exits &middot; $14,582 premium &middot; 4 wins &middot; &minus;26% on premium</div>
+        <div class="b-guard">Without <b>HOOD</b> (largest): <span class="mono neg">&minus;$11,460</span></div>
+      </div>
+    </div>
+    <p>Overnight holds are the one bucket that stays bleeding red without its best name &mdash; every other bucket's edge (or lack of one) rests almost entirely on a single position.</p>
+  </section>
+
+  <!-- ============ BURN ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>Where the premium burned</h2>
+      <span class="tag">336 closing slices</span>
+    </div>
+    <p>Every closing slice classified by whether it was a decision or the risk you already bought: intraday (both ends inside market hours, same day), overnight, or off-hours. $27,853 burned across 240 losing slices.</p>
+    <div class="figure">
+      <div class="burnrows">
+        <div class="burnrow">
+          <div class="b-name">Intraday<span>188 slices &middot; $50,134 prem</span></div>
+          <div class="track"><div class="fill" style="width:33%"></div></div>
+          <div class="pct">33% &middot; $16,734</div>
+        </div>
+        <div class="burnrow">
+          <div class="b-name">Overnight<span>46 slices &middot; $16,240 prem</span></div>
+          <div class="track"><div class="fill" style="width:61%"></div></div>
+          <div class="pct">61% &middot; $9,890</div>
+        </div>
+        <div class="burnrow">
+          <div class="b-name">Off-hours<span>6 slices &middot; $3,520 prem</span></div>
+          <div class="track"><div class="fill" style="width:35%"></div></div>
+          <div class="pct">35% &middot; $1,229</div>
+        </div>
+      </div>
+      <div class="cap"><b>Burn rate by class.</b> Overnight slices gave back money at nearly double the intraday rate, and none of the 46 overnight slices show a visible stop. One position, CLV6 (&minus;$2,428, 1 fill), has no reconstructable cost basis &mdash; it was opened before this window began.</div>
+    </div>
+  </section>
+
+  <!-- ============ RISK RULES ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>Risk rules check</h2>
+      <span class="tag">account $127,258</span>
+    </div>
+    <p>Checked against <code class="mono">docs/risk-rules.md</code>. 4 of 14 rules are checkable from the trade feed; the rest need data the feed doesn't carry.</p>
+    <div class="rules">
+      <div class="rule-row fail">
+        <span class="pill">FAIL</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 15 &middot; a day down 7% ends the day</div>
+          <div>Tue 2026-09-15 closed &minus;$9,536.</div>
+          <div class="r-c">Caveat: checks realised P&amp;L plus written-off premium, not full account value, which also moves with open positions &mdash; a day can breach the real rule without showing here, or vice versa.</div>
+        </div>
+      </div>
+      <div class="rule-row check">
+        <span class="pill">CHECK</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 6 &middot; no unprotected position over 5% overnight</div>
+          <div>One flagged night: Fri 2026-09-18, NQ &times;15, ~$7,875 (threshold $6,363).</div>
+          <div class="r-c">Caveat: market value is approximated from last traded price and can't see a live stop &mdash; a candidate to review, not a confirmed breach.</div>
+        </div>
+      </div>
+      <div class="rule-row note">
+        <span class="pill">NOTE</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 4 &middot; commission below $0.30</div>
+          <div>$36,103 of premium entered at or below $0.30 across 13 symbols; estimated round-trip friction $1,805&ndash;$3,971.</div>
+        </div>
+      </div>
+      <div class="rule-row pass">
+        <span class="pill">PASS</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 12 &middot; total open exposure under 12%</div>
+          <div>Peak open cost $10,500 (8.3% of account), cap $15,271 &mdash; never breached across 416 points in the week. Worst at Fri 18.09 10:15.</div>
+        </div>
+      </div>
+    </div>
+    <details class="tabledisc">
+      <summary>10 rules not checkable from the trade feed</summary>
+      <ul class="notes">
+        <li><strong>Rule 1</strong> &mdash; 3+ days at 2%: needs the expiry date to know the tier and stop budget.</li>
+        <li><strong>Rule 2</strong> &mdash; 0&ndash;2 days at 1%: needs the expiry date.</li>
+        <li><strong>Rule 3</strong> &mdash; 0&ndash;2 days A-game at 2%: needs the expiry date and an A-game marker in the journal.</li>
+        <li><strong>Rule 5</strong> &mdash; a risen position is not cut for having risen: intent, not visible in fills.</li>
+        <li><strong>Rule 7</strong> &mdash; a position in a move gets a stop: stop levels come back empty; an untriggered stop leaves no trace.</li>
+        <li><strong>Rule 8</strong> &mdash; correlated positions count as one: needs a correlation call, not in the data.</li>
+        <li><strong>Rule 9</strong> &mdash; a loss does not exceed the stop budget: the budget depends on the expiry date.</li>
+        <li><strong>Rule 10</strong> &mdash; zone 3 is not counted as security: intent.</li>
+        <li><strong>Rule 11</strong> &mdash; no profit target: intent.</li>
+        <li><strong>Rule 13</strong> &mdash; size halves at every rung: needs the account equity curve, not the trade feed.</li>
+        <li><strong>Rule 14</strong> &mdash; expansion only on a new high: needs the account equity curve.</li>
+      </ul>
+    </details>
+  </section>
+
+  <footer class="foot">
+    <p><strong>Net P&amp;L is already after commissions.</strong> IBKR nets <code>realized_pnl</code> against commissions on both legs. Cash-flow check: realised P&amp;L &minus;$17,902 vs. cash flow &minus;$24,608, a $6,705 gap consistent with normal FIFO cost-basis timing (largest contributors: AMZN, CL, NQ, MSTR, AAPL) &mdash; not a missing filter.</p>
+    <p>Audit chain reconciles (<code>audit_reconciles: true</code>): 551 trades in the window &rarr; &minus;81 share trades &rarr; &minus;215 BUY legs &rarr; 103 exits, cross-checked against the exits sheet.</p>
+    <p>Full detail, live formulas and the raw exit list: <code>data/2026-09-14-week/trades-filtered.xlsx</code> and <code>trades-filtered.csv</code> in the repo.</p>
+  </footer>
+
+</div>

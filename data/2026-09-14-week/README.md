@@ -12,6 +12,8 @@ Source: Interactive Brokers **paper account**, `get_account_trades` for the 7 da
 | `summary.json` | The numbers the build script printed, including the expiry block and the audit chain. |
 | `burn-slices.json` | Per-slice classification of where premium burned: intraday, overnight, off-hours, expiry. |
 
+The matching report is `reports/2026-09-14-week-trades.html`.
+
 Regenerate with:
 
 ```bash

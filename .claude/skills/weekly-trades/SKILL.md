@@ -159,10 +159,23 @@ the clock, so a stretch where they happened shows as a flat segment, not a skip)
 redraws the whole chart. This needed real recomputation, not just dimming dots, so the
 geometry (x/y scaling, nice-step gridlines, the polyline and fill) is duplicated in a small
 inline `<script>` block driven by an embedded JSON array of every exit's
-`{time, ticker, date, pnl}`, rather than trying to precompute every possible ticker
-combination in Python. It renders on page load (all tickers selected) before anyone
-touches a checkbox, so the first paint already shows the real week — the JS is what redraws
-it after that, not what's needed to see it at all.
+`{time, ticker, date, pnl, sec, prem, comm}`, rather than trying to precompute every
+possible ticker combination in Python. It renders on page load (all tickers selected)
+before anyone touches a checkbox, so the first paint already shows the real week — the JS
+is what redraws it after that, not what's needed to see it at all.
+
+**The filter also drives the top KPI strip**, not just the chart — the first version only
+updated the chart, and left net P&L, win rate, profit factor and return on premium showing
+the whole-week numbers regardless of what was filtered, which reads as broken once you
+notice it. The same `update()` call that redraws the chart also recomputes those four KPIs
+plus a fifth, **Commission** (added to the top strip for the same reason — it was easy to
+miss three screens down in its own section, and the account holder asked for it up top).
+All five use the exact formulas `build_week.py` uses (win = pnl > 0, profit factor =
+gross win / gross loss, return-on-premium is option-only pnl over option-only premium so a
+futures ticker's notional doesn't distort it) so a filtered KPI always matches what the
+by-ticker table below would say for the same tickers. A one-line note appears under the KPI
+strip whenever the filter is active, so it's never ambiguous whether the numbers are the
+whole week or a subset.
 
 If a restart write-off needs excluding and its date differs from another symbol's on the
 same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes

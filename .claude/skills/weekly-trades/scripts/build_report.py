@@ -222,7 +222,9 @@ def render_scatter(trades, starting_capital=None):
     cap = starting_capital if starting_capital else 0
 
     records = [{"t": trade_dt(t).isoformat(), "ticker": t["ticker"], "date": t["date"],
-                "time": t.get("time_session", ""), "pnl": round(t["net_pnl_usd"], 2)}
+                "time": t.get("time_session", ""), "pnl": round(t["net_pnl_usd"], 2),
+                "sec": t.get("sec_type", ""), "prem": round(t.get("premium_paid_usd", 0.0), 2),
+                "comm": round(t.get("commission_usd", 0.0), 2)}
                for t in ordered]
     data_json = json.dumps({"trades": records, "cap": cap, "tickers": tickers},
                            ensure_ascii=False).replace("</", "<\\/")
@@ -243,6 +245,10 @@ def render_scatter(trades, starting_capital=None):
         return s + '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
       }}
       function esc(s) {{ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }}
+      function fmtPct(v, digits) {{
+        digits = digits === undefined ? 1 : digits;
+        return (v >= 0 ? '+' : '-') + Math.abs(v * 100).toFixed(digits) + '%';
+      }}
       function niceStep(vmax, n) {{
         n = n || 4;
         if (vmax <= 0) return 1;
@@ -345,10 +351,45 @@ def render_scatter(trades, starting_capital=None):
         }}
       }}
 
+      function updateKpis(selected) {{
+        var trades = DATA.trades.filter(function(tr) {{ return selected.has(tr.ticker); }});
+        var n = trades.length;
+        var net = trades.reduce(function(s, t) {{ return s + t.pnl; }}, 0);
+        var wins = trades.filter(function(t) {{ return t.pnl > 0; }});
+        var losses = trades.filter(function(t) {{ return t.pnl < 0; }});
+        var winRate = n ? wins.length / n : 0;
+        var grossWin = wins.reduce(function(s, t) {{ return s + t.pnl; }}, 0);
+        var grossLoss = -losses.reduce(function(s, t) {{ return s + t.pnl; }}, 0);
+        var pf = losses.length ? grossWin / grossLoss : null;
+        var opt = trades.filter(function(t) {{ return t.sec !== 'FUT'; }});
+        var optPrem = opt.reduce(function(s, t) {{ return s + t.prem; }}, 0);
+        var optNet = opt.reduce(function(s, t) {{ return s + t.pnl; }}, 0);
+        var ret = optPrem ? optNet / optPrem : null;
+        var totalComm = trades.reduce(function(s, t) {{ return s + t.comm; }}, 0);
+        var optComm = opt.reduce(function(s, t) {{ return s + t.comm; }}, 0);
+        var commRate = optPrem ? optComm / optPrem : null;
+
+        document.getElementById('kpiNet').textContent = fmtMoney(net, true);
+        document.getElementById('kpiNet').className = 'val ' + (net >= 0 ? 'pos' : 'neg');
+        document.getElementById('kpiNetSub').textContent = 'after commissions · ' + n + ' exits';
+        document.getElementById('kpiWinRate').textContent = (winRate * 100).toFixed(0) + '%';
+        document.getElementById('kpiWinSub').textContent = wins.length + ' wins · ' + losses.length + ' losses';
+        document.getElementById('kpiPF').textContent = pf === null ? '—' : pf.toFixed(3);
+        document.getElementById('kpiRet').textContent = ret === null ? '—' : fmtPct(ret);
+        document.getElementById('kpiRet').className = 'val ' + (ret !== null && ret < 0 ? 'neg' : 'pos');
+        document.getElementById('kpiRetSub').textContent = fmtMoney(optPrem) + ' option premium deployed';
+        document.getElementById('kpiComm').textContent = fmtMoney(totalComm);
+        document.getElementById('kpiCommSub').textContent = (commRate === null ? '—' : fmtPct(commRate, 2)) + ' on option premium';
+
+        var note = document.getElementById('kpiFilterNote');
+        if (note) note.style.display = (selected.size >= DATA.tickers.length) ? 'none' : 'block';
+      }}
+
       function update() {{
         var selected = new Set();
         document.querySelectorAll('.pnlTickerChk').forEach(function(cb) {{ if (cb.checked) selected.add(cb.value); }});
         render(selected);
+        updateKpis(selected);
       }}
       var allBox = document.getElementById('pnlAll');
       allBox.addEventListener('change', function(e) {{
@@ -701,7 +742,7 @@ TEMPLATE = r"""<title>{title}</title>
   .masthead .dek {{ color: var(--ink-2); font-size: 1.02rem; max-width: 66ch; }}
   .stamp {{ display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.82rem; color: var(--ink-3); }}
   .stamp b {{ color: var(--ink-2); font-weight: 600; }}
-  .kpis {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px;
+  .kpis {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px;
     background: var(--rule); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }}
   .kpi {{ background: var(--surface); padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 4px; }}
   .kpi .lab {{ font-size: 0.76rem; color: var(--ink-3); font-weight: 600; }}
@@ -808,12 +849,15 @@ TEMPLATE = r"""<title>{title}</title>
     </div>
   </header>
 
-  <div class="kpis">
-    <div class="kpi"><div class="lab">Net P&amp;L</div><div class="val {net_cls}">{net}</div><div class="sub">after commissions &middot; {n_exits} exits</div></div>
-    <div class="kpi"><div class="lab">Win rate</div><div class="val">{win_rate}</div><div class="sub">{wins} wins &middot; {losses} losses</div></div>
-    <div class="kpi"><div class="lab">Profit factor</div><div class="val">{pf}</div><div class="sub">gross win &divide; gross loss</div></div>
-    <div class="kpi"><div class="lab">Return on premium</div><div class="val {ret_cls}">{ret}</div><div class="sub">{prem} option premium deployed</div></div>
+  <div class="kpis" id="topKpis">
+    <div class="kpi"><div class="lab">Net P&amp;L</div><div class="val {net_cls}" id="kpiNet">{net}</div><div class="sub" id="kpiNetSub">after commissions &middot; {n_exits} exits</div></div>
+    <div class="kpi"><div class="lab">Win rate</div><div class="val" id="kpiWinRate">{win_rate}</div><div class="sub" id="kpiWinSub">{wins} wins &middot; {losses} losses</div></div>
+    <div class="kpi"><div class="lab">Profit factor</div><div class="val" id="kpiPF">{pf}</div><div class="sub">gross win &divide; gross loss</div></div>
+    <div class="kpi"><div class="lab">Return on premium</div><div class="val {ret_cls}" id="kpiRet">{ret}</div><div class="sub" id="kpiRetSub">{prem} option premium deployed</div></div>
+    <div class="kpi"><div class="lab">Commission</div><div class="val" id="kpiComm">{comm_total}</div><div class="sub" id="kpiCommSub">{comm_rate} on option premium</div></div>
   </div>
+  <p class="cap" id="kpiFilterNote" style="display:none;max-width:70ch;margin:-24px 0 0">
+    KPIs above reflect the ticker filter in "Account balance over time" below.</p>
 
   <section>
     <div class="sec-head"><h2>Account balance over time</h2><span class="tag">{n_exits} exits</span></div>

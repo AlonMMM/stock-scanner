@@ -1,0 +1,23 @@
+{
+  "ticker": "NVDA",
+  "expiry": "2026-09-21",
+  "dte": 2,
+  "spot": 222.53,
+  "strikes": [
+    {"strike": 205,   "call_oi": 540,  "put_oi": 1060},
+    {"strike": 207.5, "call_oi": 180,  "put_oi": 1502},
+    {"strike": 210,   "call_oi": 1167, "put_oi": 3410},
+    {"strike": 212.5, "call_oi": 2051, "put_oi": 2054},
+    {"strike": 215,   "call_oi": 3603, "put_oi": 2122},
+    {"strike": 217.5, "call_oi": 4966, "put_oi": 513},
+    {"strike": 220,   "call_oi": 4161, "put_oi": 612},
+    {"strike": 222.5, "call_oi": 3297, "put_oi": 163},
+    {"strike": 225,   "call_oi": 3079, "put_oi": 835},
+    {"strike": 227.5, "call_oi": 1298, "put_oi": 148},
+    {"strike": 230,   "call_oi": 4840, "put_oi": 89},
+    {"strike": 232.5, "call_oi": 821,  "put_oi": 2},
+    {"strike": 235,   "call_oi": 1260, "put_oi": 1},
+    {"strike": 237.5, "call_oi": 284,  "put_oi": 0},
+    {"strike": 240,   "call_oi": 5448, "put_oi": 0}
+  ]
+}

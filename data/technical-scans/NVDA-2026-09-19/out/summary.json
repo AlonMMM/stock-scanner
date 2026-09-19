@@ -1,0 +1,73 @@
+{
+  "ticker": "NVDA",
+  "spot": 222.53,
+  "generated_at": "2026-09-19T19:07:56.375835+00:00",
+  "pivots_from_prior_day": {
+    "pp": 221.01,
+    "r1": 223.99,
+    "r2": 225.71,
+    "r3": 228.69,
+    "s1": 219.29,
+    "s2": 216.31,
+    "s3": 214.59
+  },
+  "prior_week_range": {
+    "high": 234.76,
+    "low": 217.2
+  },
+  "swing_sr_clusters": [
+    {
+      "level": 214.72,
+      "strength": 7
+    },
+    {
+      "level": 190.34,
+      "strength": 3
+    },
+    {
+      "level": 198.19,
+      "strength": 3
+    },
+    {
+      "level": 208.39,
+      "strength": 3
+    },
+    {
+      "level": 231.38,
+      "strength": 2
+    },
+    {
+      "level": 235.65,
+      "strength": 2
+    }
+  ],
+  "volume_profile": {
+    "poc": 219.55,
+    "value_area_high": 219.94,
+    "value_area_low": 218.69
+  },
+  "session_vwap_last": 220.04,
+  "options": {
+    "expiry": "2026-09-21",
+    "dte": 2,
+    "call_wall": {
+      "strike": 240,
+      "call_oi": 5448,
+      "put_oi": 0
+    },
+    "put_wall": {
+      "strike": 210,
+      "call_oi": 1167,
+      "put_oi": 3410
+    },
+    "max_pain": 215
+  },
+  "relative_strength_vs_benchmark_pp": 1.56,
+  "charts": [
+    "01_daily.png",
+    "02_hourly.png",
+    "03_intraday_volume_profile.png",
+    "04_options_oi.png",
+    "05_relative_strength.png"
+  ]
+}

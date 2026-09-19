@@ -110,7 +110,8 @@ the rules check:
 python3 <this-skill-dir>/scripts/build_report.py \
     --summary summary.json --trades trades-filtered.csv \
     --rules rules.json --burn burn-slices.json \
-    --out report.html --label "Sep 14-18, 2026" [--loss-threshold 750]
+    --out report.html --label "Sep 14-18, 2026" \
+    [--loss-threshold 750] [--starting-capital 100000]
 ```
 
 `--rules` and `--burn` are optional; the report degrades gracefully without them.
@@ -128,14 +129,24 @@ he reads every week; that belongs in `data/<week>/README.md` instead (see below)
 always explain commissions plainly (net P&L already nets both legs; the figures shown are
 for context, not a further deduction).
 
-The main chart is a **cumulative P&L curve, not a scatter of each trade's own result** — a
-scatter of raw per-trade P&L doesn't read as "profit over time" even with a real time axis,
-because a curve needs a running total, not independent points floating around zero. X is
-the actual exit timestamp (real time, not an evenly-spaced index within the day, so a burst
-of trades minutes apart moves the line in a cluster and a quiet stretch is flat); Y is the
-running total after each exit; every exit still gets its own point on the line, colored by
-whether that individual trade won or lost, so the per-trade detail survives inside the
-week's trajectory. Area fill is green above zero and red below it.
+The main chart is the week's **account balance over time, not a scatter of each trade's own
+result and not a bare P&L delta**. Two account-holder corrections shaped this:
+
+1. A scatter of raw per-trade P&L doesn't read as "profit over time" even with a real time
+   axis — a curve needs a running total, not independent points floating around zero.
+2. A cumulative-P&L curve auto-scaled tight to the week's own swing (e.g. $0 to −$15k)
+   exaggerates a loss that is actually small against the real account. `--starting-capital`
+   (default 100000 — this account's own starting figure) fixes the y-axis floor at $0 and
+   the ceiling at *at least* that value, so a $15k drawdown reads at its true size against a
+   $100k account instead of filling the whole chart. It only extends beyond that range if
+   the balance actually moves outside it (up or down) — never clipped, never shrunk.
+
+X is the actual exit timestamp (real time, not an evenly-spaced index within the day, so a
+burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat); Y is
+starting capital plus the running P&L total; every exit still gets its own point on the
+line, colored by whether that individual trade won or lost. Area fill is green above
+starting capital and red below it, with round-dollar gridlines ($0/$25k/$50k/.../ceiling)
+for scale.
 
 If a restart write-off needs excluding and its date differs from another symbol's on the
 same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes

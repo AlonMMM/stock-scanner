@@ -29,6 +29,7 @@ import collections
 import csv
 import datetime
 import json
+import math
 import sys
 
 
@@ -201,15 +202,32 @@ def trade_dt(t):
                                        "%Y-%m-%d %H:%M")
 
 
-def render_scatter(trades):
-    """The week's running P&L over time: a proper profit/loss curve, not a scatter of
-    each trade's own result. X is the actual exit timestamp (linear, real time — a
-    burst of trades minutes apart clusters; a quiet stretch shows as empty space); Y
-    is the CUMULATIVE total after that exit. Every trade still gets its own point on
-    the line, colored by whether that individual trade was a win or a loss, so the
-    per-trade detail survives inside the running total."""
+def _nice_step(vmax, n=4):
+    if vmax <= 0:
+        return 1.0
+    raw = vmax / n
+    magnitude = 10 ** math_floor_log10(raw)
+    for m in (1, 2, 2.5, 5, 10):
+        if raw <= m * magnitude:
+            return m * magnitude
+    return 10 * magnitude
+
+
+def math_floor_log10(x):
+    return math.floor(math.log10(x)) if x > 0 else 0
+
+
+def render_scatter(trades, starting_capital=None):
+    """The week's account balance over time, not a scatter of each trade's own
+    result. X is the actual exit timestamp (linear, real time — a burst of trades
+    minutes apart clusters; a quiet stretch shows as empty space). Y is starting
+    capital plus the running P&L total, scaled against the full account (0 to at
+    least starting_capital) rather than auto-fit tightly to the week's swing —
+    a $15k drawdown reads very differently against $0-$100k than against
+    $0-$15k. Every trade still gets its own point on the line, colored by
+    whether that individual trade was a win or a loss."""
     W, H = 700, 340
-    padL, padR, padT, padB = 54, 16, 14, 36
+    padL, padR, padT, padB = 66, 16, 14, 36
     plotW, plotH = W - padL - padR, H - padT - padB
 
     ordered = sorted(trades, key=trade_dt)
@@ -220,47 +238,52 @@ def render_scatter(trades):
     def x_of(dt):
         return padL + plotW * (dt - tmin).total_seconds() / trange
 
-    running = []
+    cap = starting_capital if starting_capital else 0
+    running, balances = [], []
     total = 0.0
     for t in ordered:
         total += t["net_pnl_usd"]
         running.append(total)
+        balances.append(cap + total)
 
-    vmax = max(0, max(running)) if running else 1
-    vmin = min(0, min(running)) if running else -1
+    # 0 is always the floor; the top is at least starting capital, extended only if
+    # the balance actually climbed past it (never clipped, but never shrunk below
+    # showing the full account either).
+    vmax = max(cap, max(balances)) if balances else max(cap, 1)
+    vmin = min(0, min(balances)) if balances else 0
     vrange = (vmax - vmin) or 1
 
     def y_of(v):
         return padT + plotH * (vmax - v) / vrange
 
-    zero_y = y_of(0)
-    pts = [(x_of(dt), y_of(cum)) for dt, cum in zip(times, running)]
+    start_y = y_of(cap)
+    pts = [(x_of(dt), y_of(bal)) for dt, bal in zip(times, balances)]
 
-    # Start the line/fill at (first point's x, $0) so the very first trade's own
-    # result is visible as a segment, not skipped.
-    line_pts = [(pts[0][0], zero_y)] + pts if pts else []
+    # Start the line/fill at (first point's x, starting capital) so the very first
+    # trade's own result is visible as a segment, not skipped.
+    line_pts = [(pts[0][0], start_y)] + pts if pts else []
     poly = " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts)
-    fill = " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts)
-    fill = "{:.1f},{:.1f} ".format(line_pts[0][0], zero_y) + fill + \
-        " {:.1f},{:.1f}".format(line_pts[-1][0], zero_y) if line_pts else ""
+    fill = ("{:.1f},{:.1f} ".format(line_pts[0][0], start_y) +
+            " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts) +
+            " {:.1f},{:.1f}".format(line_pts[-1][0], start_y)) if line_pts else ""
 
     circles = []
-    for t, (cx, cy), cum in zip(ordered, pts, running):
+    for t, (cx, cy), bal in zip(ordered, pts, balances):
         v = t["net_pnl_usd"]
         color = "var(--pos)" if v >= 0 else "var(--neg)"
         circles.append(
             '<circle class="bar" cx="{:.1f}" cy="{:.1f}" r="3.2" fill="{}" '
-            'fill-opacity="0.9"><title>{} {} {} — {} this trade, {} running total</title>'
+            'fill-opacity="0.9"><title>{} {} {} — {} this trade, {} balance</title>'
             '</circle>'.format(cx, cy, color, esc(t["ticker"]), t["date"],
-                                t.get("time_session", ""), money(v, sign=True), money(cum, sign=True)))
+                                t.get("time_session", ""), money(v, sign=True), money(bal)))
 
     end_label = ""
     if pts:
         ex, ey = pts[-1]
-        end_color = "var(--pos)" if running[-1] >= 0 else "var(--neg)"
+        end_color = "var(--pos)" if balances[-1] >= cap else "var(--neg)"
         end_label = ('<circle cx="{:.1f}" cy="{:.1f}" r="4.5" fill="{}"></circle>'
                      '<text class="end-lab" x="{:.1f}" y="{:.1f}" text-anchor="end">{}</text>'
-                     ).format(ex, ey, end_color, ex - 6, ey - 8, money(running[-1], sign=True))
+                     ).format(ex, ey, end_color, ex - 6, ey - 8, money(balances[-1]))
 
     daylines, daylabels = [], []
     seen = set()
@@ -275,14 +298,34 @@ def render_scatter(trades):
         daylabels.append('<text class="tick" x="{:.1f}" y="{}" text-anchor="start">{} {}</text>'
                          .format(max(gx, padL), H - 6, wd, t["date"][5:]))
 
+    # Horizontal scale ticks at round dollar amounts (e.g. $0/$25k/$50k/$75k/$100k),
+    # so the account-size context is legible, not just a bare $0 and an end label.
+    step = _nice_step(vmax)
+    hgrid = []
+    v = 0.0
+    while v <= vmax + step * 0.01:
+        y = y_of(v)
+        hgrid.append('<line class="grid-line" x1="{0}" y1="{1:.1f}" x2="{2}" y2="{1:.1f}"></line>'
+                     .format(padL, y, W - padR))
+        hgrid.append('<text class="tick" x="{0}" y="{1:.1f}" text-anchor="end">{2}</text>'
+                     .format(padL - 6, y + 3.5, money(v)))
+        v += step
+
+    start_line = ""
+    if cap and abs(cap % step) > step * 0.02:  # only add a dedicated line if it'd miss a tick
+        start_line = ('<line x1="{0}" y1="{1:.1f}" x2="{2}" y2="{1:.1f}" '
+                      'stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3,3"></line>'
+                      '<text class="tick" x="{0}" y="{3:.1f}" text-anchor="start">starting capital {4}</text>'
+                      ).format(padL, start_y, W - padR, start_y - 4, money(cap))
+
     return """
-    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Cumulative P&amp;L over the week">
+    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Account balance over the week">
       <defs>
-        <clipPath id="cuPos"><rect x="0" y="0" width="{W}" height="{zy:.1f}"></rect></clipPath>
-        <clipPath id="cuNeg"><rect x="0" y="{zy:.1f}" width="{W}" height="{H}"></rect></clipPath>
+        <clipPath id="cuPos"><rect x="0" y="0" width="{W}" height="{sy:.1f}"></rect></clipPath>
+        <clipPath id="cuNeg"><rect x="0" y="{sy:.1f}" width="{W}" height="{H}"></rect></clipPath>
       </defs>
-      <line class="grid-line" x1="{pl}" y1="{zy:.1f}" x2="{rx}" y2="{zy:.1f}"></line>
-      <text class="tick" x="{rxlab}" y="{zylab:.1f}">$0</text>
+      {hgrid}
+      {start_line}
       {daylines}
       <polygon points="{fill}" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>
       <polygon points="{fill}" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>
@@ -293,8 +336,8 @@ def render_scatter(trades):
       <line class="axis-line" x1="{pl}" y1="{ax}" x2="{rx}" y2="{ax}"></line>
       {daylabels}
     </svg>
-    """.format(W=W, H=H, pl=padL, rx=W - padR, rxlab=W - padR + 4,
-               zy=zero_y, zylab=zero_y + 3.5, ax=H - padB,
+    """.format(W=W, H=H, pl=padL, rx=W - padR, ax=H - padB,
+               sy=start_y, hgrid="\n      ".join(hgrid), start_line=start_line,
                fill=fill, poly=poly,
                daylines="\n      ".join(daylines),
                circles="\n      ".join(circles), daylabels="\n      ".join(daylabels),
@@ -716,19 +759,21 @@ TEMPLATE = r"""<title>{title}</title>
   </div>
 
   <section>
-    <div class="sec-head"><h2>P&amp;L over time</h2><span class="tag">{n_exits} exits</span></div>
-    <p>Running total across the week, plotted on real time — not evenly spaced within a day, so a
-      burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat. Every exit
-      is still its own point on the line, colored by whether that individual trade won or lost.</p>
+    <div class="sec-head"><h2>Account balance over time</h2><span class="tag">{n_exits} exits</span></div>
+    <p>Starting capital plus the running total, plotted on real time — not evenly spaced within a day, so
+      a burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat. Scaled
+      against the full account (from $0), not auto-fit tight to the week's swing, so the drawdown reads
+      at its real size. Every exit is still its own point on the line, colored by whether that individual
+      trade won or lost.</p>
     <div class="figure">
       <div class="chart-scroll">{scatter_svg}</div>
       <div class="legend">
         <span><i class="dotswatch" style="background:var(--pos)"></i> Winning trade</span>
         <span><i class="dotswatch" style="background:var(--neg)"></i> Losing trade</span>
-        <span>Line &middot; cumulative P&amp;L</span>
+        <span>Line &middot; account balance</span>
         <span>X-axis &middot; actual time</span>
       </div>
-      <div class="cap"><b>Cumulative P&amp;L, {n_exits} exits.</b> Hover a point for that trade's own result and the running total right after it.</div>
+      <div class="cap"><b>Account balance, {n_exits} exits, starting capital {starting_capital}.</b> Hover a point for that trade's own result and the balance right after it.</div>
     </div>
   </section>
 
@@ -812,7 +857,7 @@ def build(args):
 
     daily_svg = render_daily(summary["by_day"])
     ticker_svg, ticker_table = render_tickers(summary["by_ticker"])
-    scatter_svg = render_scatter(trades)
+    scatter_svg = render_scatter(trades, starting_capital=args.starting_capital)
     hold_tiles = render_hold_buckets(summary.get("by_hold", []))
     comm = render_commission(trades, summary)
     rules = render_rules(rules_json)
@@ -866,7 +911,8 @@ def build(args):
         win_rate=pct_int(summary["win_rate"]), wins=summary["wins"], losses=summary["losses"],
         pf=summary["profit_factor"],
         ret=pct(ret), ret_cls="pos" if ret >= 0 else "neg", prem=money(summary["option_premium"]),
-        scatter_svg=scatter_svg, daily_svg=daily_svg, n_days=n_days,
+        scatter_svg=scatter_svg, starting_capital=money(args.starting_capital),
+        daily_svg=daily_svg, n_days=n_days,
         ticker_svg=ticker_svg, ticker_table=ticker_table,
         hold_tiles=hold_tiles,
         burn_section=burn_section,
@@ -904,6 +950,9 @@ def main():
                     help="flag exits that lost more than this in the 'Biggest losses' section")
     ap.add_argument("--out", required=True)
     ap.add_argument("--label", help="e.g. 'Sep 14-18, 2026' — defaults to the summary's week_start")
+    ap.add_argument("--starting-capital", type=float, default=100000,
+                    help="scales the P&L-over-time chart's y-axis against the full account "
+                         "(0 to at least this) instead of auto-fitting to the week's swing")
     ap.add_argument("--title", default="Trade Week Ledger")
     args = ap.parse_args()
 

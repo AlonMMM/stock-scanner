@@ -11,6 +11,7 @@ Source: Interactive Brokers **paper account**, `get_account_trades` for the 7 da
 | `trades-filtered.csv` | The same 103 exit rows, values only, UTF-8 with BOM. |
 | `summary.json` | The numbers the build script printed, including the expiry block and the audit chain. |
 | `burn-slices.json` | Per-slice classification of where premium burned: intraday, overnight, off-hours, expiry. |
+| `rules.json` | `check_rules.py --json` output — the risk-rules check consumed by the report. |
 
 The matching report is `reports/2026-09-14-week-trades.html`.
 
@@ -20,6 +21,8 @@ Regenerate with:
 # 1. Remove the two account-restart write-offs (see below) from the raw IBKR feed —
 #    build_week.py's --drop-expiry only accepts a single date, and these two land on
 #    different session days, so a small pre-filter step is needed before the main script.
+#    check_rules.py and burn_slices.py don't need this — they take a SYM@DATE list
+#    natively (their --vanished / third-argument), so this step is build_week.py-only.
 python3 -c "
 import json
 with open('TRADES.json') as f: data = json.load(f)
@@ -34,6 +37,14 @@ python3 .claude/skills/weekly-trades/scripts/build_week.py \
 
 python3 .claude/skills/weekly-trades/scripts/burn_slices.py \
     TRADES.resetfiltered.json data/2026-09-14-week/burn-slices.json
+
+python3 .claude/skills/weekly-trades/scripts/check_rules.py \
+    TRADES.resetfiltered.json --rules docs/risk-rules.md --json > data/2026-09-14-week/rules.json
+
+python3 .claude/skills/weekly-trades/scripts/build_report.py \
+    --summary data/2026-09-14-week/summary.json --trades data/2026-09-14-week/trades-filtered.csv \
+    --rules data/2026-09-14-week/rules.json --burn data/2026-09-14-week/burn-slices.json \
+    --out reports/2026-09-14-week-trades.html --label "Sep 14-18, 2026"
 ```
 
 ## What the filter does
@@ -137,18 +148,19 @@ Run against this week (account value $127,258):
 - **FAIL — rule 15** (a day down 7% ends the day): 2026-09-15 closed −$9,536. Caveat: this
   checks realised P&L plus written-off premium, not full account value, so it can miss or
   over-flag relative to the actual rule.
-- **CHECK — rule 6** (no unprotected position over 5% overnight): one flagged night,
-  2026-09-18 NQ x15 (~$7,875, above the $6,363 threshold). Market value here is
-  approximated from last price and cannot see a live stop, so this is a candidate to
-  review, not a confirmed breach.
 - **NOTE — rule 4**: $36,103 of premium entered at or below $0.30 across 13 symbols;
   estimated round-trip commission friction $1,805–$3,971.
 - **PASS — rule 12** (total open exposure under 12%): peak open cost $10,500 (8.3%),
   never breached the $15,271 cap.
+- **PASS — rule 6** (no unprotected position over 5% overnight): nothing above the cap at
+  a session boundary. A 15-lot NQ position on 2026-09-18 initially flagged at ~$7,875
+  against the $6,363 cap — but that used a hardcoded 100x equity-option multiplier on an
+  NQ future option, which is actually 20x. The real market value was $1,575, well under
+  the cap. `check_rules.py` now reads each symbol's multiplier from its own fills instead
+  of assuming 100 (fixed 2026-09-19).
 - **Not checkable from the trade feed** (10 of 14 rules): most need the option's expiry
-  date, an equity curve, or trader intent, none of which the fills carry. See
-  `summary.json`'s companion rules output for the full list — a clean-looking check here
-  is not a clean bill of health.
+  date, an equity curve, or trader intent, none of which the fills carry. See `rules.json`
+  for the full list — a clean-looking check here is not a clean bill of health.
 
 ## Derived columns
 

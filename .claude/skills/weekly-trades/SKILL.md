@@ -85,10 +85,54 @@ to them rather than presenting a flag as a confirmed breach. It also prints the 
 Repeat that list; a check that only mentions what it could see reads as a clean bill of
 health, which it is not.
 
-**5. Save it.** If the session is working in the account holder's `stock-scanner` repo,
+Rule 6 (no unprotected position over 5% overnight) values each overnight position at its
+own multiplier, read from that symbol's own fills — not a hardcoded 100. A futures option
+like NQ (20) or CL (1000) priced at the equity-option multiplier reads as 5–50x its real
+market value and flags positions that were never actually oversized. If a flagged night
+looks wrong, check the position's real contract multiplier before reporting it as a
+breach — see NQ in the 14–18 September week, where the unfixed script over-valued a 15-lot
+position by 5x and flagged it at $7,875 against a $6,363 cap; the real value was $1,575.
+
+Run it a second time with `--json` and save the output — the report step below reads it:
+
+```bash
+python3 <this-skill-dir>/scripts/check_rules.py <path-to-trades-json> --rules docs/risk-rules.md \
+    --json > rules.json
+```
+
+**5. Build the HTML report.** `scripts/build_report.py` turns the week's summary, the
+filtered CSV, the rules check and the burn-slices output into one self-contained report —
+KPIs, every exit as an individual point (not just aggregates), day and ticker breakdowns,
+hold-time buckets, premium burn, a commission section, and the rules check:
+
+```bash
+python3 <this-skill-dir>/scripts/build_report.py \
+    --summary summary.json --trades trades-filtered.csv \
+    --rules rules.json --burn burn-slices.json \
+    --out report.html --label "Sep 14-18, 2026"
+```
+
+`--rules` and `--burn` are optional; the report degrades gracefully without them. This
+report intentionally does **not** narrate the filter chain, the audit-reconciliation
+table, or what got dropped and why — the account holder does not want that in the report
+he reads every week; that belongs in `data/<week>/README.md` instead (see below). It does
+always explain commissions plainly (net P&L already nets both legs; the figures shown are
+for context, not a further deduction) and always plots every exit as its own point, sized
+by premium and colored by win/loss — an aggregate chart alone was not enough to see it.
+
+If a restart write-off needs excluding and its date differs from another symbol's on the
+same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes
+one `--expiry-day` for the whole `--drop-expiry` set. `check_rules.py --vanished` and
+`burn_slices.py`'s third argument already accept a comma-separated `SYM@YYYY-MM-DD` list
+and handle mixed dates natively. For `build_week.py` in that situation, pre-filter the raw
+trades JSON (drop the exact `(symbol, side, size, price, trade_time)` rows) before running
+it, rather than trying to force two dates through one flag.
+
+**6. Save it.** If the session is working in the account holder's `stock-scanner` repo,
 write to `data/<YYYY-MM-DD>-week/` named after the Monday and commit it; past weeks live
-there, and `data/2026-08-24-week/README.md` is worth mirroring. Outside that repo, write
-somewhere sensible and hand the files over.
+there, and `data/2026-08-24-week/README.md` is worth mirroring. Save `report.html` next to
+it in `reports/<YYYY-MM-DD>-week-trades.html`. Outside that repo, write somewhere sensible
+and hand the files over.
 
 ## What gets filtered, and why
 

@@ -73,6 +73,7 @@ def walk_book(trades, tz, vanished=()):
     longs = collections.defaultdict(collections.deque)   # [qty, cost/contract]
     shorts = collections.defaultdict(int)
     last_px = {}
+    last_mult = {}
     timeline = []
     expiry_loss = collections.defaultdict(float)
     for t in sorted(trades, key=lambda x: x["trade_time"]):
@@ -80,6 +81,8 @@ def walk_book(trades, tz, vanished=()):
         if px:
             last_px[sym] = px
         mult = (t.get("net_amount", 0) / (qty * px)) if (qty and px) else 100
+        if qty and px:
+            last_mult[sym] = mult
         if t["side"] == "BUY":
             left = qty
             if t.get("realized_pnl"):
@@ -106,7 +109,7 @@ def walk_book(trades, tz, vanished=()):
         open_cost = sum(l[0] * l[1] for dq in longs.values() for l in dq)
         open_qty = {s: q for s, q in
                     ((s, sum(l[0] for l in dq)) for s, dq in longs.items()) if q}
-        timeline.append((dt, open_cost, open_qty, dict(last_px)))
+        timeline.append((dt, open_cost, open_qty, dict(last_px), dict(last_mult)))
     return timeline, dict(expiry_loss)
 
 
@@ -132,14 +135,17 @@ def check(trades, p, acct, tz, vanished=()):
     # ---- rule 6: nothing unprotected over 5% at a session boundary
     cap6 = p["unprotected_position_cap_pct"] * acct
     by_day = collections.OrderedDict()
-    for dt, cost, oq, lp in timeline:
-        by_day[session_day(dt)] = (oq, lp)
+    for dt, cost, oq, lp, lm in timeline:
+        by_day[session_day(dt)] = (oq, lp, lm)
     overnight = []
-    for day, (oq, lp) in by_day.items():
+    for day, (oq, lp, lm) in by_day.items():
         for sym, q in oq.items():
             if sym not in lp:
                 continue
-            mv = q * lp[sym] * 100          # equity-option multiplier; see caveat below
+            # Multiplier comes from the symbol's own fills (net_amount / qty / price),
+            # not a hardcoded 100 — a futures option like NQ (20) or CL (1000) priced
+            # at the equity-option multiplier reads as 5-50x its real market value.
+            mv = q * lp[sym] * lm.get(sym, 100)
             if mv > cap6:
                 overnight.append((day, sym, q, mv))
     findings.append({

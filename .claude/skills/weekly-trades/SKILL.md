@@ -127,7 +127,11 @@ This report intentionally does **not** narrate the filter chain, the audit-recon
 table, or what got dropped and why — the account holder does not want that in the report
 he reads every week; that belongs in `data/<week>/README.md` instead (see below). It does
 always explain commissions plainly (net P&L already nets both legs; the figures shown are
-for context, not a further deduction).
+for context, not a further deduction) **and always breaks them down by ticker** — three
+aggregate KPIs alone drew a "where is the actual breakdown" follow-up. The commission
+section is a table (ticker, exits, total, average, share of the week's commission), top 8
+rows shown and the rest behind a "Show all N tickers" disclosure, same pattern as the
+by-ticker P&L section.
 
 The main chart is the week's **account balance over time, not a scatter of each trade's own
 result and not a bare P&L delta**. Two account-holder corrections shaped this:
@@ -147,6 +151,18 @@ starting capital plus the running P&L total; every exit still gets its own point
 line, colored by whether that individual trade won or lost. Area fill is green above
 starting capital and red below it, with round-dollar gridlines ($0/$25k/$50k/.../ceiling)
 for scale.
+
+The chart has a **ticker filter** — a row of checkboxes (one per ticker plus "All") above
+it. This is the one part of the report that runs client-side: picking a subset recomputes
+the balance path using only the selected tickers' trades (unselected trades still advance
+the clock, so a stretch where they happened shows as a flat segment, not a skip) and
+redraws the whole chart. This needed real recomputation, not just dimming dots, so the
+geometry (x/y scaling, nice-step gridlines, the polyline and fill) is duplicated in a small
+inline `<script>` block driven by an embedded JSON array of every exit's
+`{time, ticker, date, pnl}`, rather than trying to precompute every possible ticker
+combination in Python. It renders on page load (all tickers selected) before anyone
+touches a checkbox, so the first paint already shows the real week — the JS is what redraws
+it after that, not what's needed to see it at all.
 
 If a restart write-off needs excluding and its date differs from another symbol's on the
 same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes

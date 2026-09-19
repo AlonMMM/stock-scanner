@@ -202,146 +202,172 @@ def trade_dt(t):
                                        "%Y-%m-%d %H:%M")
 
 
-def _nice_step(vmax, n=4):
-    if vmax <= 0:
-        return 1.0
-    raw = vmax / n
-    magnitude = 10 ** math_floor_log10(raw)
-    for m in (1, 2, 2.5, 5, 10):
-        if raw <= m * magnitude:
-            return m * magnitude
-    return 10 * magnitude
-
-
-def math_floor_log10(x):
-    return math.floor(math.log10(x)) if x > 0 else 0
-
-
 def render_scatter(trades, starting_capital=None):
-    """The week's account balance over time, not a scatter of each trade's own
-    result. X is the actual exit timestamp (linear, real time — a burst of trades
-    minutes apart clusters; a quiet stretch shows as empty space). Y is starting
-    capital plus the running P&L total, scaled against the full account (0 to at
-    least starting_capital) rather than auto-fit tightly to the week's swing —
-    a $15k drawdown reads very differently against $0-$100k than against
-    $0-$15k. Every trade still gets its own point on the line, colored by
-    whether that individual trade was a win or a loss."""
-    W, H = 700, 340
-    padL, padR, padT, padB = 66, 16, 14, 36
-    plotW, plotH = W - padL - padR, H - padT - padB
+    """The week's account balance over time, filterable by ticker.
 
+    Rendering moves to client-side JS here (see PNL_JS below) because the filter
+    needs to redraw the whole curve, not just dim points: picking a subset of
+    tickers recomputes the running total using only their trades — other trades
+    still advance the clock (so a gap where they happened is visible as a flat
+    stretch) but don't move the line. That can't be precomputed once in Python
+    for every possible ticker combination, so the geometry (x_of/y_of, nice_step,
+    the polyline/fill/gridlines) is duplicated in JS and driven by an embedded
+    JSON array of {t, ticker, date, time, pnl} per exit, chronological.
+
+    Returns (svg_shell, filter_chips, script, tickers) — the caller assembles them
+    into the section; the JS renders into #pnlSvg on load and on every checkbox
+    change, so the very first paint already shows real data (all tickers)."""
     ordered = sorted(trades, key=trade_dt)
-    times = [trade_dt(t) for t in ordered]
-    tmin, tmax = (min(times), max(times)) if times else (None, None)
-    trange = (tmax - tmin).total_seconds() if times and tmax > tmin else 1
-
-    def x_of(dt):
-        return padL + plotW * (dt - tmin).total_seconds() / trange
-
+    tickers = sorted(set(t["ticker"] for t in ordered))
     cap = starting_capital if starting_capital else 0
-    running, balances = [], []
-    total = 0.0
-    for t in ordered:
-        total += t["net_pnl_usd"]
-        running.append(total)
-        balances.append(cap + total)
 
-    # 0 is always the floor; the top is at least starting capital, extended only if
-    # the balance actually climbed past it (never clipped, but never shrunk below
-    # showing the full account either).
-    vmax = max(cap, max(balances)) if balances else max(cap, 1)
-    vmin = min(0, min(balances)) if balances else 0
-    vrange = (vmax - vmin) or 1
+    records = [{"t": trade_dt(t).isoformat(), "ticker": t["ticker"], "date": t["date"],
+                "time": t.get("time_session", ""), "pnl": round(t["net_pnl_usd"], 2)}
+               for t in ordered]
+    data_json = json.dumps({"trades": records, "cap": cap, "tickers": tickers},
+                           ensure_ascii=False).replace("</", "<\\/")
 
-    def y_of(v):
-        return padT + plotH * (vmax - v) / vrange
+    chips = ['<label class="chip"><input type="checkbox" id="pnlAll" checked> All</label>']
+    for tkr in tickers:
+        chips.append('<label class="chip"><input type="checkbox" class="pnlTickerChk" '
+                     'value="{t}" checked> {t}</label>'.format(t=esc(tkr)))
 
-    start_y = y_of(cap)
-    pts = [(x_of(dt), y_of(bal)) for dt, bal in zip(times, balances)]
+    svg_shell = '<svg id="pnlSvg" viewBox="0 0 700 340" role="img" aria-label="Account balance over the week"></svg>'
 
-    # Start the line/fill at (first point's x, starting capital) so the very first
-    # trade's own result is visible as a segment, not skipped.
-    line_pts = [(pts[0][0], start_y)] + pts if pts else []
-    poly = " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts)
-    fill = ("{:.1f},{:.1f} ".format(line_pts[0][0], start_y) +
-            " ".join("{:.1f},{:.1f}".format(x, y) for x, y in line_pts) +
-            " {:.1f},{:.1f}".format(line_pts[-1][0], start_y)) if line_pts else ""
+    script = """
+    <script>
+    (function() {{
+      var DATA = {data_json};
+      function fmtMoney(v, sign) {{
+        var s = v < 0 ? '-' : (sign && v > 0 ? '+' : '');
+        return s + '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+      }}
+      function esc(s) {{ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }}
+      function niceStep(vmax, n) {{
+        n = n || 4;
+        if (vmax <= 0) return 1;
+        var raw = vmax / n, magnitude = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+        var mults = [1, 2, 2.5, 5, 10];
+        for (var i = 0; i < mults.length; i++) {{ if (raw <= mults[i] * magnitude) return mults[i] * magnitude; }}
+        return 10 * magnitude;
+      }}
 
-    circles = []
-    for t, (cx, cy), bal in zip(ordered, pts, balances):
-        v = t["net_pnl_usd"]
-        color = "var(--pos)" if v >= 0 else "var(--neg)"
-        circles.append(
-            '<circle class="bar" cx="{:.1f}" cy="{:.1f}" r="3.2" fill="{}" '
-            'fill-opacity="0.9"><title>{} {} {} — {} this trade, {} balance</title>'
-            '</circle>'.format(cx, cy, color, esc(t["ticker"]), t["date"],
-                                t.get("time_session", ""), money(v, sign=True), money(bal)))
+      function render(selected) {{
+        var W = 700, H = 340, padL = 66, padR = 16, padT = 14, padB = 36;
+        var plotW = W - padL - padR, plotH = H - padT - padB;
+        var trades = DATA.trades, n = trades.length, cap = DATA.cap;
+        if (!n) return;
+        var tmin = new Date(trades[0].t).getTime(), tmax = new Date(trades[n - 1].t).getTime();
+        var trange = Math.max(1, (tmax - tmin) / 1000);
+        function xOf(ms) {{ return padL + plotW * ((ms - tmin) / 1000) / trange; }}
 
-    end_label = ""
-    if pts:
-        ex, ey = pts[-1]
-        end_color = "var(--pos)" if balances[-1] >= cap else "var(--neg)"
-        end_label = ('<circle cx="{:.1f}" cy="{:.1f}" r="4.5" fill="{}"></circle>'
-                     '<text class="end-lab" x="{:.1f}" y="{:.1f}" text-anchor="end">{}</text>'
-                     ).format(ex, ey, end_color, ex - 6, ey - 8, money(balances[-1]))
+        var cum = 0, balances = [];
+        for (var i = 0; i < n; i++) {{
+          if (selected.has(trades[i].ticker)) cum += trades[i].pnl;
+          balances.push(cap + cum);
+        }}
+        var vmax = Math.max(cap, Math.max.apply(null, balances));
+        var vmin = Math.min(0, Math.min.apply(null, balances));
+        var vrange = (vmax - vmin) || 1;
+        function yOf(v) {{ return padT + plotH * (vmax - v) / vrange; }}
+        var startY = yOf(cap);
 
-    daylines, daylabels = [], []
-    seen = set()
-    for t, dt in zip(ordered, times):
-        if t["date"] in seen:
-            continue
-        seen.add(t["date"])
-        gx = x_of(dt)
-        daylines.append('<line class="grid-line" x1="{0:.1f}" y1="{1}" x2="{0:.1f}" y2="{2}"></line>'
-                        .format(gx, padT, H - padB))
-        wd = dt.strftime("%a")
-        daylabels.append('<text class="tick" x="{:.1f}" y="{}" text-anchor="start">{} {}</text>'
-                         .format(max(gx, padL), H - 6, wd, t["date"][5:]))
+        var pts = trades.map(function(tr, i) {{ return [xOf(new Date(tr.t).getTime()), yOf(balances[i])]; }});
+        var linePts = [[pts[0][0], startY]].concat(pts);
+        var poly = linePts.map(function(p) {{ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }}).join(' ');
+        var fill = linePts[0][0].toFixed(1) + ',' + startY.toFixed(1) + ' ' + poly + ' ' +
+          linePts[linePts.length - 1][0].toFixed(1) + ',' + startY.toFixed(1);
 
-    # Horizontal scale ticks at round dollar amounts (e.g. $0/$25k/$50k/$75k/$100k),
-    # so the account-size context is legible, not just a bare $0 and an end label.
-    step = _nice_step(vmax)
-    hgrid = []
-    v = 0.0
-    while v <= vmax + step * 0.01:
-        y = y_of(v)
-        hgrid.append('<line class="grid-line" x1="{0}" y1="{1:.1f}" x2="{2}" y2="{1:.1f}"></line>'
-                     .format(padL, y, W - padR))
-        hgrid.append('<text class="tick" x="{0}" y="{1:.1f}" text-anchor="end">{2}</text>'
-                     .format(padL - 6, y + 3.5, money(v)))
-        v += step
+        var circles = [];
+        for (i = 0; i < n; i++) {{
+          var tr = trades[i];
+          if (!selected.has(tr.ticker)) continue;
+          var p = pts[i], color = tr.pnl >= 0 ? 'var(--pos)' : 'var(--neg)';
+          circles.push('<circle class="bar" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) +
+            '" r="3.2" fill="' + color + '" fill-opacity="0.9"><title>' + esc(tr.ticker) + ' ' + tr.date +
+            ' ' + esc(tr.time) + ' — ' + fmtMoney(tr.pnl, true) + ' this trade, ' +
+            fmtMoney(balances[i]) + ' balance</title></circle>');
+        }}
 
-    start_line = ""
-    if cap and abs(cap % step) > step * 0.02:  # only add a dedicated line if it'd miss a tick
-        start_line = ('<line x1="{0}" y1="{1:.1f}" x2="{2}" y2="{1:.1f}" '
-                      'stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3,3"></line>'
-                      '<text class="tick" x="{0}" y="{3:.1f}" text-anchor="start">starting capital {4}</text>'
-                      ).format(padL, start_y, W - padR, start_y - 4, money(cap))
+        var last = n - 1, endColor = balances[last] >= cap ? 'var(--pos)' : 'var(--neg)';
+        var endLabel = '<circle cx="' + pts[last][0].toFixed(1) + '" cy="' + pts[last][1].toFixed(1) +
+          '" r="4.5" fill="' + endColor + '"></circle><text class="end-lab" x="' +
+          (pts[last][0] - 6).toFixed(1) + '" y="' + (pts[last][1] - 8).toFixed(1) +
+          '" text-anchor="end">' + fmtMoney(balances[last]) + '</text>';
 
-    return """
-    <svg viewBox="0 0 {W} {H}" role="img" aria-label="Account balance over the week">
-      <defs>
-        <clipPath id="cuPos"><rect x="0" y="0" width="{W}" height="{sy:.1f}"></rect></clipPath>
-        <clipPath id="cuNeg"><rect x="0" y="{sy:.1f}" width="{W}" height="{H}"></rect></clipPath>
-      </defs>
-      {hgrid}
-      {start_line}
-      {daylines}
-      <polygon points="{fill}" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>
-      <polygon points="{fill}" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>
-      <polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"
-        stroke-linecap="round" points="{poly}"></polyline>
-      {circles}
-      {end_label}
-      <line class="axis-line" x1="{pl}" y1="{ax}" x2="{rx}" y2="{ax}"></line>
-      {daylabels}
-    </svg>
-    """.format(W=W, H=H, pl=padL, rx=W - padR, ax=H - padB,
-               sy=start_y, hgrid="\n      ".join(hgrid), start_line=start_line,
-               fill=fill, poly=poly,
-               daylines="\n      ".join(daylines),
-               circles="\n      ".join(circles), daylabels="\n      ".join(daylabels),
-               end_label=end_label)
+        var seen = {{}}, dayLines = [], dayLabels = [];
+        for (i = 0; i < n; i++) {{
+          var d = trades[i];
+          if (seen[d.date]) continue;
+          seen[d.date] = true;
+          var gx = xOf(new Date(d.t).getTime());
+          dayLines.push('<line class="grid-line" x1="' + gx.toFixed(1) + '" y1="' + padT + '" x2="' +
+            gx.toFixed(1) + '" y2="' + (H - padB) + '"></line>');
+          var wd = new Date(d.t).toLocaleDateString('en-US', {{ weekday: 'short' }});
+          dayLabels.push('<text class="tick" x="' + Math.max(gx, padL).toFixed(1) + '" y="' + (H - 6) +
+            '" text-anchor="start">' + wd + ' ' + d.date.slice(5) + '</text>');
+        }}
+
+        var step = niceStep(vmax), hgrid = [];
+        for (var v = 0; v <= vmax + step * 0.01; v += step) {{
+          var y = yOf(v);
+          hgrid.push('<line class="grid-line" x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' +
+            (W - padR) + '" y2="' + y.toFixed(1) + '"></line>');
+          hgrid.push('<text class="tick" x="' + (padL - 6) + '" y="' + (y + 3.5).toFixed(1) +
+            '" text-anchor="end">' + fmtMoney(v) + '</text>');
+        }}
+
+        var startLine = '';
+        if (cap && Math.abs(cap % step) > step * 0.02) {{
+          startLine = '<line x1="' + padL + '" y1="' + startY.toFixed(1) + '" x2="' + (W - padR) +
+            '" y2="' + startY.toFixed(1) + '" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3,3">' +
+            '</line><text class="tick" x="' + padL + '" y="' + (startY - 4).toFixed(1) +
+            '" text-anchor="start">starting capital ' + fmtMoney(cap) + '</text>';
+        }}
+
+        document.getElementById('pnlSvg').innerHTML =
+          '<defs><clipPath id="cuPos"><rect x="0" y="0" width="' + W + '" height="' + startY.toFixed(1) +
+          '"></rect></clipPath><clipPath id="cuNeg"><rect x="0" y="' + startY.toFixed(1) + '" width="' + W +
+          '" height="' + H + '"></rect></clipPath></defs>' + hgrid.join('') + startLine + dayLines.join('') +
+          '<polygon points="' + fill + '" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>' +
+          '<polygon points="' + fill + '" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>' +
+          '<polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" ' +
+          'stroke-linecap="round" points="' + poly + '"></polyline>' + circles.join('') + endLabel +
+          '<line class="axis-line" x1="' + padL + '" y1="' + (H - padB) + '" x2="' + (W - padR) + '" y2="' +
+          (H - padB) + '"></line>' + dayLabels.join('');
+
+        var status = document.getElementById('pnlStatus');
+        if (status) {{
+          var included = trades.filter(function(tr) {{ return selected.has(tr.ticker); }}).length;
+          status.textContent = selected.size >= DATA.tickers.length ?
+            'Showing all tickers, ' + n + ' exits.' :
+            'Showing ' + selected.size + ' of ' + DATA.tickers.length + ' tickers (' + included + ' of ' + n + ' exits).';
+        }}
+      }}
+
+      function update() {{
+        var selected = new Set();
+        document.querySelectorAll('.pnlTickerChk').forEach(function(cb) {{ if (cb.checked) selected.add(cb.value); }});
+        render(selected);
+      }}
+      var allBox = document.getElementById('pnlAll');
+      allBox.addEventListener('change', function(e) {{
+        document.querySelectorAll('.pnlTickerChk').forEach(function(cb) {{ cb.checked = e.target.checked; }});
+        update();
+      }});
+      document.querySelectorAll('.pnlTickerChk').forEach(function(cb) {{
+        cb.addEventListener('change', function() {{
+          var boxes = document.querySelectorAll('.pnlTickerChk');
+          allBox.checked = Array.prototype.every.call(boxes, function(b) {{ return b.checked; }});
+          update();
+        }});
+      }});
+      update();
+    }})();
+    </script>
+    """.format(data_json=data_json)
+
+    return svg_shell, "\n".join(chips), script, tickers
 
 
 # -------------------------------------------------------------- hold tiles --
@@ -550,6 +576,24 @@ def render_commission(trades, summary):
     n = len(trades) or 1
     option_premium = summary.get("option_premium") or 0
     rate = (opt_comm / option_premium) if option_premium else 0
+
+    by_ticker = collections.OrderedDict()
+    for t in trades:
+        r = by_ticker.setdefault(t["ticker"], {"n": 0, "comm": 0.0})
+        r["n"] += 1
+        r["comm"] += t.get("commission_usd", 0.0)
+    rows = sorted(by_ticker.items(), key=lambda kv: -kv[1]["comm"])
+
+    def _row(tkr, r):
+        return ('<tr><td class="tkr">{t}</td><td class="num">{n}</td><td class="num">{comm}</td>'
+               '<td class="num">{avg}</td><td class="num">{share}</td></tr>').format(
+            t=esc(tkr), n=r["n"], comm=money(r["comm"]), avg=money(r["comm"] / r["n"]),
+            share="{:.0f}%".format(100 * r["comm"] / total_comm) if total_comm else "&mdash;")
+
+    TOP_N = 8
+    top_rows = "\n".join(_row(t, r) for t, r in rows[:TOP_N])
+    rest_rows = "\n".join(_row(t, r) for t, r in rows[TOP_N:])
+
     return {
         "total": total_comm,
         "avg": total_comm / n,
@@ -557,6 +601,12 @@ def render_commission(trades, summary):
         "n": n,
         "n_opt": len(opt_trades),
         "opt_comm": opt_comm,
+        "top_rows": top_rows,
+        "rest_rows": rest_rows,
+        "n_rest": len(rows) - TOP_N,
+        "n_tickers": len(by_ticker),
+        "top_ticker": rows[0][0] if rows else "",
+        "top_ticker_comm": rows[0][1]["comm"] if rows else 0,
     }
 
 
@@ -682,6 +732,13 @@ TEMPLATE = r"""<title>{title}</title>
   .legend span {{ display: inline-flex; align-items: center; gap: 7px; }}
   .swatch {{ width: 13px; height: 3px; border-radius: 2px; display: inline-block; }}
   .dotswatch {{ width: 9px; height: 9px; border-radius: 50%; display: inline-block; }}
+  .tickerfilter {{ display: flex; flex-wrap: wrap; gap: 6px 8px; }}
+  .chip {{ display: inline-flex; align-items: center; gap: 5px; font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 20px; padding: 3px 10px 3px 8px; cursor: pointer; user-select: none; }}
+  .chip:has(input:checked) {{ color: var(--ink); border-color: var(--rule-2); background: var(--surface-2); }}
+  .chip input {{ accent-color: var(--accent); margin: 0; cursor: pointer; }}
+  #pnlStatus {{ color: var(--ink); font-weight: 600; }}
   .tbl-wrap {{ overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }}
   table {{ border-collapse: collapse; width: 100%; font-size: 0.87rem; }}
   th, td {{ padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--rule); }}
@@ -765,6 +822,7 @@ TEMPLATE = r"""<title>{title}</title>
       against the full account (from $0), not auto-fit tight to the week's swing, so the drawdown reads
       at its real size. Every exit is still its own point on the line, colored by whether that individual
       trade won or lost.</p>
+    <div class="tickerfilter">{pnl_chips}</div>
     <div class="figure">
       <div class="chart-scroll">{scatter_svg}</div>
       <div class="legend">
@@ -773,8 +831,12 @@ TEMPLATE = r"""<title>{title}</title>
         <span>Line &middot; account balance</span>
         <span>X-axis &middot; actual time</span>
       </div>
-      <div class="cap"><b>Account balance, {n_exits} exits, starting capital {starting_capital}.</b> Hover a point for that trade's own result and the balance right after it.</div>
+      <div class="cap"><b>Account balance, starting capital {starting_capital}.</b>
+        <span id="pnlStatus">Showing all tickers, {n_exits} exits.</span>
+        Untick a ticker to see the balance path with only the rest; hover a point for that trade's
+        own result and the balance right after it.</div>
     </div>
+    {pnl_script}
   </section>
 
   <section>
@@ -822,6 +884,15 @@ TEMPLATE = r"""<title>{title}</title>
       <div class="kpi"><div class="lab">Rate on option premium</div><div class="val">{comm_rate}</div><div class="sub">{opt_comm} option commission &divide; {opt_prem} option premium</div></div>
     </div>
     {cheap_note}
+    <p class="cap" style="max-width:70ch"><b>{top_ticker}</b> was the single largest source of commission this week
+      at {top_ticker_comm}, out of {comm_n_tickers} tickers traded.</p>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Ticker</th><th style="text-align:right">Exits</th>
+        <th style="text-align:right">Commission</th><th style="text-align:right">Avg/exit</th>
+        <th style="text-align:right">% of total</th></tr></thead>
+      <tbody>{comm_top_rows}</tbody></table>
+    </div>
+    {comm_rest_block}
   </section>
 
   <section>
@@ -857,9 +928,22 @@ def build(args):
 
     daily_svg = render_daily(summary["by_day"])
     ticker_svg, ticker_table = render_tickers(summary["by_ticker"])
-    scatter_svg = render_scatter(trades, starting_capital=args.starting_capital)
+    pnl_svg, pnl_chips, pnl_script, pnl_tickers = render_scatter(
+        trades, starting_capital=args.starting_capital)
     hold_tiles = render_hold_buckets(summary.get("by_hold", []))
     comm = render_commission(trades, summary)
+    comm_rest_block = ""
+    if comm["n_rest"] > 0:
+        comm_rest_block = """
+    <details class="tabledisc">
+      <summary>Show all {n} tickers</summary>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Ticker</th><th style="text-align:right">Exits</th>
+          <th style="text-align:right">Commission</th><th style="text-align:right">Avg/exit</th>
+          <th style="text-align:right">% of total</th></tr></thead>
+        <tbody>{rows}</tbody></table>
+      </div>
+    </details>""".format(n=comm["n_tickers"], rows=comm["top_rows"] + "\n" + comm["rest_rows"])
     rules = render_rules(rules_json)
 
     net = summary["net_pnl"]
@@ -911,7 +995,8 @@ def build(args):
         win_rate=pct_int(summary["win_rate"]), wins=summary["wins"], losses=summary["losses"],
         pf=summary["profit_factor"],
         ret=pct(ret), ret_cls="pos" if ret >= 0 else "neg", prem=money(summary["option_premium"]),
-        scatter_svg=scatter_svg, starting_capital=money(args.starting_capital),
+        scatter_svg=pnl_svg, pnl_chips=pnl_chips, pnl_script=pnl_script,
+        n_pnl_tickers=len(pnl_tickers), starting_capital=money(args.starting_capital),
         daily_svg=daily_svg, n_days=n_days,
         ticker_svg=ticker_svg, ticker_table=ticker_table,
         hold_tiles=hold_tiles,
@@ -921,6 +1006,9 @@ def build(args):
         comm_rate=pct(comm["rate"], digits=2),
         opt_comm=money(comm["opt_comm"]), opt_prem=money(summary["option_premium"]),
         cheap_note=cheap_note,
+        top_ticker=esc(comm["top_ticker"]), top_ticker_comm=money(comm["top_ticker_comm"]),
+        comm_n_tickers=comm["n_tickers"], comm_top_rows=comm["top_rows"],
+        comm_rest_block=comm_rest_block,
         rules_rows=(rules["rows"] if rules else ""),
         rules_unchecked=(rules["unchecked"] if rules else ""),
         n_checked=(rules["n_checked"] if rules else 0),

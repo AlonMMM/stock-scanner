@@ -83,6 +83,13 @@
   .legend span { display: inline-flex; align-items: center; gap: 7px; }
   .swatch { width: 13px; height: 3px; border-radius: 2px; display: inline-block; }
   .dotswatch { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .tickerfilter { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 20px; padding: 3px 10px 3px 8px; cursor: pointer; user-select: none; }
+  .chip:has(input:checked) { color: var(--ink); border-color: var(--rule-2); background: var(--surface-2); }
+  .chip input { accent-color: var(--accent); margin: 0; cursor: pointer; }
+  #pnlStatus { color: var(--ink); font-weight: 600; }
   .tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
   table { border-collapse: collapse; width: 100%; font-size: 0.87rem; }
   th, td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--rule); }
@@ -166,155 +173,180 @@
       against the full account (from $0), not auto-fit tight to the week's swing, so the drawdown reads
       at its real size. Every exit is still its own point on the line, colored by whether that individual
       trade won or lost.</p>
+    <div class="tickerfilter"><label class="chip"><input type="checkbox" id="pnlAll" checked> All</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="AAPL" checked> AAPL</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="CL" checked> CL</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="CRWD" checked> CRWD</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="CVX" checked> CVX</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="ES" checked> ES</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="GOOGL" checked> GOOGL</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="HOOD" checked> HOOD</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="HPE" checked> HPE</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="IBIT" checked> IBIT</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="INTC" checked> INTC</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="IREN" checked> IREN</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="META" checked> META</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MNQ" checked> MNQ</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MRNA" checked> MRNA</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MSFT" checked> MSFT</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MSTR" checked> MSTR</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MU" checked> MU</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="NQ" checked> NQ</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="NVDA" checked> NVDA</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="NVO" checked> NVO</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="OKLO" checked> OKLO</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="PLTR" checked> PLTR</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="QCOM" checked> QCOM</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="SMCI" checked> SMCI</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="SNDK" checked> SNDK</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="SPCX" checked> SPCX</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="TSLA" checked> TSLA</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="WIX" checked> WIX</label></div>
     <div class="figure">
-      <div class="chart-scroll">
-    <svg viewBox="0 0 700 340" role="img" aria-label="Account balance over the week">
-      <defs>
-        <clipPath id="cuPos"><rect x="0" y="0" width="700" height="14.0"></rect></clipPath>
-        <clipPath id="cuNeg"><rect x="0" y="14.0" width="700" height="340"></rect></clipPath>
-      </defs>
-      <line class="grid-line" x1="66" y1="304.0" x2="684" y2="304.0"></line>
-      <text class="tick" x="60" y="307.5" text-anchor="end">$0</text>
-      <line class="grid-line" x1="66" y1="231.5" x2="684" y2="231.5"></line>
-      <text class="tick" x="60" y="235.0" text-anchor="end">$25,000</text>
-      <line class="grid-line" x1="66" y1="159.0" x2="684" y2="159.0"></line>
-      <text class="tick" x="60" y="162.5" text-anchor="end">$50,000</text>
-      <line class="grid-line" x1="66" y1="86.5" x2="684" y2="86.5"></line>
-      <text class="tick" x="60" y="90.0" text-anchor="end">$75,000</text>
-      <line class="grid-line" x1="66" y1="14.0" x2="684" y2="14.0"></line>
-      <text class="tick" x="60" y="17.5" text-anchor="end">$100,000</text>
-      
-      <line class="grid-line" x1="66.0" y1="14" x2="66.0" y2="304"></line>
-      <line class="grid-line" x1="155.3" y1="14" x2="155.3" y2="304"></line>
-      <line class="grid-line" x1="257.9" y1="14" x2="257.9" y2="304"></line>
-      <line class="grid-line" x1="363.8" y1="14" x2="363.8" y2="304"></line>
-      <line class="grid-line" x1="497.3" y1="14" x2="497.3" y2="304"></line>
-      <line class="grid-line" x1="614.9" y1="14" x2="614.9" y2="304"></line>
-      <polygon points="66.0,14.0 66.0,14.0 66.0,14.4 66.0,14.3 67.3,15.6 67.3,16.8 155.3,16.8 156.9,17.4 157.5,18.9 160.9,21.8 164.4,21.4 164.6,20.4 164.7,19.3 174.2,19.4 180.8,19.5 257.9,22.7 269.2,25.5 273.3,29.7 273.3,33.0 274.3,38.4 274.5,34.1 276.1,35.7 276.1,35.8 276.3,39.7 277.9,40.7 279.2,40.7 280.5,42.9 280.7,43.5 284.3,47.1 284.4,38.3 301.6,38.5 305.8,40.0 336.9,41.2 363.8,44.3 371.9,46.0 373.6,46.2 381.2,48.9 399.2,48.9 399.2,51.7 399.5,52.1 399.6,52.2 399.8,55.9 400.1,58.0 400.6,60.7 401.3,60.2 427.7,60.2 430.7,60.9 431.8,63.5 431.9,65.7 497.3,66.3 525.1,58.5 525.7,60.2 525.8,60.2 526.0,64.3 526.3,64.7 529.9,66.4 530.0,67.5 531.1,67.7 531.7,67.4 534.0,68.2 534.0,68.3 537.0,69.3 540.4,71.6 542.7,71.7 542.7,72.0 542.8,72.6 543.7,74.3 544.0,72.4 544.1,66.5 546.2,67.8 553.7,70.0 556.5,71.3 558.0,71.3 558.0,71.2 558.6,73.0 559.0,73.4 570.5,72.9 614.9,72.9 624.7,70.2 624.8,70.8 631.0,72.9 639.4,75.1 643.6,78.3 651.3,80.3 653.3,75.8 653.7,72.3 654.1,65.5 654.1,64.9 656.8,65.3 657.4,62.2 657.5,57.4 657.5,56.2 659.5,58.2 664.3,58.3 664.3,58.3 664.6,60.3 664.7,61.5 666.8,63.3 671.0,65.6 671.1,66.0 671.3,64.9 671.5,65.9 678.3,58.1 682.5,58.4 684.0,58.8 684.0,14.0" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>
-      <polygon points="66.0,14.0 66.0,14.0 66.0,14.4 66.0,14.3 67.3,15.6 67.3,16.8 155.3,16.8 156.9,17.4 157.5,18.9 160.9,21.8 164.4,21.4 164.6,20.4 164.7,19.3 174.2,19.4 180.8,19.5 257.9,22.7 269.2,25.5 273.3,29.7 273.3,33.0 274.3,38.4 274.5,34.1 276.1,35.7 276.1,35.8 276.3,39.7 277.9,40.7 279.2,40.7 280.5,42.9 280.7,43.5 284.3,47.1 284.4,38.3 301.6,38.5 305.8,40.0 336.9,41.2 363.8,44.3 371.9,46.0 373.6,46.2 381.2,48.9 399.2,48.9 399.2,51.7 399.5,52.1 399.6,52.2 399.8,55.9 400.1,58.0 400.6,60.7 401.3,60.2 427.7,60.2 430.7,60.9 431.8,63.5 431.9,65.7 497.3,66.3 525.1,58.5 525.7,60.2 525.8,60.2 526.0,64.3 526.3,64.7 529.9,66.4 530.0,67.5 531.1,67.7 531.7,67.4 534.0,68.2 534.0,68.3 537.0,69.3 540.4,71.6 542.7,71.7 542.7,72.0 542.8,72.6 543.7,74.3 544.0,72.4 544.1,66.5 546.2,67.8 553.7,70.0 556.5,71.3 558.0,71.3 558.0,71.2 558.6,73.0 559.0,73.4 570.5,72.9 614.9,72.9 624.7,70.2 624.8,70.8 631.0,72.9 639.4,75.1 643.6,78.3 651.3,80.3 653.3,75.8 653.7,72.3 654.1,65.5 654.1,64.9 656.8,65.3 657.4,62.2 657.5,57.4 657.5,56.2 659.5,58.2 664.3,58.3 664.3,58.3 664.6,60.3 664.7,61.5 666.8,63.3 671.0,65.6 671.1,66.0 671.3,64.9 671.5,65.9 678.3,58.1 682.5,58.4 684.0,58.8 684.0,14.0" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>
-      <polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"
-        stroke-linecap="round" points="66.0,14.0 66.0,14.4 66.0,14.3 67.3,15.6 67.3,16.8 155.3,16.8 156.9,17.4 157.5,18.9 160.9,21.8 164.4,21.4 164.6,20.4 164.7,19.3 174.2,19.4 180.8,19.5 257.9,22.7 269.2,25.5 273.3,29.7 273.3,33.0 274.3,38.4 274.5,34.1 276.1,35.7 276.1,35.8 276.3,39.7 277.9,40.7 279.2,40.7 280.5,42.9 280.7,43.5 284.3,47.1 284.4,38.3 301.6,38.5 305.8,40.0 336.9,41.2 363.8,44.3 371.9,46.0 373.6,46.2 381.2,48.9 399.2,48.9 399.2,51.7 399.5,52.1 399.6,52.2 399.8,55.9 400.1,58.0 400.6,60.7 401.3,60.2 427.7,60.2 430.7,60.9 431.8,63.5 431.9,65.7 497.3,66.3 525.1,58.5 525.7,60.2 525.8,60.2 526.0,64.3 526.3,64.7 529.9,66.4 530.0,67.5 531.1,67.7 531.7,67.4 534.0,68.2 534.0,68.3 537.0,69.3 540.4,71.6 542.7,71.7 542.7,72.0 542.8,72.6 543.7,74.3 544.0,72.4 544.1,66.5 546.2,67.8 553.7,70.0 556.5,71.3 558.0,71.3 558.0,71.2 558.6,73.0 559.0,73.4 570.5,72.9 614.9,72.9 624.7,70.2 624.8,70.8 631.0,72.9 639.4,75.1 643.6,78.3 651.3,80.3 653.3,75.8 653.7,72.3 654.1,65.5 654.1,64.9 656.8,65.3 657.4,62.2 657.5,57.4 657.5,56.2 659.5,58.2 664.3,58.3 664.3,58.3 664.6,60.3 664.7,61.5 666.8,63.3 671.0,65.6 671.1,66.0 671.3,64.9 671.5,65.9 678.3,58.1 682.5,58.4 684.0,58.8"></polyline>
-      <circle class="bar" cx="66.0" cy="14.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-13 18:06 — -$134 this trade, $99,866 balance</title></circle>
-      <circle class="bar" cx="66.0" cy="14.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-13 18:06 — +$15 this trade, $99,881 balance</title></circle>
-      <circle class="bar" cx="67.3" cy="15.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-13 18:21 — -$445 this trade, $99,436 balance</title></circle>
-      <circle class="bar" cx="67.3" cy="16.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-13 18:21 — -$415 this trade, $99,022 balance</title></circle>
-      <circle class="bar" cx="155.3" cy="16.8" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-14 11:06 — $0 this trade, $99,022 balance</title></circle>
-      <circle class="bar" cx="156.9" cy="17.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>PLTR 2026-09-14 11:24 — -$191 this trade, $98,831 balance</title></circle>
-      <circle class="bar" cx="157.5" cy="18.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MSFT 2026-09-14 11:31 — -$531 this trade, $98,299 balance</title></circle>
-      <circle class="bar" cx="160.9" cy="21.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-14 12:10 — -$995 this trade, $97,305 balance</title></circle>
-      <circle class="bar" cx="164.4" cy="21.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSFT 2026-09-14 12:50 — +$143 this trade, $97,448 balance</title></circle>
-      <circle class="bar" cx="164.6" cy="20.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSFT 2026-09-14 12:52 — +$347 this trade, $97,795 balance</title></circle>
-      <circle class="bar" cx="164.7" cy="19.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSFT 2026-09-14 12:54 — +$372 this trade, $98,167 balance</title></circle>
-      <circle class="bar" cx="174.2" cy="19.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IBIT 2026-09-14 14:42 — -$40 this trade, $98,127 balance</title></circle>
-      <circle class="bar" cx="180.8" cy="19.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>GOOGL 2026-09-14 15:58 — -$36 this trade, $98,091 balance</title></circle>
-      <circle class="bar" cx="257.9" cy="22.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 06:38 — -$1,089 this trade, $97,002 balance</title></circle>
-      <circle class="bar" cx="269.2" cy="25.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 08:47 — -$955 this trade, $96,047 balance</title></circle>
-      <circle class="bar" cx="273.3" cy="29.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IBIT 2026-09-15 09:34 — -$1,462 this trade, $94,585 balance</title></circle>
-      <circle class="bar" cx="273.3" cy="33.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MSTR 2026-09-15 09:34 — -$1,126 this trade, $93,459 balance</title></circle>
-      <circle class="bar" cx="274.3" cy="38.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>GOOGL 2026-09-15 09:46 — -$1,859 this trade, $91,599 balance</title></circle>
-      <circle class="bar" cx="274.5" cy="34.1" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-15 09:48 — +$1,470 this trade, $93,069 balance</title></circle>
-      <circle class="bar" cx="276.1" cy="35.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-15 10:06 — -$546 this trade, $92,523 balance</title></circle>
-      <circle class="bar" cx="276.1" cy="35.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-15 10:06 — -$45 this trade, $92,478 balance</title></circle>
-      <circle class="bar" cx="276.3" cy="39.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>WIX 2026-09-15 10:09 — -$1,351 this trade, $91,127 balance</title></circle>
-      <circle class="bar" cx="277.9" cy="40.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>ES 2026-09-15 10:27 — -$339 this trade, $90,788 balance</title></circle>
-      <circle class="bar" cx="279.2" cy="40.7" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-15 10:42 — $0 this trade, $90,788 balance</title></circle>
-      <circle class="bar" cx="280.5" cy="42.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CRWD 2026-09-15 10:57 — -$763 this trade, $90,025 balance</title></circle>
-      <circle class="bar" cx="280.7" cy="43.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 10:59 — -$198 this trade, $89,827 balance</title></circle>
-      <circle class="bar" cx="284.3" cy="47.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 11:40 — -$1,247 this trade, $88,580 balance</title></circle>
-      <circle class="bar" cx="284.4" cy="38.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-15 11:41 — +$3,046 this trade, $91,625 balance</title></circle>
-      <circle class="bar" cx="301.6" cy="38.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 14:57 — -$85 this trade, $91,540 balance</title></circle>
-      <circle class="bar" cx="305.8" cy="40.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>QCOM 2026-09-15 15:46 — -$514 this trade, $91,027 balance</title></circle>
-      <circle class="bar" cx="336.9" cy="41.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-15 21:41 — -$389 this trade, $90,637 balance</title></circle>
-      <circle class="bar" cx="363.8" cy="44.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 02:48 — -$1,069 this trade, $89,568 balance</title></circle>
-      <circle class="bar" cx="371.9" cy="46.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 04:21 — -$609 this trade, $88,959 balance</title></circle>
-      <circle class="bar" cx="373.6" cy="46.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 04:40 — -$55 this trade, $88,904 balance</title></circle>
-      <circle class="bar" cx="381.2" cy="48.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 06:07 — -$955 this trade, $87,949 balance</title></circle>
-      <circle class="bar" cx="399.2" cy="48.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>INTC 2026-09-16 09:32 — +$2 this trade, $87,952 balance</title></circle>
-      <circle class="bar" cx="399.2" cy="51.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CVX 2026-09-16 09:33 — -$952 this trade, $86,999 balance</title></circle>
-      <circle class="bar" cx="399.5" cy="52.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-16 09:36 — -$132 this trade, $86,867 balance</title></circle>
-      <circle class="bar" cx="399.6" cy="52.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-16 09:37 — -$37 this trade, $86,831 balance</title></circle>
-      <circle class="bar" cx="399.8" cy="55.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-16 09:39 — -$1,289 this trade, $85,541 balance</title></circle>
-      <circle class="bar" cx="400.1" cy="58.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>AAPL 2026-09-16 09:43 — -$698 this trade, $84,844 balance</title></circle>
-      <circle class="bar" cx="400.6" cy="60.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-16 09:48 — -$949 this trade, $83,895 balance</title></circle>
-      <circle class="bar" cx="401.3" cy="60.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>SPCX 2026-09-16 09:57 — +$164 this trade, $84,059 balance</title></circle>
-      <circle class="bar" cx="427.7" cy="60.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-16 14:58 — $0 this trade, $84,059 balance</title></circle>
-      <circle class="bar" cx="430.7" cy="60.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>ES 2026-09-16 15:32 — -$227 this trade, $83,832 balance</title></circle>
-      <circle class="bar" cx="431.8" cy="63.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CRWD 2026-09-16 15:45 — -$896 this trade, $82,936 balance</title></circle>
-      <circle class="bar" cx="431.9" cy="65.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SMCI 2026-09-16 15:46 — -$765 this trade, $82,171 balance</title></circle>
-      <circle class="bar" cx="497.3" cy="66.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NQ 2026-09-17 04:13 — -$214 this trade, $81,956 balance</title></circle>
-      <circle class="bar" cx="525.1" cy="58.5" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-17 09:31 — +$2,696 this trade, $84,652 balance</title></circle>
-      <circle class="bar" cx="525.7" cy="60.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>TSLA 2026-09-17 09:38 — -$568 this trade, $84,084 balance</title></circle>
-      <circle class="bar" cx="525.8" cy="60.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IREN 2026-09-17 09:39 — -$12 this trade, $84,072 balance</title></circle>
-      <circle class="bar" cx="526.0" cy="64.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IREN 2026-09-17 09:41 — -$1,421 this trade, $82,651 balance</title></circle>
-      <circle class="bar" cx="526.3" cy="64.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NVDA 2026-09-17 09:44 — -$143 this trade, $82,507 balance</title></circle>
-      <circle class="bar" cx="529.9" cy="66.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>TSLA 2026-09-17 10:25 — -$576 this trade, $81,932 balance</title></circle>
-      <circle class="bar" cx="530.0" cy="67.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MU 2026-09-17 10:27 — -$365 this trade, $81,567 balance</title></circle>
-      <circle class="bar" cx="531.1" cy="67.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 10:39 — -$96 this trade, $81,470 balance</title></circle>
-      <circle class="bar" cx="531.7" cy="67.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NVDA 2026-09-17 10:46 — +$117 this trade, $81,587 balance</title></circle>
-      <circle class="bar" cx="534.0" cy="68.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 11:12 — -$273 this trade, $81,314 balance</title></circle>
-      <circle class="bar" cx="534.0" cy="68.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 11:12 — -$34 this trade, $81,280 balance</title></circle>
-      <circle class="bar" cx="537.0" cy="69.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SMCI 2026-09-17 11:47 — -$352 this trade, $80,927 balance</title></circle>
-      <circle class="bar" cx="540.4" cy="71.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MRNA 2026-09-17 12:25 — -$789 this trade, $80,139 balance</title></circle>
-      <circle class="bar" cx="542.7" cy="71.7" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HPE 2026-09-17 12:52 — -$46 this trade, $80,092 balance</title></circle>
-      <circle class="bar" cx="542.7" cy="72.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HPE 2026-09-17 12:52 — -$107 this trade, $79,985 balance</title></circle>
-      <circle class="bar" cx="542.8" cy="72.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HPE 2026-09-17 12:53 — -$209 this trade, $79,776 balance</title></circle>
-      <circle class="bar" cx="543.7" cy="74.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>GOOGL 2026-09-17 13:03 — -$573 this trade, $79,203 balance</title></circle>
-      <circle class="bar" cx="544.0" cy="72.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>OKLO 2026-09-17 13:07 — +$671 this trade, $79,874 balance</title></circle>
-      <circle class="bar" cx="544.1" cy="66.5" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>OKLO 2026-09-17 13:08 — +$2,018 this trade, $81,892 balance</title></circle>
-      <circle class="bar" cx="546.2" cy="67.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-17 13:32 — -$447 this trade, $81,445 balance</title></circle>
-      <circle class="bar" cx="553.7" cy="70.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>INTC 2026-09-17 14:57 — -$743 this trade, $80,701 balance</title></circle>
-      <circle class="bar" cx="556.5" cy="71.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MSTR 2026-09-17 15:30 — -$455 this trade, $80,246 balance</title></circle>
-      <circle class="bar" cx="558.0" cy="71.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-17 15:47 — -$5 this trade, $80,241 balance</title></circle>
-      <circle class="bar" cx="558.0" cy="71.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>META 2026-09-17 15:47 — +$28 this trade, $80,270 balance</title></circle>
-      <circle class="bar" cx="558.6" cy="73.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NVO 2026-09-17 15:53 — -$602 this trade, $79,667 balance</title></circle>
-      <circle class="bar" cx="559.0" cy="73.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>AAPL 2026-09-17 15:58 — -$161 this trade, $79,506 balance</title></circle>
-      <circle class="bar" cx="570.5" cy="72.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>CL 2026-09-17 18:09 — +$191 this trade, $79,697 balance</title></circle>
-      <circle class="bar" cx="614.9" cy="72.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MNQ 2026-09-18 02:37 — +$5 this trade, $79,701 balance</title></circle>
-      <circle class="bar" cx="624.7" cy="70.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>NQ 2026-09-18 04:29 — +$926 this trade, $80,627 balance</title></circle>
-      <circle class="bar" cx="624.8" cy="70.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>ES 2026-09-18 04:30 — -$203 this trade, $80,424 balance</title></circle>
-      <circle class="bar" cx="631.0" cy="72.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NQ 2026-09-18 05:40 — -$749 this trade, $79,675 balance</title></circle>
-      <circle class="bar" cx="639.4" cy="75.1" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>NQ 2026-09-18 07:17 — -$734 this trade, $78,940 balance</title></circle>
-      <circle class="bar" cx="643.6" cy="78.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 08:05 — -$1,129 this trade, $77,811 balance</title></circle>
-      <circle class="bar" cx="651.3" cy="80.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>META 2026-09-18 09:33 — -$672 this trade, $77,139 balance</title></circle>
-      <circle class="bar" cx="653.3" cy="75.8" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 09:55 — +$1,551 this trade, $78,690 balance</title></circle>
-      <circle class="bar" cx="653.7" cy="72.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 10:00 — +$1,201 this trade, $79,891 balance</title></circle>
-      <circle class="bar" cx="654.1" cy="65.5" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 10:04 — +$2,346 this trade, $82,237 balance</title></circle>
-      <circle class="bar" cx="654.1" cy="64.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 10:04 — +$208 this trade, $82,445 balance</title></circle>
-      <circle class="bar" cx="656.8" cy="65.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SNDK 2026-09-18 10:35 — -$127 this trade, $82,318 balance</title></circle>
-      <circle class="bar" cx="657.4" cy="62.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 10:42 — +$1,052 this trade, $83,370 balance</title></circle>
-      <circle class="bar" cx="657.5" cy="57.4" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 10:43 — +$1,659 this trade, $85,029 balance</title></circle>
-      <circle class="bar" cx="657.5" cy="56.2" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 10:43 — +$422 this trade, $85,452 balance</title></circle>
-      <circle class="bar" cx="659.5" cy="58.2" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SNDK 2026-09-18 11:06 — -$703 this trade, $84,748 balance</title></circle>
-      <circle class="bar" cx="664.3" cy="58.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HOOD 2026-09-18 12:01 — -$41 this trade, $84,708 balance</title></circle>
-      <circle class="bar" cx="664.3" cy="58.3" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>HOOD 2026-09-18 12:01 — +$0 this trade, $84,708 balance</title></circle>
-      <circle class="bar" cx="664.6" cy="60.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 12:04 — -$657 this trade, $84,051 balance</title></circle>
-      <circle class="bar" cx="664.7" cy="61.5" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 12:05 — -$438 this trade, $83,613 balance</title></circle>
-      <circle class="bar" cx="666.8" cy="63.3" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>CL 2026-09-18 12:29 — -$609 this trade, $83,004 balance</title></circle>
-      <circle class="bar" cx="671.0" cy="65.6" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>SNDK 2026-09-18 13:18 — -$798 this trade, $82,206 balance</title></circle>
-      <circle class="bar" cx="671.1" cy="66.0" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HOOD 2026-09-18 13:19 — -$143 this trade, $82,063 balance</title></circle>
-      <circle class="bar" cx="671.3" cy="64.9" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 13:21 — +$400 this trade, $82,463 balance</title></circle>
-      <circle class="bar" cx="671.5" cy="65.9" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>HOOD 2026-09-18 13:23 — -$374 this trade, $82,089 balance</title></circle>
-      <circle class="bar" cx="678.3" cy="58.1" r="3.2" fill="var(--pos)" fill-opacity="0.9"><title>MSTR 2026-09-18 14:41 — +$2,710 this trade, $84,798 balance</title></circle>
-      <circle class="bar" cx="682.5" cy="58.4" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>MU 2026-09-18 15:29 — -$108 this trade, $84,690 balance</title></circle>
-      <circle class="bar" cx="684.0" cy="58.8" r="3.2" fill="var(--neg)" fill-opacity="0.9"><title>IBIT 2026-09-18 15:46 — -$131 this trade, $84,560 balance</title></circle>
-      <circle cx="684.0" cy="58.8" r="4.5" fill="var(--neg)"></circle><text class="end-lab" x="678.0" y="50.8" text-anchor="end">$84,560</text>
-      <line class="axis-line" x1="66" y1="304" x2="684" y2="304"></line>
-      <text class="tick" x="66.0" y="334" text-anchor="start">Sun 09-13</text>
-      <text class="tick" x="155.3" y="334" text-anchor="start">Mon 09-14</text>
-      <text class="tick" x="257.9" y="334" text-anchor="start">Tue 09-15</text>
-      <text class="tick" x="363.8" y="334" text-anchor="start">Wed 09-16</text>
-      <text class="tick" x="497.3" y="334" text-anchor="start">Thu 09-17</text>
-      <text class="tick" x="614.9" y="334" text-anchor="start">Fri 09-18</text>
-    </svg>
-    </div>
+      <div class="chart-scroll"><svg id="pnlSvg" viewBox="0 0 700 340" role="img" aria-label="Account balance over the week"></svg></div>
       <div class="legend">
         <span><i class="dotswatch" style="background:var(--pos)"></i> Winning trade</span>
         <span><i class="dotswatch" style="background:var(--neg)"></i> Losing trade</span>
         <span>Line &middot; account balance</span>
         <span>X-axis &middot; actual time</span>
       </div>
-      <div class="cap"><b>Account balance, 103 exits, starting capital $100,000.</b> Hover a point for that trade's own result and the balance right after it.</div>
+      <div class="cap"><b>Account balance, starting capital $100,000.</b>
+        <span id="pnlStatus">Showing all tickers, 103 exits.</span>
+        Untick a ticker to see the balance path with only the rest; hover a point for that trade's
+        own result and the balance right after it.</div>
     </div>
+    
+    <script>
+    (function() {
+      var DATA = {"trades": [{"t": "2026-09-13T18:06:00", "ticker": "CL", "date": "2026-09-13", "time": "18:06", "pnl": -134.16}, {"t": "2026-09-13T18:06:00", "ticker": "CL", "date": "2026-09-13", "time": "18:06", "pnl": 15.28}, {"t": "2026-09-13T18:21:00", "ticker": "CL", "date": "2026-09-13", "time": "18:21", "pnl": -444.72}, {"t": "2026-09-13T18:21:00", "ticker": "CL", "date": "2026-09-13", "time": "18:21", "pnl": -414.72}, {"t": "2026-09-14T11:06:00", "ticker": "CL", "date": "2026-09-14", "time": "11:06", "pnl": 0.0}, {"t": "2026-09-14T11:24:00", "ticker": "PLTR", "date": "2026-09-14", "time": "11:24", "pnl": -190.84}, {"t": "2026-09-14T11:31:00", "ticker": "MSFT", "date": "2026-09-14", "time": "11:31", "pnl": -531.39}, {"t": "2026-09-14T12:10:00", "ticker": "CL", "date": "2026-09-14", "time": "12:10", "pnl": -994.72}, {"t": "2026-09-14T12:50:00", "ticker": "MSFT", "date": "2026-09-14", "time": "12:50", "pnl": 143.17}, {"t": "2026-09-14T12:52:00", "ticker": "MSFT", "date": "2026-09-14", "time": "12:52", "pnl": 347.15}, {"t": "2026-09-14T12:54:00", "ticker": "MSFT", "date": "2026-09-14", "time": "12:54", "pnl": 371.86}, {"t": "2026-09-14T14:42:00", "ticker": "IBIT", "date": "2026-09-14", "time": "14:42", "pnl": -40.38}, {"t": "2026-09-14T15:58:00", "ticker": "GOOGL", "date": "2026-09-14", "time": "15:58", "pnl": -35.55}, {"t": "2026-09-15T06:38:00", "ticker": "CL", "date": "2026-09-15", "time": "06:38", "pnl": -1089.44}, {"t": "2026-09-15T08:47:00", "ticker": "CL", "date": "2026-09-15", "time": "08:47", "pnl": -954.72}, {"t": "2026-09-15T09:34:00", "ticker": "IBIT", "date": "2026-09-15", "time": "09:34", "pnl": -1462.14}, {"t": "2026-09-15T09:34:00", "ticker": "MSTR", "date": "2026-09-15", "time": "09:34", "pnl": -1126.15}, {"t": "2026-09-15T09:46:00", "ticker": "GOOGL", "date": "2026-09-15", "time": "09:46", "pnl": -1859.32}, {"t": "2026-09-15T09:48:00", "ticker": "CL", "date": "2026-09-15", "time": "09:48", "pnl": 1470.28}, {"t": "2026-09-15T10:06:00", "ticker": "META", "date": "2026-09-15", "time": "10:06", "pnl": -546.36}, {"t": "2026-09-15T10:06:00", "ticker": "META", "date": "2026-09-15", "time": "10:06", "pnl": -45.14}, {"t": "2026-09-15T10:09:00", "ticker": "WIX", "date": "2026-09-15", "time": "10:09", "pnl": -1350.82}, {"t": "2026-09-15T10:27:00", "ticker": "ES", "date": "2026-09-15", "time": "10:27", "pnl": -339.1}, {"t": "2026-09-15T10:42:00", "ticker": "NQ", "date": "2026-09-15", "time": "10:42", "pnl": 0.0}, {"t": "2026-09-15T10:57:00", "ticker": "CRWD", "date": "2026-09-15", "time": "10:57", "pnl": -763.47}, {"t": "2026-09-15T10:59:00", "ticker": "CL", "date": "2026-09-15", "time": "10:59", "pnl": -197.76}, {"t": "2026-09-15T11:40:00", "ticker": "CL", "date": "2026-09-15", "time": "11:40", "pnl": -1247.2}, {"t": "2026-09-15T11:41:00", "ticker": "CL", "date": "2026-09-15", "time": "11:41", "pnl": 3045.56}, {"t": "2026-09-15T14:57:00", "ticker": "CL", "date": "2026-09-15", "time": "14:57", "pnl": -84.72}, {"t": "2026-09-15T15:46:00", "ticker": "QCOM", "date": "2026-09-15", "time": "15:46", "pnl": -513.61}, {"t": "2026-09-15T21:41:00", "ticker": "CL", "date": "2026-09-15", "time": "21:41", "pnl": -389.44}, {"t": "2026-09-16T02:48:00", "ticker": "CL", "date": "2026-09-16", "time": "02:48", "pnl": -1069.44}, {"t": "2026-09-16T04:21:00", "ticker": "CL", "date": "2026-09-16", "time": "04:21", "pnl": -609.44}, {"t": "2026-09-16T04:40:00", "ticker": "CL", "date": "2026-09-16", "time": "04:40", "pnl": -54.72}, {"t": "2026-09-16T06:07:00", "ticker": "CL", "date": "2026-09-16", "time": "06:07", "pnl": -954.72}, {"t": "2026-09-16T09:32:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:32", "pnl": 2.42}, {"t": "2026-09-16T09:33:00", "ticker": "CVX", "date": "2026-09-16", "time": "09:33", "pnl": -952.31}, {"t": "2026-09-16T09:36:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:36", "pnl": -131.82}, {"t": "2026-09-16T09:37:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:37", "pnl": -36.64}, {"t": "2026-09-16T09:39:00", "ticker": "CL", "date": "2026-09-16", "time": "09:39", "pnl": -1289.44}, {"t": "2026-09-16T09:43:00", "ticker": "AAPL", "date": "2026-09-16", "time": "09:43", "pnl": -697.59}, {"t": "2026-09-16T09:48:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:48", "pnl": -948.62}, {"t": "2026-09-16T09:57:00", "ticker": "SPCX", "date": "2026-09-16", "time": "09:57", "pnl": 164.28}, {"t": "2026-09-16T14:58:00", "ticker": "NQ", "date": "2026-09-16", "time": "14:58", "pnl": 0.0}, {"t": "2026-09-16T15:32:00", "ticker": "ES", "date": "2026-09-16", "time": "15:32", "pnl": -226.92}, {"t": "2026-09-16T15:45:00", "ticker": "CRWD", "date": "2026-09-16", "time": "15:45", "pnl": -896.21}, {"t": "2026-09-16T15:46:00", "ticker": "SMCI", "date": "2026-09-16", "time": "15:46", "pnl": -765.38}, {"t": "2026-09-17T04:13:00", "ticker": "NQ", "date": "2026-09-17", "time": "04:13", "pnl": -214.48}, {"t": "2026-09-17T09:31:00", "ticker": "NQ", "date": "2026-09-17", "time": "09:31", "pnl": 2695.52}, {"t": "2026-09-17T09:38:00", "ticker": "TSLA", "date": "2026-09-17", "time": "09:38", "pnl": -567.83}, {"t": "2026-09-17T09:39:00", "ticker": "IREN", "date": "2026-09-17", "time": "09:39", "pnl": -12.16}, {"t": "2026-09-17T09:41:00", "ticker": "IREN", "date": "2026-09-17", "time": "09:41", "pnl": -1421.13}, {"t": "2026-09-17T09:44:00", "ticker": "NVDA", "date": "2026-09-17", "time": "09:44", "pnl": -143.47}, {"t": "2026-09-17T10:25:00", "ticker": "TSLA", "date": "2026-09-17", "time": "10:25", "pnl": -575.69}, {"t": "2026-09-17T10:27:00", "ticker": "MU", "date": "2026-09-17", "time": "10:27", "pnl": -365.08}, {"t": "2026-09-17T10:39:00", "ticker": "INTC", "date": "2026-09-17", "time": "10:39", "pnl": -96.32}, {"t": "2026-09-17T10:46:00", "ticker": "NVDA", "date": "2026-09-17", "time": "10:46", "pnl": 116.62}, {"t": "2026-09-17T11:12:00", "ticker": "INTC", "date": "2026-09-17", "time": "11:12", "pnl": -272.61}, {"t": "2026-09-17T11:12:00", "ticker": "INTC", "date": "2026-09-17", "time": "11:12", "pnl": -34.34}, {"t": "2026-09-17T11:47:00", "ticker": "SMCI", "date": "2026-09-17", "time": "11:47", "pnl": -352.43}, {"t": "2026-09-17T12:25:00", "ticker": "MRNA", "date": "2026-09-17", "time": "12:25", "pnl": -788.84}, {"t": "2026-09-17T12:52:00", "ticker": "HPE", "date": "2026-09-17", "time": "12:52", "pnl": -46.31}, {"t": "2026-09-17T12:52:00", "ticker": "HPE", "date": "2026-09-17", "time": "12:52", "pnl": -107.49}, {"t": "2026-09-17T12:53:00", "ticker": "HPE", "date": "2026-09-17", "time": "12:53", "pnl": -208.63}, {"t": "2026-09-17T13:03:00", "ticker": "GOOGL", "date": "2026-09-17", "time": "13:03", "pnl": -572.82}, {"t": "2026-09-17T13:07:00", "ticker": "OKLO", "date": "2026-09-17", "time": "13:07", "pnl": 670.69}, {"t": "2026-09-17T13:08:00", "ticker": "OKLO", "date": "2026-09-17", "time": "13:08", "pnl": 2017.8}, {"t": "2026-09-17T13:32:00", "ticker": "CL", "date": "2026-09-17", "time": "13:32", "pnl": -447.2}, {"t": "2026-09-17T14:57:00", "ticker": "INTC", "date": "2026-09-17", "time": "14:57", "pnl": -743.28}, {"t": "2026-09-17T15:30:00", "ticker": "MSTR", "date": "2026-09-17", "time": "15:30", "pnl": -455.29}, {"t": "2026-09-17T15:47:00", "ticker": "META", "date": "2026-09-17", "time": "15:47", "pnl": -4.85}, {"t": "2026-09-17T15:47:00", "ticker": "META", "date": "2026-09-17", "time": "15:47", "pnl": 28.36}, {"t": "2026-09-17T15:53:00", "ticker": "NVO", "date": "2026-09-17", "time": "15:53", "pnl": -602.2}, {"t": "2026-09-17T15:58:00", "ticker": "AAPL", "date": "2026-09-17", "time": "15:58", "pnl": -161.32}, {"t": "2026-09-17T18:09:00", "ticker": "CL", "date": "2026-09-17", "time": "18:09", "pnl": 190.56}, {"t": "2026-09-18T02:37:00", "ticker": "MNQ", "date": "2026-09-18", "time": "02:37", "pnl": 4.78}, {"t": "2026-09-18T04:29:00", "ticker": "NQ", "date": "2026-09-18", "time": "04:29", "pnl": 925.52}, {"t": "2026-09-18T04:30:00", "ticker": "ES", "date": "2026-09-18", "time": "04:30", "pnl": -203.2}, {"t": "2026-09-18T05:40:00", "ticker": "NQ", "date": "2026-09-18", "time": "05:40", "pnl": -749.12}, {"t": "2026-09-18T07:17:00", "ticker": "NQ", "date": "2026-09-18", "time": "07:17", "pnl": -734.48}, {"t": "2026-09-18T08:05:00", "ticker": "CL", "date": "2026-09-18", "time": "08:05", "pnl": -1129.44}, {"t": "2026-09-18T09:33:00", "ticker": "META", "date": "2026-09-18", "time": "09:33", "pnl": -671.91}, {"t": "2026-09-18T09:55:00", "ticker": "MSTR", "date": "2026-09-18", "time": "09:55", "pnl": 1551.41}, {"t": "2026-09-18T10:00:00", "ticker": "HOOD", "date": "2026-09-18", "time": "10:00", "pnl": 1201.09}, {"t": "2026-09-18T10:04:00", "ticker": "HOOD", "date": "2026-09-18", "time": "10:04", "pnl": 2345.62}, {"t": "2026-09-18T10:04:00", "ticker": "HOOD", "date": "2026-09-18", "time": "10:04", "pnl": 208.32}, {"t": "2026-09-18T10:35:00", "ticker": "SNDK", "date": "2026-09-18", "time": "10:35", "pnl": -127.24}, {"t": "2026-09-18T10:42:00", "ticker": "MSTR", "date": "2026-09-18", "time": "10:42", "pnl": 1051.92}, {"t": "2026-09-18T10:43:00", "ticker": "MSTR", "date": "2026-09-18", "time": "10:43", "pnl": 1659.27}, {"t": "2026-09-18T10:43:00", "ticker": "MSTR", "date": "2026-09-18", "time": "10:43", "pnl": 422.38}, {"t": "2026-09-18T11:06:00", "ticker": "SNDK", "date": "2026-09-18", "time": "11:06", "pnl": -703.27}, {"t": "2026-09-18T12:01:00", "ticker": "HOOD", "date": "2026-09-18", "time": "12:01", "pnl": -40.74}, {"t": "2026-09-18T12:01:00", "ticker": "HOOD", "date": "2026-09-18", "time": "12:01", "pnl": 0.13}, {"t": "2026-09-18T12:04:00", "ticker": "CL", "date": "2026-09-18", "time": "12:04", "pnl": -656.64}, {"t": "2026-09-18T12:05:00", "ticker": "CL", "date": "2026-09-18", "time": "12:05", "pnl": -437.76}, {"t": "2026-09-18T12:29:00", "ticker": "CL", "date": "2026-09-18", "time": "12:29", "pnl": -609.44}, {"t": "2026-09-18T13:18:00", "ticker": "SNDK", "date": "2026-09-18", "time": "13:18", "pnl": -797.55}, {"t": "2026-09-18T13:19:00", "ticker": "HOOD", "date": "2026-09-18", "time": "13:19", "pnl": -143.21}, {"t": "2026-09-18T13:21:00", "ticker": "MSTR", "date": "2026-09-18", "time": "13:21", "pnl": 400.0}, {"t": "2026-09-18T13:23:00", "ticker": "HOOD", "date": "2026-09-18", "time": "13:23", "pnl": -374.23}, {"t": "2026-09-18T14:41:00", "ticker": "MSTR", "date": "2026-09-18", "time": "14:41", "pnl": 2709.62}, {"t": "2026-09-18T15:29:00", "ticker": "MU", "date": "2026-09-18", "time": "15:29", "pnl": -108.07}, {"t": "2026-09-18T15:46:00", "ticker": "IBIT", "date": "2026-09-18", "time": "15:46", "pnl": -130.8}], "cap": 100000.0, "tickers": ["AAPL", "CL", "CRWD", "CVX", "ES", "GOOGL", "HOOD", "HPE", "IBIT", "INTC", "IREN", "META", "MNQ", "MRNA", "MSFT", "MSTR", "MU", "NQ", "NVDA", "NVO", "OKLO", "PLTR", "QCOM", "SMCI", "SNDK", "SPCX", "TSLA", "WIX"]};
+      function fmtMoney(v, sign) {
+        var s = v < 0 ? '-' : (sign && v > 0 ? '+' : '');
+        return s + '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+      }
+      function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      function niceStep(vmax, n) {
+        n = n || 4;
+        if (vmax <= 0) return 1;
+        var raw = vmax / n, magnitude = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+        var mults = [1, 2, 2.5, 5, 10];
+        for (var i = 0; i < mults.length; i++) { if (raw <= mults[i] * magnitude) return mults[i] * magnitude; }
+        return 10 * magnitude;
+      }
+
+      function render(selected) {
+        var W = 700, H = 340, padL = 66, padR = 16, padT = 14, padB = 36;
+        var plotW = W - padL - padR, plotH = H - padT - padB;
+        var trades = DATA.trades, n = trades.length, cap = DATA.cap;
+        if (!n) return;
+        var tmin = new Date(trades[0].t).getTime(), tmax = new Date(trades[n - 1].t).getTime();
+        var trange = Math.max(1, (tmax - tmin) / 1000);
+        function xOf(ms) { return padL + plotW * ((ms - tmin) / 1000) / trange; }
+
+        var cum = 0, balances = [];
+        for (var i = 0; i < n; i++) {
+          if (selected.has(trades[i].ticker)) cum += trades[i].pnl;
+          balances.push(cap + cum);
+        }
+        var vmax = Math.max(cap, Math.max.apply(null, balances));
+        var vmin = Math.min(0, Math.min.apply(null, balances));
+        var vrange = (vmax - vmin) || 1;
+        function yOf(v) { return padT + plotH * (vmax - v) / vrange; }
+        var startY = yOf(cap);
+
+        var pts = trades.map(function(tr, i) { return [xOf(new Date(tr.t).getTime()), yOf(balances[i])]; });
+        var linePts = [[pts[0][0], startY]].concat(pts);
+        var poly = linePts.map(function(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+        var fill = linePts[0][0].toFixed(1) + ',' + startY.toFixed(1) + ' ' + poly + ' ' +
+          linePts[linePts.length - 1][0].toFixed(1) + ',' + startY.toFixed(1);
+
+        var circles = [];
+        for (i = 0; i < n; i++) {
+          var tr = trades[i];
+          if (!selected.has(tr.ticker)) continue;
+          var p = pts[i], color = tr.pnl >= 0 ? 'var(--pos)' : 'var(--neg)';
+          circles.push('<circle class="bar" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) +
+            '" r="3.2" fill="' + color + '" fill-opacity="0.9"><title>' + esc(tr.ticker) + ' ' + tr.date +
+            ' ' + esc(tr.time) + ' — ' + fmtMoney(tr.pnl, true) + ' this trade, ' +
+            fmtMoney(balances[i]) + ' balance</title></circle>');
+        }
+
+        var last = n - 1, endColor = balances[last] >= cap ? 'var(--pos)' : 'var(--neg)';
+        var endLabel = '<circle cx="' + pts[last][0].toFixed(1) + '" cy="' + pts[last][1].toFixed(1) +
+          '" r="4.5" fill="' + endColor + '"></circle><text class="end-lab" x="' +
+          (pts[last][0] - 6).toFixed(1) + '" y="' + (pts[last][1] - 8).toFixed(1) +
+          '" text-anchor="end">' + fmtMoney(balances[last]) + '</text>';
+
+        var seen = {}, dayLines = [], dayLabels = [];
+        for (i = 0; i < n; i++) {
+          var d = trades[i];
+          if (seen[d.date]) continue;
+          seen[d.date] = true;
+          var gx = xOf(new Date(d.t).getTime());
+          dayLines.push('<line class="grid-line" x1="' + gx.toFixed(1) + '" y1="' + padT + '" x2="' +
+            gx.toFixed(1) + '" y2="' + (H - padB) + '"></line>');
+          var wd = new Date(d.t).toLocaleDateString('en-US', { weekday: 'short' });
+          dayLabels.push('<text class="tick" x="' + Math.max(gx, padL).toFixed(1) + '" y="' + (H - 6) +
+            '" text-anchor="start">' + wd + ' ' + d.date.slice(5) + '</text>');
+        }
+
+        var step = niceStep(vmax), hgrid = [];
+        for (var v = 0; v <= vmax + step * 0.01; v += step) {
+          var y = yOf(v);
+          hgrid.push('<line class="grid-line" x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' +
+            (W - padR) + '" y2="' + y.toFixed(1) + '"></line>');
+          hgrid.push('<text class="tick" x="' + (padL - 6) + '" y="' + (y + 3.5).toFixed(1) +
+            '" text-anchor="end">' + fmtMoney(v) + '</text>');
+        }
+
+        var startLine = '';
+        if (cap && Math.abs(cap % step) > step * 0.02) {
+          startLine = '<line x1="' + padL + '" y1="' + startY.toFixed(1) + '" x2="' + (W - padR) +
+            '" y2="' + startY.toFixed(1) + '" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3,3">' +
+            '</line><text class="tick" x="' + padL + '" y="' + (startY - 4).toFixed(1) +
+            '" text-anchor="start">starting capital ' + fmtMoney(cap) + '</text>';
+        }
+
+        document.getElementById('pnlSvg').innerHTML =
+          '<defs><clipPath id="cuPos"><rect x="0" y="0" width="' + W + '" height="' + startY.toFixed(1) +
+          '"></rect></clipPath><clipPath id="cuNeg"><rect x="0" y="' + startY.toFixed(1) + '" width="' + W +
+          '" height="' + H + '"></rect></clipPath></defs>' + hgrid.join('') + startLine + dayLines.join('') +
+          '<polygon points="' + fill + '" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>' +
+          '<polygon points="' + fill + '" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>' +
+          '<polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" ' +
+          'stroke-linecap="round" points="' + poly + '"></polyline>' + circles.join('') + endLabel +
+          '<line class="axis-line" x1="' + padL + '" y1="' + (H - padB) + '" x2="' + (W - padR) + '" y2="' +
+          (H - padB) + '"></line>' + dayLabels.join('');
+
+        var status = document.getElementById('pnlStatus');
+        if (status) {
+          var included = trades.filter(function(tr) { return selected.has(tr.ticker); }).length;
+          status.textContent = selected.size >= DATA.tickers.length ?
+            'Showing all tickers, ' + n + ' exits.' :
+            'Showing ' + selected.size + ' of ' + DATA.tickers.length + ' tickers (' + included + ' of ' + n + ' exits).';
+        }
+      }
+
+      function update() {
+        var selected = new Set();
+        document.querySelectorAll('.pnlTickerChk').forEach(function(cb) { if (cb.checked) selected.add(cb.value); });
+        render(selected);
+      }
+      var allBox = document.getElementById('pnlAll');
+      allBox.addEventListener('change', function(e) {
+        document.querySelectorAll('.pnlTickerChk').forEach(function(cb) { cb.checked = e.target.checked; });
+        update();
+      });
+      document.querySelectorAll('.pnlTickerChk').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+          var boxes = document.querySelectorAll('.pnlTickerChk');
+          allBox.checked = Array.prototype.every.call(boxes, function(b) { return b.checked; });
+          update();
+        });
+      });
+      update();
+    })();
+    </script>
+    
   </section>
 
   <section>
@@ -531,6 +563,58 @@
       <div class="kpi"><div class="lab">Rate on option premium</div><div class="val">+1.06%</div><div class="sub">$908 option commission &divide; $85,398 option premium</div></div>
     </div>
     <p class="cap" style="max-width:70ch">$36,103 of premium entered at or below $0.30 across 13 symbols; round-trip friction on that is roughly $1,805-$3,971</p>
+    <p class="cap" style="max-width:70ch"><b>CL</b> was the single largest source of commission this week
+      at $186, out of 28 tickers traded.</p>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Ticker</th><th style="text-align:right">Exits</th>
+        <th style="text-align:right">Commission</th><th style="text-align:right">Avg/exit</th>
+        <th style="text-align:right">% of total</th></tr></thead>
+      <tbody><tr><td class="tkr">CL</td><td class="num">25</td><td class="num">$186</td><td class="num">$7</td><td class="num">19%</td></tr>
+<tr><td class="tkr">INTC</td><td class="num">8</td><td class="num">$83</td><td class="num">$10</td><td class="num">8%</td></tr>
+<tr><td class="tkr">SMCI</td><td class="num">2</td><td class="num">$80</td><td class="num">$40</td><td class="num">8%</td></tr>
+<tr><td class="tkr">IBIT</td><td class="num">3</td><td class="num">$79</td><td class="num">$26</td><td class="num">8%</td></tr>
+<tr><td class="tkr">MSTR</td><td class="num">8</td><td class="num">$74</td><td class="num">$9</td><td class="num">7%</td></tr>
+<tr><td class="tkr">NVO</td><td class="num">1</td><td class="num">$50</td><td class="num">$50</td><td class="num">5%</td></tr>
+<tr><td class="tkr">TSLA</td><td class="num">2</td><td class="num">$45</td><td class="num">$22</td><td class="num">5%</td></tr>
+<tr><td class="tkr">HOOD</td><td class="num">7</td><td class="num">$42</td><td class="num">$6</td><td class="num">4%</td></tr></tbody></table>
+    </div>
+    
+    <details class="tabledisc">
+      <summary>Show all 28 tickers</summary>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Ticker</th><th style="text-align:right">Exits</th>
+          <th style="text-align:right">Commission</th><th style="text-align:right">Avg/exit</th>
+          <th style="text-align:right">% of total</th></tr></thead>
+        <tbody><tr><td class="tkr">CL</td><td class="num">25</td><td class="num">$186</td><td class="num">$7</td><td class="num">19%</td></tr>
+<tr><td class="tkr">INTC</td><td class="num">8</td><td class="num">$83</td><td class="num">$10</td><td class="num">8%</td></tr>
+<tr><td class="tkr">SMCI</td><td class="num">2</td><td class="num">$80</td><td class="num">$40</td><td class="num">8%</td></tr>
+<tr><td class="tkr">IBIT</td><td class="num">3</td><td class="num">$79</td><td class="num">$26</td><td class="num">8%</td></tr>
+<tr><td class="tkr">MSTR</td><td class="num">8</td><td class="num">$74</td><td class="num">$9</td><td class="num">7%</td></tr>
+<tr><td class="tkr">NVO</td><td class="num">1</td><td class="num">$50</td><td class="num">$50</td><td class="num">5%</td></tr>
+<tr><td class="tkr">TSLA</td><td class="num">2</td><td class="num">$45</td><td class="num">$22</td><td class="num">5%</td></tr>
+<tr><td class="tkr">HOOD</td><td class="num">7</td><td class="num">$42</td><td class="num">$6</td><td class="num">4%</td></tr>
+<tr><td class="tkr">AAPL</td><td class="num">2</td><td class="num">$42</td><td class="num">$21</td><td class="num">4%</td></tr>
+<tr><td class="tkr">GOOGL</td><td class="num">3</td><td class="num">$37</td><td class="num">$12</td><td class="num">4%</td></tr>
+<tr><td class="tkr">NQ</td><td class="num">7</td><td class="num">$36</td><td class="num">$5</td><td class="num">4%</td></tr>
+<tr><td class="tkr">ES</td><td class="num">3</td><td class="num">$30</td><td class="num">$10</td><td class="num">3%</td></tr>
+<tr><td class="tkr">META</td><td class="num">5</td><td class="num">$27</td><td class="num">$5</td><td class="num">3%</td></tr>
+<tr><td class="tkr">IREN</td><td class="num">2</td><td class="num">$24</td><td class="num">$12</td><td class="num">2%</td></tr>
+<tr><td class="tkr">MSFT</td><td class="num">4</td><td class="num">$22</td><td class="num">$5</td><td class="num">2%</td></tr>
+<tr><td class="tkr">CRWD</td><td class="num">2</td><td class="num">$20</td><td class="num">$10</td><td class="num">2%</td></tr>
+<tr><td class="tkr">PLTR</td><td class="num">1</td><td class="num">$19</td><td class="num">$19</td><td class="num">2%</td></tr>
+<tr><td class="tkr">NVDA</td><td class="num">2</td><td class="num">$18</td><td class="num">$9</td><td class="num">2%</td></tr>
+<tr><td class="tkr">OKLO</td><td class="num">2</td><td class="num">$15</td><td class="num">$8</td><td class="num">2%</td></tr>
+<tr><td class="tkr">CVX</td><td class="num">1</td><td class="num">$14</td><td class="num">$14</td><td class="num">1%</td></tr>
+<tr><td class="tkr">QCOM</td><td class="num">1</td><td class="num">$14</td><td class="num">$14</td><td class="num">1%</td></tr>
+<tr><td class="tkr">MU</td><td class="num">2</td><td class="num">$13</td><td class="num">$7</td><td class="num">1%</td></tr>
+<tr><td class="tkr">MRNA</td><td class="num">1</td><td class="num">$10</td><td class="num">$10</td><td class="num">1%</td></tr>
+<tr><td class="tkr">HPE</td><td class="num">3</td><td class="num">$9</td><td class="num">$3</td><td class="num">1%</td></tr>
+<tr><td class="tkr">SPCX</td><td class="num">1</td><td class="num">$3</td><td class="num">$3</td><td class="num">0%</td></tr>
+<tr><td class="tkr">WIX</td><td class="num">1</td><td class="num">$2</td><td class="num">$2</td><td class="num">0%</td></tr>
+<tr><td class="tkr">MNQ</td><td class="num">1</td><td class="num">$1</td><td class="num">$1</td><td class="num">0%</td></tr>
+<tr><td class="tkr">SNDK</td><td class="num">3</td><td class="num">-$1</td><td class="num">-$0</td><td class="num">-0%</td></tr></tbody></table>
+      </div>
+    </details>
   </section>
 
   <section>

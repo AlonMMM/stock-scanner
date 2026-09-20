@@ -346,12 +346,45 @@ The user wants to *see* the levels, not just read strike numbers. Either:
 - Or send the PNGs / `report.html` directly as files if the session isn't
   artifact-capable.
 
+**Before publishing, add a short "bottom line" box at the very top of the
+report** — right under the title/price line, before the pivot/OI summary
+grid — with Claude's own synthesized read: an immediate-entry take and a
+later/follow-through-entry take (each brief, each with some directional
+lean), plus the one or two things actually driving the picture (e.g. which
+benchmark fits and why, a beta regime shift, an options wall sitting right
+at spot). `analyze.py` itself never writes this — the script's numbers stay
+neutral by design — so this box is composed by Claude each time and
+inserted into the generated `report.html` before publishing (or written
+directly if building a custom page). Skipping this is the single most
+common complaint this skill gets: a report that is all charts and no
+verdict up front reads as "too many graphs, no decision." State the same
+verdict in the chat reply too, leading with it, before any supporting
+numbers.
+
 Quote the numeric summary in the reply too (pivots, POC/VAH/VAL, call
 wall/put wall/max pain, beta, current alpha, the named divergence windows,
 and — when the user is thinking about a position — the nearest support and
-resistance zones with their sources and the long/short risk-reward numbers
-from `trade_plan`) — the charts support the numbers, they don't replace
-saying them.
+resistance zones with their sources) — the charts support the numbers, they
+don't replace saying them.
+
+**Adapt the trade-plan framing to how the user actually trades.** The
+`trade_plan.scenarios` block (`if_long`/`if_short` with entry/stop/target/
+rr_ratio) is written in stock-position language — a hard stop price and a
+reward:risk ratio. That is the right framing for a stock/CFD trader, but it
+is close to meaningless for an options trader, who manages risk through
+strike/spread structure and expiry, not a stop-loss order on the
+underlying. If the user has said (in this conversation, or is a known
+preference) that they trade options, **do not lead with the stop/target
+cards** — instead translate the same underlying level ladder into
+options-relevant terms: which strikes sit on top of a confluence zone (good
+candidates for a spread's short strike), how the nearest expiry's DTE
+relates to the walls/max pain (pinning risk matters more the closer to
+expiry — see caveats), and where the call wall / put wall bound the range
+dealers are likely to defend. This is still descriptive, not a
+recommendation to buy a specific contract — same neutrality rule as the
+stock scenarios, just expressed in the vocabulary that's actually useful to
+the reader. If it isn't clear which the user is, ask once rather than
+guessing.
 
 ## Data schema reference
 

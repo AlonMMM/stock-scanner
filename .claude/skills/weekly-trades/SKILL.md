@@ -85,10 +85,111 @@ to them rather than presenting a flag as a confirmed breach. It also prints the 
 Repeat that list; a check that only mentions what it could see reads as a clean bill of
 health, which it is not.
 
-**5. Save it.** If the session is working in the account holder's `stock-scanner` repo,
+Rule 6 (no unprotected position over 5% overnight) values each overnight position at its
+own multiplier, read from that symbol's own fills — not a hardcoded 100. A futures option
+like NQ (20) or CL (1000) priced at the equity-option multiplier reads as 5–50x its real
+market value and flags positions that were never actually oversized. If a flagged night
+looks wrong, check the position's real contract multiplier before reporting it as a
+breach — see NQ in the 14–18 September week, where the unfixed script over-valued a 15-lot
+position by 5x and flagged it at $7,875 against a $6,363 cap; the real value was $1,575.
+
+Run it a second time with `--json` and save the output — the report step below reads it:
+
+```bash
+python3 <this-skill-dir>/scripts/check_rules.py <path-to-trades-json> --rules docs/risk-rules.md \
+    --json > rules.json
+```
+
+**5. Build the HTML report.** `scripts/build_report.py` turns the week's summary, the
+filtered CSV, the rules check and the burn-slices output into one self-contained report —
+KPIs, every exit as an individual point (not just aggregates), day and ticker breakdowns,
+hold-time buckets, premium burn, the biggest losses explained, a commission section, and
+the rules check:
+
+```bash
+python3 <this-skill-dir>/scripts/build_report.py \
+    --summary summary.json --trades trades-filtered.csv \
+    --rules rules.json --burn burn-slices.json \
+    --out report.html --label "Sep 14-18, 2026" \
+    [--loss-threshold 750] [--starting-capital 100000]
+```
+
+`--rules` and `--burn` are optional; the report degrades gracefully without them.
+`--loss-threshold` (default 750) drives the "Biggest losses explained" section: every exit
+that lost more than it, grouped by what actually happened — outright futures (a point-move
+loss, not premium decay, reported with the ticker's own week-long price arc and whether the
+losses were long or short), overnight options (theta plus, usually, an adverse move by the
+next open), and intraday options split by whether an actual stop order fired. This needs no
+per-week tuning; it reads straight from the filtered CSV plus whichever slice/rules data is
+available and degrades to a hold-time heuristic when `--burn` is omitted.
+
+This report intentionally does **not** narrate the filter chain, the audit-reconciliation
+table, or what got dropped and why — the account holder does not want that in the report
+he reads every week; that belongs in `data/<week>/README.md` instead (see below). It does
+always explain commissions plainly (net P&L already nets both legs; the figures shown are
+for context, not a further deduction) **and always breaks them down by ticker** — three
+aggregate KPIs alone drew a "where is the actual breakdown" follow-up. The commission
+section is a table (ticker, exits, total, average, share of the week's commission), top 8
+rows shown and the rest behind a "Show all N tickers" disclosure, same pattern as the
+by-ticker P&L section.
+
+The main chart is the week's **account balance over time, not a scatter of each trade's own
+result and not a bare P&L delta**. Two account-holder corrections shaped this:
+
+1. A scatter of raw per-trade P&L doesn't read as "profit over time" even with a real time
+   axis — a curve needs a running total, not independent points floating around zero.
+2. A cumulative-P&L curve auto-scaled tight to the week's own swing (e.g. $0 to −$15k)
+   exaggerates a loss that is actually small against the real account. `--starting-capital`
+   (default 100000 — this account's own starting figure) fixes the y-axis floor at $0 and
+   the ceiling at *at least* that value, so a $15k drawdown reads at its true size against a
+   $100k account instead of filling the whole chart. It only extends beyond that range if
+   the balance actually moves outside it (up or down) — never clipped, never shrunk.
+
+X is the actual exit timestamp (real time, not an evenly-spaced index within the day, so a
+burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat); Y is
+starting capital plus the running P&L total; every exit still gets its own point on the
+line, colored by whether that individual trade won or lost. Area fill is green above
+starting capital and red below it, with round-dollar gridlines ($0/$25k/$50k/.../ceiling)
+for scale.
+
+The chart has a **ticker filter** — a row of checkboxes (one per ticker plus "All") above
+it. This is the one part of the report that runs client-side: picking a subset recomputes
+the balance path using only the selected tickers' trades (unselected trades still advance
+the clock, so a stretch where they happened shows as a flat segment, not a skip) and
+redraws the whole chart. This needed real recomputation, not just dimming dots, so the
+geometry (x/y scaling, nice-step gridlines, the polyline and fill) is duplicated in a small
+inline `<script>` block driven by an embedded JSON array of every exit's
+`{time, ticker, date, pnl, sec, prem, comm}`, rather than trying to precompute every
+possible ticker combination in Python. It renders on page load (all tickers selected)
+before anyone touches a checkbox, so the first paint already shows the real week — the JS
+is what redraws it after that, not what's needed to see it at all.
+
+**The filter also drives the top KPI strip**, not just the chart — the first version only
+updated the chart, and left net P&L, win rate, profit factor and return on premium showing
+the whole-week numbers regardless of what was filtered, which reads as broken once you
+notice it. The same `update()` call that redraws the chart also recomputes those four KPIs
+plus a fifth, **Commission** (added to the top strip for the same reason — it was easy to
+miss three screens down in its own section, and the account holder asked for it up top).
+All five use the exact formulas `build_week.py` uses (win = pnl > 0, profit factor =
+gross win / gross loss, return-on-premium is option-only pnl over option-only premium so a
+futures ticker's notional doesn't distort it) so a filtered KPI always matches what the
+by-ticker table below would say for the same tickers. A one-line note appears under the KPI
+strip whenever the filter is active, so it's never ambiguous whether the numbers are the
+whole week or a subset.
+
+If a restart write-off needs excluding and its date differs from another symbol's on the
+same run, `build_week.py --drop-expiry` cannot take two dates in one invocation — it takes
+one `--expiry-day` for the whole `--drop-expiry` set. `check_rules.py --vanished` and
+`burn_slices.py`'s third argument already accept a comma-separated `SYM@YYYY-MM-DD` list
+and handle mixed dates natively. For `build_week.py` in that situation, pre-filter the raw
+trades JSON (drop the exact `(symbol, side, size, price, trade_time)` rows) before running
+it, rather than trying to force two dates through one flag.
+
+**6. Save it.** If the session is working in the account holder's `stock-scanner` repo,
 write to `data/<YYYY-MM-DD>-week/` named after the Monday and commit it; past weeks live
-there, and `data/2026-08-24-week/README.md` is worth mirroring. Outside that repo, write
-somewhere sensible and hand the files over.
+there, and `data/2026-08-24-week/README.md` is worth mirroring. Save `report.html` next to
+it in `reports/<YYYY-MM-DD>-week-trades.html`. Outside that repo, write somewhere sensible
+and hand the files over.
 
 ## What gets filtered, and why
 

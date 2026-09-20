@@ -1,0 +1,89 @@
+{
+  "account": 127258,
+  "findings": [
+    {
+      "rule": 12,
+      "name": "total open exposure under 12%",
+      "status": "PASS",
+      "detail": "peak open cost $10,500 (8.3% of account), cap $15,271; above the cap at 0 of 416 points in the week",
+      "worst": "Fri 18.09 10:15"
+    },
+    {
+      "rule": 6,
+      "name": "no unprotected position over 5% overnight",
+      "status": "PASS",
+      "detail": "nothing above the cap at a session boundary",
+      "caveat": "Market value is approximated from the last traded price of that symbol, and the feed cannot separate strikes, so a position spanning several strikes is marked at one price. Treat flagged nights as candidates to review, not as confirmed breaches. A live stop also satisfies the rule and is invisible here."
+    },
+    {
+      "rule": 4,
+      "name": "check the commission below $0.30",
+      "status": "NOTE",
+      "detail": "$36,103 of premium entered at or below $0.30 across 13 symbols; round-trip friction on that is roughly $1,805-$3,971"
+    },
+    {
+      "rule": 15,
+      "name": "a day down 7% ends the day",
+      "status": "FAIL",
+      "detail": "2026-09-15 -9,536",
+      "caveat": "Realised P&L plus premium written off at expiry. The rule is written against account value, which also moves with open positions, so a day can breach it without showing here."
+    }
+  ],
+  "unchecked": [
+    {
+      "rule": 1,
+      "name": "3+ days at 2%",
+      "why": "needs the expiry date to know the tier and the stop budget"
+    },
+    {
+      "rule": 2,
+      "name": "0-2 days at 1%",
+      "why": "needs the expiry date"
+    },
+    {
+      "rule": 3,
+      "name": "0-2 days A-game at 2%",
+      "why": "needs the expiry date and an A-game marker in the journal"
+    },
+    {
+      "rule": 5,
+      "name": "a risen position is not cut for having risen",
+      "why": "intent, not visible in fills"
+    },
+    {
+      "rule": 7,
+      "name": "a position in a move gets a stop",
+      "why": "stop levels come back empty; an untriggered stop leaves no trace"
+    },
+    {
+      "rule": 8,
+      "name": "correlated positions count as one",
+      "why": "needs a correlation call, not in the data"
+    },
+    {
+      "rule": 9,
+      "name": "a loss does not exceed the stop budget",
+      "why": "the budget depends on the expiry date"
+    },
+    {
+      "rule": 10,
+      "name": "zone 3 is not counted as security",
+      "why": "intent"
+    },
+    {
+      "rule": 11,
+      "name": "no profit target",
+      "why": "intent"
+    },
+    {
+      "rule": 13,
+      "name": "size halves at every rung",
+      "why": "needs the account equity curve, not the trade feed"
+    },
+    {
+      "rule": 14,
+      "name": "expansion only on a new high",
+      "why": "needs the account equity curve"
+    }
+  ]
+}

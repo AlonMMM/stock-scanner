@@ -1,0 +1,28 @@
+{
+  "run_date": "2026-08-23",
+  "run_number": 2,
+  "top5": [
+    "NVDA Q2 FY27 earnings - Wed Aug 26, after close (96, CRITICAL)",
+    "Jackson Hole Symposium + Fed Chair Warsh's first keynote - Fri Aug 28 AM (95, CRITICAL)",
+    "Treasury-buyback/dollar-weakness liquidity thread repricing Gold/BTC/crypto complex (84, HIGH)",
+    "Semis earnings cluster (MRVL, HPE, DELL) after last week's SOX -5% selloff (83, HIGH)",
+    "Oil / Strait-of-Hormuz Iran tension re-escalation (79, HIGH)"
+  ],
+  "open_positions_snapshot": [
+    {"ticker": "ANET", "contract": "Aug28'26 210 CALL", "qty": 51, "unrealized_pnl": 267.51, "dte": 5},
+    {"ticker": "BABA", "contract": "Aug28'26 110 PUT", "qty": 50, "unrealized_pnl": -287.42, "dte": 5},
+    {"ticker": "IBIT", "contract": "Aug28'26 47 CALL", "qty": 200, "unrealized_pnl": 1538.06, "dte": 5},
+    {"ticker": "MRNA", "contract": "Aug28'26 200 CALL", "qty": 11, "unrealized_pnl": 30.43, "dte": 5},
+    {"ticker": "MU", "contract": "Aug24'26 900 PUT", "qty": 30, "unrealized_pnl": -72.32, "dte": 1}
+  ],
+  "methodology_change": "First run using the SKILL.md 2026-08-23 update: (1) 0-14 DTE added alongside 7-30 DTE, (2) research shortlist now selected by trading-volume ranking (top 5 per watchlist, top 10 for Favorites) instead of judgment-based anchor names, (3) a capped news-discovery pass (up to 10, this run found 5: GILD, REGN, NEM, COIN, HOOD) adds names with dated catalysts that aren't on the watchlist at all.",
+  "research_shortlist_names": ["IBIT", "NVDA", "MRNA", "TSLA", "AAPL", "PLTR", "AMZN", "BABA", "MSFT", "GOOGL", "SPY", "HYG", "QQQ", "TLT", "IWM", "XLE", "XLF", "PLUG", "PURR", "XOM", "COP", "CVX", "INTC", "MRVL", "CRWV", "MU", "NBIS", "NOK", "IREN", "CSCO", "MSTR", "DGXX", "RGTI", "IONQ", "QBTS", "QUBT", "LAES", "SOFI", "SMR", "RKT", "PATH", "NOW", "ONDS", "INVZ", "NVO", "RKLB", "SPCX", "ASTS", "NASA"],
+  "news_discovered_names": ["GILD", "REGN", "NEM", "COIN", "HOOD"],
+  "not_researched_this_run": [
+    "PURR - no meaningful company info found (thinly covered/possibly mislabeled ticker); volume-ranked into Energy top-5 but content genuinely unavailable, not skipped",
+    "Full mega-cap Favorites bench (AAPL/MSFT/GOOGL/AMZN/META/TSLA/PLTR) - in the volume shortlist but no fresh dated catalyst surfaced this run; carried on the Live Watchlist Strip only, not manufactured into event cards",
+    "Exact CRM/Dell/MRVL/IREN earnings dates - genuine cross-source date conflicts this run (Aug 25 vs Aug 27 for MRVL/IREN); flagged rather than resolved",
+    "Robotics/humanoid sector (Figure AI, Symbotic, Unitree IPO) - real sector momentum but no single dated trigger in-window; not on watchlist and didn't clear the discovery bar for a full thesis card"
+  ],
+  "artifact_url": "https://claude.ai/code/artifact/0f327164-a284-4873-b968-42133204a5ae"
+}

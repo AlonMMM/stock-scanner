@@ -1,0 +1,297 @@
+{
+  "week_start": "2026-09-14",
+  "exits": 103,
+  "fills_kept": 254,
+  "tickers": [
+    "AAPL",
+    "CL",
+    "CRWD",
+    "CVX",
+    "ES",
+    "GOOGL",
+    "HOOD",
+    "HPE",
+    "IBIT",
+    "INTC",
+    "IREN",
+    "META",
+    "MNQ",
+    "MRNA",
+    "MSFT",
+    "MSTR",
+    "MU",
+    "NQ",
+    "NVDA",
+    "NVO",
+    "OKLO",
+    "PLTR",
+    "QCOM",
+    "SMCI",
+    "SNDK",
+    "SPCX",
+    "TSLA",
+    "WIX"
+  ],
+  "net_pnl": -15440.38,
+  "wins": 26,
+  "losses": 74,
+  "win_rate": 0.2524,
+  "profit_factor": 0.606,
+  "commission_sell_leg": 992.52,
+  "option_premium": 85397.86,
+  "return_on_option_premium": -0.1487,
+  "by_day": [
+    [
+      "2026-09-13",
+      -978.32
+    ],
+    [
+      "2026-09-14",
+      -930.7
+    ],
+    [
+      "2026-09-15",
+      -7453.55
+    ],
+    [
+      "2026-09-16",
+      -8466.55
+    ],
+    [
+      "2026-09-17",
+      -2474.22
+    ],
+    [
+      "2026-09-18",
+      4862.96
+    ]
+  ],
+  "by_ticker": [
+    [
+      "MSTR",
+      6213.16
+    ],
+    [
+      "HOOD",
+      3196.98
+    ],
+    [
+      "OKLO",
+      2688.49
+    ],
+    [
+      "NQ",
+      1922.96
+    ],
+    [
+      "MSFT",
+      330.79
+    ],
+    [
+      "SPCX",
+      164.28
+    ],
+    [
+      "MNQ",
+      4.78
+    ],
+    [
+      "NVDA",
+      -26.85
+    ],
+    [
+      "PLTR",
+      -190.84
+    ],
+    [
+      "HPE",
+      -362.43
+    ],
+    [
+      "MU",
+      -473.15
+    ],
+    [
+      "QCOM",
+      -513.61
+    ],
+    [
+      "NVO",
+      -602.2
+    ],
+    [
+      "ES",
+      -769.22
+    ],
+    [
+      "MRNA",
+      -788.84
+    ],
+    [
+      "AAPL",
+      -858.91
+    ],
+    [
+      "CVX",
+      -952.31
+    ],
+    [
+      "SMCI",
+      -1117.81
+    ],
+    [
+      "TSLA",
+      -1143.52
+    ],
+    [
+      "META",
+      -1239.9
+    ],
+    [
+      "WIX",
+      -1350.82
+    ],
+    [
+      "IREN",
+      -1433.29
+    ],
+    [
+      "SNDK",
+      -1628.06
+    ],
+    [
+      "IBIT",
+      -1633.32
+    ],
+    [
+      "CRWD",
+      -1659.68
+    ],
+    [
+      "INTC",
+      -2261.21
+    ],
+    [
+      "GOOGL",
+      -2467.69
+    ],
+    [
+      "CL",
+      -8488.16
+    ]
+  ],
+  "by_hold": [
+    {
+      "bucket": "עד 5 דק׳",
+      "exits": 8,
+      "premium": 2559.05,
+      "pnl": -634.65,
+      "return_on_premium": -0.2034,
+      "wins": 3,
+      "largest_contributor": "CL",
+      "pnl_without_largest": -649.93
+    },
+    {
+      "bucket": "5–30 דק׳",
+      "exits": 34,
+      "premium": 31994.34,
+      "pnl": -8116.98,
+      "return_on_premium": -0.1903,
+      "wins": 6,
+      "largest_contributor": "MSTR",
+      "pnl_without_largest": -9668.39
+    },
+    {
+      "bucket": "30–120 דק׳",
+      "exits": 27,
+      "premium": 25438.99,
+      "pnl": 1739.65,
+      "return_on_premium": -0.0412,
+      "wins": 9,
+      "largest_contributor": "CL",
+      "pnl_without_largest": -1305.91
+    },
+    {
+      "bucket": "2–8 שעות",
+      "exits": 11,
+      "premium": 7283.81,
+      "pnl": 2545.35,
+      "return_on_premium": 0.0856,
+      "wins": 4,
+      "largest_contributor": "MSTR",
+      "pnl_without_largest": -164.27
+    },
+    {
+      "bucket": "מעל לילה",
+      "exits": 19,
+      "premium": 14582.35,
+      "pnl": -9114.43,
+      "return_on_premium": -0.2612,
+      "wins": 4,
+      "largest_contributor": "HOOD",
+      "pnl_without_largest": -11460.05
+    }
+  ],
+  "expiries": {
+    "count": 0,
+    "contracts": 0,
+    "premium_lost": 0,
+    "share_of_gross_loss": 0.0,
+    "by_ticker": []
+  },
+  "audit": [
+    [
+      "סה\"כ עסקאות שנמשכו מ-IBKR",
+      551,
+      -19544.78
+    ],
+    [
+      "(-) מחוץ לשבוע 2026-09-14 עד 2026-09-18",
+      -1,
+      2428.32
+    ],
+    [
+      "(-) עסקאות במניות עצמן",
+      -81,
+      1642.42
+    ],
+    [
+      "(-) רגלי BUY",
+      -215,
+      33.68
+    ]
+  ],
+  "audit_reconciles": true,
+  "cash_check": {
+    "cash_flow": -24607.81,
+    "realized": -17902.37,
+    "gap": -6705.44,
+    "expiry_rows": 1,
+    "worst_gaps": [
+      [
+        "AMZN",
+        -1654.95
+      ],
+      [
+        "CL",
+        -1590.68
+      ],
+      [
+        "NQ",
+        -1576.15
+      ],
+      [
+        "MSTR",
+        -1510.72
+      ],
+      [
+        "AAPL",
+        -1064.67
+      ]
+    ]
+  },
+  "files": {
+    "xlsx": "/home/user/stock-scanner/data/2026-09-14-week/trades-filtered.xlsx",
+    "csv": "/home/user/stock-scanner/data/2026-09-14-week/trades-filtered.csv"
+  }
+}

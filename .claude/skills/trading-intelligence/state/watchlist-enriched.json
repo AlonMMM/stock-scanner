@@ -1,0 +1,40 @@
+{
+  "snapshot_date": "2026-08-23",
+  "watchlists": {
+    "Favorites": ["ES", "NQ", "IBIT", "AMZN", "META", "GC", "SOXX", "MSFT", "NVDA", "AAPL", "PLTR", "GOOGL", "TSLA", "ORCL", "IBM", "NNOX", "BABA", "MRNA", "WIX"],
+    "Market Overview": ["SPY", "QQQ", "DIA", "IWM", "EFA", "EEM", "TLT", "IEF", "SHY", "AGG", "HYG", "GLD", "USO", "UUP", "VIXY"],
+    "Indexes": ["SPY", "QQQ", "IWM", "SOXX", "IGV", "VIX", "GC", "CL", "DIA", "MDY", "RSP", "EFA", "EEM", "FXI", "XLE", "XLF", "XLK", "XLV", "UVXY", "TLT", "ES", "NQ", "UTHY"],
+    "Energy": ["SMR", "OKLO", "VRT", "NNE", "CEG", "VST", "CCJ", "LEU", "BWXT", "XOM", "CVX", "COP", "LNG", "EQT", "ETN", "GEV", "URA", "URNM", "PLUG", "NEOV", "PURR"],
+    "semis": ["SNDK", "MU", "AMD", "AMAT", "INTC", "CSCO", "QCOM", "CRWV", "NBIS", "AAOI", "MRVL", "ANET", "LITE", "ASML", "AVGO", "CBRS", "ALAB", "TSEM", "NVMI", "CRDO", "TXN", "AMKR", "PENG", "SKHY"],
+    "AI Infra": ["CRWV", "HPE", "DELL", "CLS", "TEL", "CSCO", "NOK", "ERIC", "LITE", "POET", "AAOI", "LWLG", "IREN", "BE", "BB", "RBRK", "NBIS"],
+    "Crypto": ["MSTR", "DGXX", "IREN"],
+    "Quantum": ["IONQ", "RGTI", "QBTS", "QUBT", "ARQQ", "LAES", "QNT"],
+    "Short Options Candidates": ["SPY", "QQQ", "IWM", "DIA", "GC", "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AMD", "AVGO", "MU", "INTC", "QCOM", "MRVL", "ANET", "PLTR", "CRM", "ADBE", "NOW", "PANW", "CRWD", "SHOP", "PYPL", "SOFI", "MSTR", "IBIT", "XOM", "CVX", "IBKR", "ORCL", "IBM", "CSCO"],
+    "Long-Term Options Candidates": ["SOFI", "PYPL", "XYZ", "RKT", "RDDT", "NET", "APP", "MNDY", "TEAM", "TWLO", "IGV", "SHOP", "SMR", "OKLO", "CEG", "VST", "CCJ", "LEU", "CRWV", "LITE", "AAOI", "BE", "ANET", "MU", "SNDK", "ASML", "IONQ", "RGTI", "QBTS", "QUBT", "ASTS", "IBIT", "MSTR"],
+    "software": ["CRM", "ADBE", "NET", "MDB", "SNOW", "PLTR", "IGV", "NOW", "TWLO", "MNDY", "RDDT", "CRWD", "PANW", "ZS", "FTNT", "S", "WDAY", "TEAM", "HUBS", "DDOG", "ZM", "AI", "PATH", "APP", "SHOP", "XYZ", "PYPL", "SOFI", "RKT"],
+    "Autonomous & Drones": ["INVZ", "ONDS"],
+    "Healthcare": ["NVO"],
+    "space": ["RKLB", "NASA", "ASTS", "SPCX"]
+  },
+  "positions_at_snapshot": ["ANET", "BABA", "IBIT", "MRNA", "MU"],
+  "research_shortlist_this_run": {
+    "method": "top 5 by trading volume per watchlist, top 10 for Favorites; union across lists",
+    "Favorites_top10": ["IBIT", "NVDA", "MRNA", "TSLA", "AAPL", "PLTR", "AMZN", "BABA", "MSFT", "GOOGL"],
+    "MarketOverview_top5": ["SPY", "HYG", "QQQ", "TLT", "IWM"],
+    "Indexes_top5": ["SPY", "QQQ", "XLE", "XLF", "TLT"],
+    "Energy_top5": ["PLUG", "PURR", "XOM", "COP", "CVX"],
+    "semis_top5": ["INTC", "MRVL", "CRWV", "MU", "NBIS"],
+    "AIInfra_top5": ["NOK", "IREN", "CRWV", "NBIS", "CSCO"],
+    "Crypto_all3": ["IREN", "MSTR", "DGXX"],
+    "Quantum_top5": ["RGTI", "IONQ", "QBTS", "QUBT", "LAES"],
+    "ShortOptionsCandidates_top5": ["IBIT", "NVDA", "INTC", "SOFI", "TSLA"],
+    "LongTermOptionsCandidates_top5": ["IBIT", "SOFI", "MSTR", "SMR", "RKT"],
+    "software_top5": ["SOFI", "PATH", "PLTR", "RKT", "NOW"],
+    "AutonomousDrones_all2": ["ONDS", "INVZ"],
+    "Healthcare_all1": ["NVO"],
+    "space_all4": ["RKLB", "SPCX", "ASTS", "NASA"],
+    "futures_not_rank_eligible": ["ES", "NQ", "GC", "VIX", "CL — no volume returned (Sunday/market closed at snapshot time); included in Favorites/Indexes regardless of rank"]
+  },
+  "news_discovered_this_run": ["GILD", "REGN", "NEM", "COIN", "HOOD"],
+  "note": "Store is a name->ticker-list summary for cheap diffing next run, not full contract metadata (re-fetched live from IBKR each run). First run using the volume-ranked-shortlist + news-discovery methodology (SKILL.md updated 2026-08-23)."
+}

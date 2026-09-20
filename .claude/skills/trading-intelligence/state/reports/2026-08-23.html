@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalyst Desk — Aug 23, 2026</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme: light;
+  --surface-1:#fcfcfb; --page:#f9f9f7; --card:#ffffff;
+  --ink:#0b0b0b; --ink-2:#52514e; --ink-muted:#898781;
+  --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --success-text:#006300;
+  --slot-position:#2a78d6; --slot-watchlist:#1baf7a; --slot-discovered:#4a3aa7;
+  --seq-1:#cde2fb; --seq-4:#3987e5; --seq-7:#0d366b;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --surface-1:#1a1a19; --page:#0d0d0d; --card:#212120;
+    --ink:#ffffff; --ink-2:#c3c2b7; --ink-muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+    --success-text:#0ca30c;
+    --slot-position:#3987e5; --slot-watchlist:#199e70; --slot-discovered:#9085e9;
+  }
+}
+[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:#1a1a19; --page:#0d0d0d; --card:#212120;
+  --ink:#ffffff; --ink-2:#c3c2b7; --ink-muted:#898781;
+  --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+  --success-text:#0ca30c;
+  --slot-position:#3987e5; --slot-watchlist:#199e70; --slot-discovered:#9085e9;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+a{color:inherit;}
+.app{display:flex;min-height:100vh;}
+
+/* ---- Nav (same markup, CSS-only responsive) ---- */
+nav.rail{
+  width:220px;flex:0 0 220px;background:var(--surface-1);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:16px 0;
+}
+nav.rail .brand{font-weight:700;font-size:15px;padding:0 16px 16px;letter-spacing:.02em;}
+nav.rail .brand span{color:var(--ink-muted);font-weight:400;display:block;font-size:11px;margin-top:2px;}
+nav.rail ul{list-style:none;margin:0;padding:0;}
+nav.rail li a{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;color:var(--ink-2);
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;
+}
+nav.rail li a.active{color:var(--ink);background:var(--card);border-left-color:var(--slot-position);font-weight:600;}
+nav.rail li a:hover{background:var(--card);}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+
+/* ---- Ticker strip (persistent chrome) ---- */
+.ticker-wrap{background:var(--surface-1);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;padding:8px 0;}
+.ticker{display:inline-flex;gap:22px;padding:0 16px;font-variant-numeric:tabular-nums;font-size:12.5px;}
+.tick{display:inline-flex;gap:6px;align-items:baseline;}
+.tick b{font-weight:700;}
+.tick .up{color:var(--success-text);}
+.tick .down{color:var(--critical);}
+.ticker-note{padding:4px 16px 0;font-size:10.5px;color:var(--ink-muted);}
+
+.content{padding:20px 22px 90px;max-width:980px;}
+.page{display:none;}
+.page.active{display:block;}
+h1.pagetitle{font-size:20px;margin:0 0 4px;}
+.sub{color:var(--ink-2);font-size:13px;margin:0 0 20px;}
+
+/* ---- Cards ---- */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;}
+.card h3{margin:0 0 8px;font-size:15px;}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;border:1px solid var(--border);color:var(--ink-2);background:var(--surface-1);}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:700;color:#fff;}
+.badge.critical{background:var(--critical);}
+.badge.high{background:var(--serious);}
+.badge.medium{background:var(--warning);color:#231a00;}
+.src{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;color:#fff;}
+.src.position{background:var(--slot-position);}
+.src.watchlist{background:var(--slot-watchlist);}
+.src.discovered{background:var(--slot-discovered);}
+.field{margin:8px 0;font-size:13px;line-height:1.5;}
+.field b{color:var(--ink-2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:2px;}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;margin:6px 0;}
+.chain .node{background:var(--surface-1);border:1px solid var(--border);border-radius:6px;padding:4px 8px;}
+.chain .arrow{color:var(--ink-muted);}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+.tag{background:var(--surface-1);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11.5px;color:var(--ink-2);}
+.label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:4px;}
+.label.confirmed{background:rgba(12,163,12,.15);color:var(--success-text);}
+.label.multi{background:rgba(42,120,214,.15);color:var(--slot-position);}
+.label.single{background:rgba(250,178,25,.18);color:#8a5a00;}
+.label.unconfirmed{background:rgba(211,59,59,.13);color:var(--critical);}
+
+/* ---- Open Positions ---- */
+.warn{border-left:4px solid var(--critical);background:var(--card);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:10px;font-size:13px;}
+.warn.serious{border-left-color:var(--serious);}
+.warn.warning{border-left-color:var(--warning);}
+.postable{width:100%;border-collapse:collapse;font-size:12.5px;}
+.postable th{text-align:left;color:var(--ink-muted);font-weight:600;font-size:10.5px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--grid);}
+.postable td{padding:8px;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums;}
+.pnl-pos{color:var(--success-text);font-weight:700;}
+.pnl-neg{color:var(--critical);font-weight:700;}
+
+/* ---- Theses ---- */
+.thesis{display:grid;grid-template-columns:28px 1fr;gap:10px;}
+.rank{font-size:18px;font-weight:800;color:var(--ink-muted);}
+.dir{font-size:13px;font-weight:700;}
+.meter{height:6px;background:var(--grid);border-radius:99px;overflow:hidden;margin:6px 0;width:160px;}
+.meter i{display:block;height:100%;background:var(--slot-position);border-radius:99px;}
+
+/* ---- Regime grid ---- */
+.regime-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.tile{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.tile .k{font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.03em;}
+.tile .v{font-size:14px;font-weight:700;margin-top:4px;}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+
+/* ---- What changed diff ---- */
+.diffnew{border-left:3px solid var(--good);padding-left:10px;margin-bottom:6px;font-size:13px;}
+.diffrm{border-left:3px solid var(--critical);padding-left:10px;margin-bottom:6px;font-size:13px;}
+.diffchg{border-left:3px solid var(--slot-position);padding-left:10px;margin-bottom:6px;font-size:13px;}
+
+/* ---- Pager ---- */
+.pager{display:flex;justify-content:space-between;margin-top:24px;font-size:13px;}
+.pager a{padding:8px 14px;border:1px solid var(--border);border-radius:8px;text-decoration:none;background:var(--card);}
+
+/* ---- Mobile nav ---- */
+@media (max-width:920px){
+  .app{flex-direction:column;}
+  nav.rail{
+    width:100%;flex:none;height:auto;position:sticky;top:0;z-index:10;
+    display:flex;overflow-x:auto;padding:8px 0;white-space:nowrap;border-right:none;border-bottom:1px solid var(--border);
+  }
+  nav.rail .brand{display:none;}
+  nav.rail ul{display:flex;gap:2px;padding:0 8px;}
+  nav.rail li a{border-left:none;border-bottom:3px solid transparent;padding:8px 12px;flex-direction:column;font-size:11px;gap:3px;text-align:center;}
+  nav.rail li a.active{border-left-color:transparent;border-bottom-color:var(--slot-position);background:transparent;}
+  .content{padding:16px 14px 80px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<nav class="rail" id="navrail">
+  <div class="brand">Catalyst Desk<span>Trading Intelligence · Aug 23, 2026</span></div>
+  <ul>
+    <li><a href="#positions" data-p="positions">◆ <span>Open Positions</span></a></li>
+    <li><a href="#top5" data-p="top5">🔥 <span>Top 5 to Watch</span></a></li>
+    <li><a href="#next7" data-p="next7">📅 <span>Next 7 Days</span></a></li>
+    <li><a href="#developing" data-p="developing">🔭 <span>Developing</span></a></li>
+    <li><a href="#regime" data-p="regime">🧠 <span>Market Regime</span></a></li>
+    <li><a href="#theses" data-p="theses">🎯 <span>Active Theses</span></a></li>
+    <li><a href="#changed" data-p="changed">⚠️ <span>What Changed</span></a></li>
+    <li><a href="#further" data-p="further">👀 <span>Research Further</span></a></li>
+  </ul>
+</nav>
+
+<div class="main">
+  <div class="ticker-wrap">
+    <div class="ticker" id="tickerRow"></div>
+    <div class="ticker-note">Snapshot Sun Aug 23, 2026 — US markets closed; last = Friday Aug 21 close, change% reflects last session, not live intraday.</div>
+  </div>
+
+  <div class="content">
+
+  <!-- PAGE 0: OPEN POSITIONS -->
+  <section class="page" id="p-positions">
+    <h1 class="pagetitle">◆ Open Positions</h1>
+    <p class="sub">5 live option positions · snapshot Sun Aug 23, 2026 (IBKR market closed — IV/greeks below carry over from Friday's close where noted)</p>
+
+    <div class="card">
+      <h3 style="margin-bottom:10px;">Warnings</h3>
+      <div class="warn critical"><b>Structural collision — 4 of 5 positions expire the same day as the Fed keynote.</b> ANET, BABA, IBIT and MRNA all expire Fri Aug 28 — the exact day Fed Chair Warsh delivers his first keynote as chair (~10am ET, Jackson Hole). Zero adjustment window if the speech moves markets.</div>
+      <div class="warn critical"><b>MU short put — 1 DTE, needs a ~6.6% one-session move.</b> Expires Monday Aug 24. Spot $963.20 vs. 900 strike requires a ~6.6% down move by tomorrow's close; no confirmed catalyst before then was identified. Tightest timeline of any position this run.</div>
+      <div class="warn serious"><b>MRNA — deep OTM + rich IV, no catalyst before expiry.</b> ~37% away from the 200 strike with 5 DTE remaining; IV was last observed elevated (~154% annualized) with both known catalysts already fired. Classic vol-crush setup.</div>
+      <div class="warn warning"><b>ANET / BABA — moneyness stretch beyond the last-known expected move.</b> ANET needs +11.1% (Friday's IV-implied move was ~6.6%); BABA needs -7.6% (Friday's IV-implied move was ~5.4%). Sunday's snapshot could not refresh IV/greeks live (market closed) — figures carry over from Friday's close.</div>
+    </div>
+
+    <div class="card">
+      <table class="postable">
+        <tr><th>Ticker</th><th>Contract</th><th>DTE</th><th>Qty</th><th>Avg</th><th>Mkt</th><th>Mkt Value</th><th>Unrl. P&L</th></tr>
+        <tr><td>ANET</td><td>Aug28'26 210C</td><td>5</td><td>51</td><td>$0.42</td><td>$0.47</td><td>$2,417.56</td><td class="pnl-pos">+$267.51 (+11.1%)</td></tr>
+        <tr><td>BABA</td><td>Aug28'26 110P</td><td>5</td><td>50</td><td>$0.28</td><td>$0.23</td><td>$1,136.31</td><td class="pnl-neg">-$287.42 (-24.1%)</td></tr>
+        <tr><td>IBIT</td><td>Aug28'26 47C</td><td>5</td><td>200</td><td>$0.25</td><td>$0.32</td><td>$6,458.10</td><td class="pnl-pos">+$1,538.06 (+31.2%)</td></tr>
+        <tr><td>MRNA</td><td>Aug28'26 200C</td><td>5</td><td>11</td><td>$1.05</td><td>$1.08</td><td>$1,188.00</td><td class="pnl-pos">+$30.43 (+2.6%)</td></tr>
+        <tr><td>MU</td><td>Aug24'26 900P</td><td>1</td><td>30</td><td>$0.50</td><td>$0.48</td><td>$1,440.00</td><td class="pnl-neg">-$72.32 (-5.0%)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Spot vs. strike, this snapshot</h3>
+      <div class="field"><b>ANET</b> spot $189.08 → needs +11.1% to reach 210 strike (5 DTE)</div>
+      <div class="field"><b>BABA</b> spot $119.00 → needs -7.6% to reach 110 strike (5 DTE)</div>
+      <div class="field"><b>IBIT</b> spot $44.39 → needs +5.9% to reach 47 strike (5 DTE); BTC itself has been far more volatile than that over just the past 3 days</div>
+      <div class="field"><b>MRNA</b> spot $145.84 → needs +37.1% to reach 200 strike (5 DTE)</div>
+      <div class="field"><b>MU</b> spot $963.20 → needs -6.6% to reach 900 strike (1 DTE)</div>
+    </div>
+  </section>
+
+  <!-- PAGE 1: TOP 5 -->
+  <section class="page" id="p-top5">
+    <h1 class="pagetitle">🔥 Top 5 Things to Watch</h1>
+    <p class="sub">Ranked by priority score (0–100) · market-wide, position-agnostic</p>
+
+    <div class="card">
+      <div class="row"><span class="badge critical">96 · CRITICAL</span><span class="pill">Wed Aug 26, after close</span></div>
+      <h3>NVDA — Q2 FY27 earnings</h3>
+      <div class="field"><b>Fact</b>NVIDIA reports fiscal Q2 2027 results Wednesday after the close; call begins ~5pm ET. Lands the same day as the July PCE print.</div>
+      <div class="field"><b>Expectation</b>Market is pricing continued AI-capex-cycle strength after CoreWeave (+19%) and Nebius (+34%) both beat huge on Aug 12 — a very high bar has been set for the whole complex.</div>
+      <div class="field"><b>Surprise</b>Any guidance softness on Blackwell/next-gen demand or hyperscaler capex commentary would be a bigger surprise than a raw beat, given how much strength is already priced.</div>
+      <div class="chain"><span class="node">NVDA print</span><span class="arrow">→</span><span class="node">AI-capex read-through</span><span class="arrow">→</span><span class="node">semis complex</span><span class="arrow">→</span><span class="node">SOXX / MRVL / INTC</span></div>
+      <div class="field"><b>Market reaction to watch</b>After-hours move vs. the options-implied expected move; whether the broader semis complex (which sold off -5% on the SOX last week) follows through or fades the print.</div>
+      <div class="field"><b>Trading implication</b>Textbook near-dated (0-14 DTE) IV-crush event — the setup is around the reaction to the print, not a directional bet on the beat itself. <span class="label confirmed">confirmed</span></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="badge critical">95 · CRITICAL</span><span class="pill">Fri Aug 28, ~10am ET</span></div>
+      <h3>Jackson Hole Symposium + Fed Chair Warsh's first keynote</h3>
+      <div class="field"><b>Fact</b>The Jackson Hole Economic Policy Symposium runs Aug 27–29 (theme: "Financial Innovation: Implications for Payments and Policy"). Kevin Warsh delivers the Friday keynote — his first as Fed Chair, succeeding Powell.</div>
+      <div class="field"><b>Expectation</b>No prior Warsh-as-chair speaking record at this podium exists — genuinely higher uncertainty than a normal Fed speech. Markets are currently torn between two narratives (see below).</div>
+      <div class="field"><b>Surprise</b>Either a hawkish inflation-vigilant tone (yields spike further, gold/BTC give back gains) or an explicitly dovish easing signal (extends the current liquidity/debasement trade) would both be a bigger move than a neutral, wait-and-see tone.</div>
+      <div class="chain"><span class="node">Warsh tone</span><span class="arrow">→</span><span class="node">rate-path expectations</span><span class="arrow">→</span><span class="node">Treasury yields</span><span class="arrow">→</span><span class="node">TLT / Gold / BTC / USD</span></div>
+      <div class="field"><b>Market reaction to watch</b>30Y yield reaction in the first 30 minutes; DXY; gold and BTC as the cleanest read on "dovish/debasement" vs. "hawkish/inflation" framing.</div>
+      <div class="field"><b>Trading implication</b>The two-sided macro tension (rates at highest since 2007 on inflation/oil fears vs. rate-cut-hope-driven gold/BTC rally) makes this a genuine binary-ish macro event, not a priced-in formality. <span class="label confirmed">confirmed</span></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="badge high">84 · HIGH</span><span class="pill">Developing, into Fri Aug 28</span></div>
+      <h3>Treasury-buyback / dollar-weakness thread repricing Gold, BTC, and the crypto complex</h3>
+      <div class="field"><b>Fact</b>Gold is near a 3-month high; BTC topped $78K over the weekend on continued Treasury-liquidity/dollar-weakness themes, then saw a sharp pullback ($109.7M in BTC/ETH liquidations, 80% long-side). Weekly BTC-product inflows still ran $1.9B despite the pullback.</div>
+      <div class="field"><b>Expectation</b>Market has been trading a "debasement trade" narrative (Treasury doubling note/bond buybacks) — genuinely two-sided right now given the weekend volatility.</div>
+      <div class="field"><b>Surprise</b>A sharp DXY reversal or a hawkish Jackson Hole outcome would be the cleanest invalidation of this whole thread at once.</div>
+      <div class="chain"><span class="node">Treasury buybacks</span><span class="arrow">→</span><span class="node">USD weakness</span><span class="arrow">→</span><span class="node">real yields</span><span class="arrow">→</span><span class="node">Gold / BTC / miners</span></div>
+      <div class="field"><b>Market reaction to watch</b>Whether gold/GLD holds its 3-month-high zone and whether BTC stabilizes above the mid-$70Ks after the weekend liquidation cascade.</div>
+      <div class="field"><b>Trading implication</b>Same thread now confirmed from three independent angles this run: GLD (watchlist), IBIT (position), and NEM (newly discovered, equity-side confirmation via Nevada JV + record FCF). <span class="label multi">multiple credible reports</span></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="badge high">83 · HIGH</span><span class="pill">Tue–Thu this week</span></div>
+      <h3>Semis earnings cluster (MRVL, HPE, DELL) after last week's SOX -5% selloff</h3>
+      <div class="field"><b>Fact</b>Marvell (Google's $12B custom-ASIC deal extension already confirmed), HPE, and Dell all report within days of NVDA, right after the semiconductor index fell ~5% last week amid the broader risk-off move.</div>
+      <div class="field"><b>Expectation</b>HPE/Dell already ran +54-59% in a month on AI-server demand — the print is the confirmation test, not the catalyst itself. CoreWeave/Nebius's huge Aug 12 beats set an unusually high bar for the whole AI-infra complex.</div>
+      <div class="field"><b>Surprise</b>Any margin disappointment given how much AI-server strength is already priced into HPE/Dell would be a bigger surprise than a top-line beat.</div>
+      <div class="chain"><span class="node">MRVL/HPE/DELL prints</span><span class="arrow">→</span><span class="node">AI-server demand confirmation</span><span class="arrow">→</span><span class="node">semis/AI-infra complex</span></div>
+      <div class="field"><b>Market reaction to watch</b>Whether the complex follows through on beats or sells the news given the run-up; read-through into NVDA's Wednesday print.</div>
+      <div class="field"><b>Trading implication</b>Exact reporting dates for MRVL/IREN show a genuine cross-source conflict (Aug 25 vs Aug 27) — verify closer to the date. <span class="label single">single-source report</span> on exact timing.</div>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="badge high">79 · HIGH</span><span class="pill">Developing, escalating</span></div>
+      <h3>Oil / Strait-of-Hormuz Iran tension re-escalation</h3>
+      <div class="field"><b>Fact</b>Brent $94.39, WTI $87.06 — both rising again after a suggested US-Iran deal on Hormuz traffic never materialized and rhetoric escalated. Iran's president has signaled wanting to "end the war," while Trump has warned of expanded economic pressure.</div>
+      <div class="field"><b>Expectation</b>Market had priced in a de-escalation (oil eased through early August) — the past week's reversal is a genuine repricing of supply risk, not a continuation of an existing trend.</div>
+      <div class="field"><b>Surprise</b>An actual Hormuz disruption (vs. rhetoric) would be a much larger surprise than continued posturing.</div>
+      <div class="chain"><span class="node">Hormuz tension</span><span class="arrow">→</span><span class="node">supply-risk premium</span><span class="arrow">→</span><span class="node">Brent/WTI</span><span class="arrow">→</span><span class="node">XOM / COP / CVX / XLE</span></div>
+      <div class="field"><b>Market reaction to watch</b>Whether XLE and the energy complex (this run's volume-ranked top names: PLUG, PURR, XOM, COP, CVX) continue higher alongside crude, or whether equities decouple from the headline risk.</div>
+      <div class="field"><b>Trading implication</b>Genuinely live, escalating geopolitical risk — not stale news. <span class="label multi">multiple credible reports</span></div>
+    </div>
+  </section>
+
+  <!-- PAGE 2: NEXT 7 DAYS -->
+  <section class="page" id="p-next7">
+    <h1 class="pagetitle">📅 Next 7 Days</h1>
+    <p class="sub">Chronological, market-wide only</p>
+    <div class="card">
+      <div class="field"><b>Mon Aug 24</b>Quiet positioning session ahead of Wednesday's macro/earnings double-header; no major scheduled catalyst identified.</div>
+      <div class="field"><b>Tue Aug 25</b>Software/fintech earnings cluster window (names including ADSK, AFRM, WDAY, ULTA, GAP, RBRK, S per one earnings-calendar source) — exact company-by-company dates in this cluster carry some cross-source uncertainty this week. <span class="label single">single-source report</span></div>
+      <div class="field"><b>Wed Aug 26 — AM</b>July PCE price index (Fed's preferred inflation gauge).</div>
+      <div class="field"><b>Wed Aug 26 — after close</b>NVDA Q2 FY27 earnings; CRM earnings (exact day has minor cross-source uncertainty).</div>
+      <div class="field"><b>Thu Aug 27</b>Jackson Hole Symposium opens. MRVL and IREN earnings expected (after close) — date conflicts with an Aug 25 listing on one calendar source; treat as <span class="label single">single-source</span> until closer to the date. HPE earnings also expected this day.</div>
+      <div class="field"><b>Fri Aug 28 — ~10am ET</b>Fed Chair Warsh's first keynote address at Jackson Hole.</div>
+      <div class="field"><b>Fri Aug 28–29</b>Dell earnings expected (exact day unconfirmed between sources). Jackson Hole Symposium concludes Sat Aug 29.</div>
+      <div class="field"><b>Sun Aug 31</b>REGN PDUFA date (garetosmab, OPTIMA) — biotech binary event, not on the IBKR watchlist.</div>
+    </div>
+  </section>
+
+  <!-- PAGE 3: DEVELOPING -->
+  <section class="page" id="p-developing">
+    <h1 class="pagetitle">🔭 Developing — 2–8 Weeks</h1>
+    <div class="card">
+      <div class="field"><b>Quantum sector follow-through</b>SEALSQ (LAES) begins Phase 2 of its $200M quantum investment plan in September — a concrete near-term milestone for a sector that just had four independent confirming catalysts land within two weeks.</div>
+      <div class="field"><b>UiPath (PATH) Sept 3 earnings</b>Real test of whether the Maestro Flow launch (Aug 19) and the recent +30% run translate into actual new contracts, not just sentiment.</div>
+      <div class="field"><b>Robotics/humanoid sector momentum</b>Unitree's oversubscribed IPO, Figure AI's BMW Spartanburg deployment deal, and a broad robotics rally (Serve Robotics, Symbotic, Teradyne, Ouster) are real but diffuse — no single dated trigger yet, and none of the private/pre-IPO names are tradable on the watchlist. Worth monitoring for a dated catalyst to emerge.</div>
+      <div class="field"><b>SPCX ongoing share-unlock schedule</b>Following the Aug 6 unlock of 911.5M Class A shares (public float 4.9% → 11.8%) and a further ~319M-share tranche, more staggered unlocks remain on the post-IPO lockup schedule — a structural overhang/volatility source independent of company fundamentals, compounded by the tokenized-proxy trading dynamics (a $203M whale short bet was reported against tokenized SPCX).</div>
+      <div class="field"><b>DGXX 55MW AI rollout</b>Scheduled for Oct 1, 2026 — outside this run's near-term window but the next hard catalyst after Aug 14's Q2 print ($1.1B contracted AI infrastructure revenue backlog).</div>
+      <div class="field"><b>Post-Jackson-Hole positioning into the September FOMC</b>However Warsh's Friday keynote lands, the market's read of it will shape positioning into the next FOMC meeting.</div>
+    </div>
+  </section>
+
+  <!-- PAGE 4: MARKET REGIME -->
+  <section class="page" id="p-regime">
+    <h1 class="pagetitle">🧠 Current Market Regime</h1>
+    <div class="regime-grid">
+      <div class="tile"><div class="k">Inflation</div><div class="v"><span class="dot" style="background:var(--warning)"></span>Mixed / Watching PCE</div></div>
+      <div class="tile"><div class="k">Growth</div><div class="v"><span class="dot" style="background:var(--warning)"></span>Softening (weak jobs print)</div></div>
+      <div class="tile"><div class="k">Rates</div><div class="v"><span class="dot" style="background:var(--critical)"></span>Elevated &amp; two-sided</div></div>
+      <div class="tile"><div class="k">Liquidity</div><div class="v"><span class="dot" style="background:var(--good)"></span>Loosening (Treasury buybacks)</div></div>
+      <div class="tile"><div class="k">USD</div><div class="v"><span class="dot" style="background:var(--good)"></span>Softening</div></div>
+      <div class="tile"><div class="k">Credit (HYG)</div><div class="v"><span class="dot" style="background:var(--ink-muted)"></span>Not independently verified this run</div></div>
+      <div class="tile"><div class="k">AI / Tech</div><div class="v"><span class="dot" style="background:var(--serious)"></span>Red-hot, richly priced</div></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <h3>Dominant narrative</h3>
+      <div class="field">A Fed leadership transition (Powell → Warsh) collides with a genuinely two-sided rates/inflation picture — 30Y yields at their highest since 2007 on Iran/oil-driven inflation fear, while a weakening-labor-market/dollar-weakness thread simultaneously drives gold and Bitcoin toward multi-week highs. That tension lands in the exact same 72-hour window as NVDA's earnings and the broadest AI-infra earnings cluster in months. This is one of the highest cross-catalyst-density weeks of the year so far.</div>
+      <div class="field"><b>What would invalidate this</b>A calm, uneventful Warsh keynote that resolves the two-sided rates tension quickly (rather than extending it) would collapse most of this week's macro volatility premium at once.</div>
+    </div>
+  </section>
+
+  <!-- PAGE 5: ACTIVE THESES -->
+  <section class="page" id="p-theses">
+    <h1 class="pagetitle">🎯 Active Theses</h1>
+    <p class="sub">Ranked by confidence, highest first · spans positions, watchlist, and this run's news discoveries</p>
+
+    <!-- 7s -->
+    <div class="card"><div class="thesis"><div class="rank">1</div><div>
+      <div class="row"><b class="dir">NEM — Bullish ▲</b><span class="src discovered">discovered</span><span class="pill">7/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:70%"></i></div>
+      <div class="field">Not on the IBKR watchlist. Barrick/Newmont finalized the Nevada Gold Mines JV; record Q2 FCF ($2.2B); gold near 3-month high; multiple analyst PT raises this month.</div>
+      <div class="field"><b>Confirmation</b>Gold strength through Jackson Hole · Nevada JV synergies in guidance <b>Invalidation</b>Hawkish Warsh reverses the dollar-weakness thread</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">2</div><div>
+      <div class="row"><b class="dir">OKLO — Bullish ▲</b><span class="src watchlist">watchlist</span><span class="pill">7/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:70%"></i></div>
+      <div class="field">Groves reactor reached criticality (Aug 6, 5th SMR globally); Microsoft/Nvidia $200M AI-datacenter-power partnership. Note: didn't make this run's volume-ranked Energy top-5 (PLUG/PURR/XOM/COP/CVX ranked higher) — stays active on unrefuted thesis merit, not volume.</div>
+      <div class="field"><b>Confirmation</b>Further regulatory approvals · hyperscaler partnerships <b>Invalidation</b>Safety/regulatory setback</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">3</div><div>
+      <div class="row"><b class="dir">IONQ / RGTI / QBTS / QUBT / LAES — Bullish ▲</b><span class="src watchlist">watchlist</span><span class="pill">7/10</span><span class="pill">🟢 stronger</span></div>
+      <div class="meter"><i style="width:70%"></i></div>
+      <div class="field">4th independent confirming catalyst this run: SEALSQ (LAES) +120% YoY H1 revenue, $485M cash, new Chief Quantum Officer — on top of IonQ's raised guidance, Rigetti's CHIPS Act LOI, D-Wave's $550M acquisition.</div>
+      <div class="field"><b>Confirmation</b>LAES Phase 2 begins Sept · continued bookings growth <b>Invalidation</b>Jackson-Hole-driven risk-off hits high-beta names hardest</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">4</div><div>
+      <div class="row"><b class="dir">GLD — Bullish ▲</b><span class="src watchlist">watchlist</span><span class="pill">7/10</span><span class="pill">🟢 stronger</span></div>
+      <div class="meter"><i style="width:70%"></i></div>
+      <div class="field">Same Treasury-buyback/dollar-weakness thread as IBIT, now independently confirmed from the equity side by NEM. Gold near 3-month high.</div>
+      <div class="field"><b>Confirmation</b>Yield declines · dollar weakness · dovish Warsh <b>Invalidation</b>Hawkish tone, yields turn back up</div>
+    </div></div></div>
+
+    <!-- 6s -->
+    <div class="card"><div class="thesis"><div class="rank">5</div><div>
+      <div class="row"><b class="dir">IBIT — Bullish, two-sided ▲</b><span class="src position">position</span><span class="pill">6/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">+31% unrealized. BTC topped $78K on the liquidity thread, then a sharp weekend pullback with heavy long liquidations. Structural fact unchanged: expires the same day as Warsh's keynote.</div>
+      <div class="field"><b>Confirmation</b>ETF inflows continue · BTC holds mid-$70Ks <b>Invalidation</b>Hawkish keynote · liquidation cascade extends</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">6</div><div>
+      <div class="row"><b class="dir">MRVL — Bullish, event risk ▲</b><span class="src watchlist">watchlist</span><span class="pill">6/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">Google extended its custom AI-ASIC deal to $12B. Ran from $162.93 to $252, retreated to ~$235 with the semis selloff. Earnings date conflicts across sources.</div>
+      <div class="field"><b>Confirmation</b>Beat-and-raise on ASIC demand <b>Invalidation</b>Miss/soft guide after the run-up</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">7</div><div>
+      <div class="row"><b class="dir">INTC — Bullish, rich ▲</b><span class="src watchlist">watchlist</span><span class="pill">6/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">#1 semis name by volume this run (91.7M shares). $20B stock offering closed Aug 12 at $95/share; up 175% YTD. Elevated volume is the offering itself, not a fresh catalyst.</div>
+      <div class="field"><b>Confirmation</b>Continued AI-demand commentary <b>Invalidation</b>Profit-taking after the run + dilutive raise</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">8</div><div>
+      <div class="row"><b class="dir">COIN — Bullish ▲</b><span class="src discovered">discovered</span><span class="pill">6/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">+9% on the crypto rally, then a short squeeze (~$2.7B shorts liquidated). Same macro thread as IBIT/GLD/NEM, higher beta.</div>
+      <div class="field"><b>Confirmation</b>BTC strength continues <b>Invalidation</b>Pullback deepens · regulatory setback</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">9</div><div>
+      <div class="row"><b class="dir">HOOD — Bullish ▲</b><span class="src discovered">discovered</span><span class="pill">6/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">Genuine developing catalyst: SEC reportedly working on a tokenized-securities "innovation exemption"; Tenev publicly pushing for it Aug 18. Also a direct BTC-rally beneficiary.</div>
+      <div class="field"><b>Confirmation</b>SEC exemption progresses <b>Invalidation</b>Rulemaking stalls · crypto rally reverses</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">10</div><div>
+      <div class="row"><b class="dir">ONDS — Bullish ▲</b><span class="src watchlist">watchlist</span><span class="pill">6/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">Record Q2 (+67% sequential, >13x YoY); FY26 guidance raised to $525-550M. Real dated military contracts: >$50M US Army order, Israeli MoD win.</div>
+      <div class="field"><b>Confirmation</b>Further contract wins <b>Invalidation</b>Award pace slows · risk-off hits small-cap defense-tech</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">11</div><div>
+      <div class="row"><b class="dir">HPE / DELL — Neutral / Event risk</b><span class="src watchlist">watchlist</span><span class="pill">6/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:60%"></i></div>
+      <div class="field">+54-59% in a month on AI-server demand; earnings this week is the confirmation test against a very high bar set by CRWV/NBIS's huge Aug 12 beats.</div>
+      <div class="field"><b>Confirmation</b>Beat-and-raise matching CRWV/NBIS strength <b>Invalidation</b>Any margin disappointment</div>
+    </div></div></div>
+
+    <!-- 5s -->
+    <div class="card"><div class="thesis"><div class="rank">12</div><div>
+      <div class="row"><b class="dir">BABA — Bearish lean, softened ▼</b><span class="src position">position</span><span class="pill">5/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">-24% unrealized. Core thesis (capex margin compression, litigation overhang) intact, but the Aug 17 $1.5B videogame-unit sale is a real capital-discipline data point that cuts slightly against it.</div>
+      <div class="field"><b>Confirmation</b>Downgrades · new litigation <b>Invalidation</b>Stock stabilizes on Cloud strength or the divestiture read</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">13</div><div>
+      <div class="row"><b class="dir">RKLB — Bullish ▲</b><span class="src watchlist">watchlist</span><span class="pill">5/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">Multiple real US Space Force contract wins in mid-August. No new news this run.</div>
+      <div class="field"><b>Confirmation</b>More contract wins <b>Invalidation</b>Wins prove smaller than market's reaction implies</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">14</div><div>
+      <div class="row"><b class="dir">NVO — Bearish lean ▼</b><span class="src watchlist">watchlist</span><span class="pill">5/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">Losing ground to Lilly: CagriSema missed head-to-head, Wegovy pill sales badly missed estimates.</div>
+      <div class="field"><b>Confirmation</b>Continued share loss to Lilly <b>Invalidation</b>New pipeline asset follow-through</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">15</div><div>
+      <div class="row"><b class="dir">CRM — Neutral / Event risk</b><span class="src watchlist">watchlist</span><span class="pill">5/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">Binary read on enterprise software demand + Agentforce monetization for the whole IGV complex.</div>
+      <div class="field"><b>Confirmation</b>Beat-and-raise with AI-monetization commentary <b>Invalidation</b>Soft guidance</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">16</div><div>
+      <div class="row"><b class="dir">SOFI — Neutral, bullish lean ▲</b><span class="src watchlist">watchlist</span><span class="pill">5/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">Beat + raised FY26 guidance (35% member growth), but Piper Sandler Overweight ($22 PT) vs. Morgan Stanley cut ($15 PT, capital-intensity concern) — two-sided.</div>
+      <div class="field"><b>Confirmation</b>Continued growth beats <b>Invalidation</b>Capital-intensity concerns prove out</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">17</div><div>
+      <div class="row"><b class="dir">NOK — Bullish ▲</b><span class="src watchlist">watchlist</span><span class="pill">5/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">EUR2.8B AI &amp; Cloud orders; AI-RAN platform with Nvidia; potential FCC ban on Chinese optical transceivers could redirect demand to Nokia. BofA PT $18.50 (Buy).</div>
+      <div class="field"><b>Confirmation</b>FCC ban progresses · AI-RAN pilot wins <b>Invalidation</b>FCC action stalls</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">18</div><div>
+      <div class="row"><b class="dir">GILD — Neutral / Event risk</b><span class="src discovered">discovered</span><span class="pill">5/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:50%"></i></div>
+      <div class="field">Not on the watchlist — discovered for the trader's stated PDUFA-calendar interest. PDUFA Aug 27 (bictegravir/lenacapavir, ARTISTRY-2), binary regulatory event.</div>
+      <div class="field"><b>Confirmation</b>N/A — binary <b>Invalidation</b>N/A — binary</div>
+    </div></div></div>
+
+    <!-- 4s -->
+    <div class="card"><div class="thesis"><div class="rank">19</div><div>
+      <div class="row"><b class="dir">MRNA — Neutral / Cautious</b><span class="src position">position</span><span class="pill">4/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:40%"></i></div>
+      <div class="field">+2.6% unrealized. Both known catalysts already fired; deep OTM with rich IV and no fresh news — vol-crush risk stands.</div>
+      <div class="field"><b>Confirmation</b>Momentum without fresh news <b>Invalidation</b>IV collapse / negative follow-up data</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">20</div><div>
+      <div class="row"><b class="dir">MU — Neutral / Cautious</b><span class="src position">position</span><span class="pill">4/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:40%"></i></div>
+      <div class="field">-5.0% unrealized. 1 DTE, needs ~6.6% one-session move; no catalyst identified before Monday's close.</div>
+      <div class="field"><b>Confirmation</b>Weak pre-NVDA positioning headlines <b>Invalidation</b>No catalyst before close (likely)</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">21</div><div>
+      <div class="row"><b class="dir">ASTS — Bearish lean ▼</b><span class="src watchlist">watchlist</span><span class="pill">4/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:40%"></i></div>
+      <div class="field">Postponed ~45-satellite deployment target from 2026 to early 2027 — execution-risk flag under a rallying share price.</div>
+      <div class="field"><b>Confirmation</b>Further delays <b>Invalidation</b>Timeline confirmed/accelerated</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">22</div><div>
+      <div class="row"><b class="dir">RKT — Neutral / Mixed</b><span class="src watchlist">watchlist</span><span class="pill">4/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:40%"></i></div>
+      <div class="field">Record Q2 profitability, but Q3 guidance below consensus and mortgage rates near a near-year high choke purchase activity. Morgan Stanley upgrade vs. Stephens PT cut, same week.</div>
+      <div class="field"><b>Confirmation</b>Mortgage rates ease <b>Invalidation</b>Housing headwind persists</div>
+    </div></div></div>
+
+    <div class="card"><div class="thesis"><div class="rank">23</div><div>
+      <div class="row"><b class="dir">REGN — Neutral / Event risk</b><span class="src discovered">discovered</span><span class="pill">4/10</span><span class="pill">🟢 new</span></div>
+      <div class="meter"><i style="width:40%"></i></div>
+      <div class="field">Not on the watchlist — discovered. PDUFA Aug 31 (garetosmab, OPTIMA), binary regulatory event, further out than GILD's.</div>
+      <div class="field"><b>Confirmation</b>N/A — binary <b>Invalidation</b>N/A — binary</div>
+    </div></div></div>
+
+    <!-- 3 -->
+    <div class="card"><div class="thesis"><div class="rank">24</div><div>
+      <div class="row"><b class="dir">ANET — Neutral</b><span class="src position">position</span><span class="pill">3/10</span><span class="pill">🟡 unchanged</span></div>
+      <div class="meter"><i style="width:30%"></i></div>
+      <div class="field">+11.1% unrealized. Pure momentum play, no fresh catalyst since Aug 4 earnings. Didn't make this run's semis volume top-5 — researched purely because it's a position.</div>
+      <div class="field"><b>Confirmation</b>Broad semis strength off NVDA's print <b>Invalidation</b>No new catalyst · semis sell off</div>
+    </div></div></div>
+  </section>
+
+  <!-- PAGE 6: WHAT CHANGED -->
+  <section class="page" id="p-changed">
+    <h1 class="pagetitle">⚠️ What Changed</h1>
+    <p class="sub">vs. the Aug 22, 2026 run</p>
+    <div class="card">
+      <h3>Methodology change (this run)</h3>
+      <div class="diffchg">First run using the updated skill: 0-14 DTE now sits alongside 7-30 DTE; the research shortlist is now selected by <b>trading-volume ranking</b> (top 5 per watchlist, top 10 for Favorites) instead of judgment-based anchor picks; a capped <b>news-discovery pass</b> (up to 10) now surfaces names with real catalysts that aren't on the watchlist at all — this run found 5 (GILD, REGN, NEM, COIN, HOOD).</div>
+    </div>
+    <div class="card">
+      <h3>New this run</h3>
+      <div class="diffnew"><b>NEM, COIN, HOOD, GILD, REGN</b> — news-discovered, not on the watchlist at all.</div>
+      <div class="diffnew"><b>INTC, MRVL, NOK, SOFI, RKT, ONDS</b> — surfaced by the new volume-ranking mechanism; none of these had thesis cards in the prior run's anchor-based selection.</div>
+    </div>
+    <div class="card">
+      <h3>Changed</h3>
+      <div class="diffchg"><b>OKLO</b> — dropped out of Energy's volume-ranked top-5 this run (PLUG/PURR/XOM/COP/CVX now rank higher by trading volume). Thesis stays active (7/10, unchanged) because it was already confirmed and unrefuted — a methodology artifact worth watching, not a bearish signal.</div>
+      <div class="diffchg"><b>ANET</b> — similarly dropped out of the semis volume top-5 (INTC/MRVL/CRWV/MU/NBIS ranked higher); stays covered only because it's an open position, exactly as designed.</div>
+      <div class="diffchg"><b>MRVL earnings date</b> — corrected from an earlier single-source read of Aug 25 to a cross-source conflict (Aug 25 vs. Aug 27 confirmed by a dedicated preview); flagged rather than silently resolved.</div>
+      <div class="diffchg"><b>BABA thesis</b> — new confirmed data point (Aug 17 videogame-unit sale, $1.5B) cuts slightly against the bearish lean; confidence held at 5/10 pending market reaction.</div>
+    </div>
+    <div class="card">
+      <h3>Thesis confidence changes</h3>
+      <div class="diffnew">GLD thesis: 6/10 → 7/10 — reason: independently confirmed from the equity side by newly-discovered NEM (Nevada JV, record FCF).</div>
+      <div class="diffnew">Quantum complex (IONQ/RGTI/QBTS/QUBT + LAES): 6/10 → 7/10 — reason: LAES adds a 4th independent confirming catalyst (120% YoY revenue growth, new Chief Quantum Officer).</div>
+    </div>
+    <div class="card">
+      <h3>Removed</h3>
+      <div class="diffrm">Nothing removed outright this run — all prior theses remain either active or explicitly re-confirmed as unchanged.</div>
+    </div>
+  </section>
+
+  <!-- PAGE 7: RESEARCH FURTHER -->
+  <section class="page" id="p-further">
+    <h1 class="pagetitle">👀 Research Further</h1>
+    <p class="sub">Researched this run, real but not yet high-conviction</p>
+    <div class="card">
+      <div class="field"><b>SPCX</b> — Tokenized-share dynamics create real but hard-to-interpret volatility (whale $203M short bet vs. staggered lockup unlocks driving demand). Interesting mechanically, not yet a clean thesis.</div>
+      <div class="field"><b>PATH (UiPath)</b> — +30%+ run on Maestro Flow launch, but the real test (Sept 3 earnings) sits just outside this run's window. Revisit closer to the print.</div>
+      <div class="field"><b>DGXX</b> — Solid Q2 print ($1.1B contracted AI-infra revenue backlog) but the next hard catalyst (55MW rollout) is Oct 1 — too far out for a 0-30 DTE thesis right now.</div>
+      <div class="field"><b>PLUG</b> — Genuine Q2 beat and raised guidance (PT raised to $5 from $3.50), but the name's small-cap volatility profile and lack of a near-dated catalyst keep this below a full thesis card for now.</div>
+    </div>
+  </section>
+
+  </div>
+  <div class="pager" style="max-width:980px;margin:0 22px 40px;">
+    <a href="#" id="pagerPrev">← Prev</a>
+    <a href="#" id="pagerNext">Next →</a>
+  </div>
+</div>
+</div>
+
+<script>
+const order = ["positions","top5","next7","developing","regime","theses","changed","further"];
+const strip = [
+  ["SPY",767.00,0.58],["QQQ",714.25,0.47],["TLT",82.02,-0.39],["GLD",423.09,1.89],
+  ["NVDA",215.38,-0.68],["MRVL",236.10,-5.94],["INTC",89.86,-2.46],["MSTR",121.16,7.80],
+  ["HYG",79.55,-0.01],["XLE",63.63,-0.19],["RKLB",73.00,0.07],["SOXX",519.52,-0.54],
+  ["IONQ",44.61,7.42],["SOFI",18.99,5.97],["OKLO",42.19,1.27]
+];
+document.getElementById("tickerRow").innerHTML = strip.map(function(t){
+  var up = t[2] >= 0;
+  return '<span class="tick"><b>'+t[0]+'</b> $'+t[1].toFixed(2)+' <span class="'+(up?"up":"down")+'">'+(up?"▲":"▼")+' '+Math.abs(t[2]).toFixed(2)+'%</span></span>';
+}).join("");
+
+function showPage(id){
+  if(order.indexOf(id) === -1) id = order[0];
+  document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});
+  document.getElementById("p-"+id).classList.add("active");
+  document.querySelectorAll("nav.rail a").forEach(function(a){a.classList.remove("active");});
+  var link = document.querySelector('nav.rail a[data-p="'+id+'"]');
+  if(link) link.classList.add("active");
+  var idx = order.indexOf(id);
+  document.getElementById("pagerPrev").href = "#"+order[(idx-1+order.length)%order.length];
+  document.getElementById("pagerNext").href = "#"+order[(idx+1)%order.length];
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", function(){ showPage(location.hash.replace("#","")); });
+showPage(location.hash.replace("#","") || order[0]);
+</script>
+</body>
+</html>

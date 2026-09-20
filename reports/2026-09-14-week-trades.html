@@ -1,0 +1,720 @@
+<title>Trade Week Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --bg:        #f5f6f8; --surface: #ffffff; --surface-2: #eef0f4;
+    --ink:       #12151b; --ink-2: #4b5563; --ink-3: #7c8698;
+    --rule:      #e2e5eb; --rule-2: #c9cedb;
+    --pos:       #059669; --neg: #dc2626;
+    --accent:    #b8790a; --accent-ink: #7a5006;
+    --warnbg:    #fdf3df; --warnrule: #e8c583; --warnink: #6b4a08;
+    --failbg:    #fdecec; --failrule: #f3b9b9; --failink: #8a1f1f;
+    --passbg:    #e9f7f0; --passrule: #a9dfc4; --passink: #0f5132;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:        #0a0c10; --surface: #12151b; --surface-2: #1a1e26;
+      --ink:       #eef1f5; --ink-2: #a6afc0; --ink-3: #707a8c;
+      --rule:      #232833; --rule-2: #333b4a;
+      --pos:       #34d399; --neg: #f87171;
+      --accent:    #f0b342; --accent-ink: #f0b342;
+      --warnbg:    #241b0e; --warnrule: #5c431a; --warnink: #f0c674;
+      --failbg:    #2a1616; --failrule: #6b2a2a; --failink: #f5a3a3;
+      --passbg:    #10261c; --passrule: #2c5941; --passink: #7fd6ab;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:        #0a0c10; --surface: #12151b; --surface-2: #1a1e26;
+    --ink:       #eef1f5; --ink-2: #a6afc0; --ink-3: #707a8c;
+    --rule:      #232833; --rule-2: #333b4a;
+    --pos:       #34d399; --neg: #f87171;
+    --accent:    #f0b342; --accent-ink: #f0b342;
+    --warnbg:    #241b0e; --warnrule: #5c431a; --warnink: #f0c674;
+    --failbg:    #2a1616; --failrule: #6b2a2a; --failink: #f5a3a3;
+    --passbg:    #10261c; --passrule: #2c5941; --passink: #7fd6ab;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); }
+  .page { background: var(--bg); color: var(--ink); font-family: "Public Sans", system-ui, sans-serif;
+    font-size: 16px; line-height: 1.6; max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px;
+    display: flex; flex-direction: column; gap: 40px; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .masthead { display: flex; flex-direction: column; gap: 12px; border-bottom: 2px solid var(--ink); padding-bottom: 22px; }
+  .masthead .kicker { font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
+  .masthead h1 { font-family: "Fraunces", Georgia, serif; font-size: clamp(2rem, 5.2vw, 2.9rem);
+    line-height: 1.08; margin: 0; font-weight: 600; text-wrap: balance; }
+  .masthead .dek { color: var(--ink-2); font-size: 1.02rem; max-width: 66ch; }
+  .stamp { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.82rem; color: var(--ink-3); }
+  .stamp b { color: var(--ink-2); font-weight: 600; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px;
+    background: var(--rule); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .kpi { background: var(--surface); padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .kpi .lab { font-size: 0.76rem; color: var(--ink-3); font-weight: 600; }
+  .kpi .val { font-family: "IBM Plex Mono", monospace; font-size: 1.9rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; }
+  .kpi .sub { font-size: 0.82rem; color: var(--ink-2); }
+  .pos { color: var(--pos); } .neg { color: var(--neg); }
+  section { display: flex; flex-direction: column; gap: 16px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--rule-2); padding-bottom: 9px; }
+  .sec-head h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.4rem; margin: 0; }
+  .sec-head .tag { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-inline-start: auto; white-space: nowrap; }
+  section > p { margin: 0; max-width: 70ch; color: var(--ink-2); }
+  section > p strong { color: var(--ink); font-weight: 700; }
+  .figure { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 18px 18px 14px;
+    display: flex; flex-direction: column; gap: 10px; }
+  .figure .cap { font-size: 0.85rem; color: var(--ink-2); }
+  .figure .cap b { color: var(--ink); font-weight: 700; }
+  .chart-scroll { overflow-x: auto; }
+  .chart-scroll svg { display: block; min-width: 480px; width: 100%; height: auto; }
+  .grid-line { stroke: var(--rule); stroke-width: 1; }
+  .axis-line { stroke: var(--rule-2); stroke-width: 1; }
+  .tick { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-3); }
+  .val-lab { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--ink); font-weight: 600; }
+  .end-lab { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; fill: var(--ink); font-weight: 700; }
+  .row-lab { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 600; fill: var(--ink); }
+  .bar { transition: opacity .12s ease; } .bar:hover { opacity: .72; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.83rem; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 13px; height: 3px; border-radius: 2px; display: inline-block; }
+  .dotswatch { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .tickerfilter { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 20px; padding: 3px 10px 3px 8px; cursor: pointer; user-select: none; }
+  .chip:has(input:checked) { color: var(--ink); border-color: var(--rule-2); background: var(--surface-2); }
+  .chip input { accent-color: var(--accent); margin: 0; cursor: pointer; }
+  #pnlStatus { color: var(--ink); font-weight: 600; }
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.87rem; }
+  th, td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--rule); }
+  thead th { background: var(--surface-2); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 700; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: "IBM Plex Mono", monospace; text-align: right; white-space: nowrap; }
+  td.tkr { font-family: "IBM Plex Mono", monospace; font-weight: 700; }
+  details.tabledisc summary { cursor: pointer; font-size: 0.85rem; color: var(--ink-2); padding: 4px 0; font-weight: 600; }
+  details.tabledisc[open] summary { margin-bottom: 10px; }
+  .buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .bucket { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 15px 16px;
+    display: flex; flex-direction: column; gap: 5px; }
+  .bucket .b-lab { font-size: 0.78rem; color: var(--ink-3); font-weight: 600; }
+  .bucket .b-val { font-family: "IBM Plex Mono", monospace; font-size: 1.35rem; font-weight: 600; }
+  .bucket .b-sub { font-size: 0.79rem; color: var(--ink-2); }
+  .bucket .b-guard { font-size: 0.76rem; color: var(--ink-3); border-top: 1px dashed var(--rule-2); padding-top: 7px; margin-top: 2px; }
+  .bucket .b-guard b { color: var(--ink-2); }
+  .burnrows { display: flex; flex-direction: column; gap: 14px; }
+  .burnrow { display: grid; grid-template-columns: 96px 1fr 96px; align-items: center; gap: 14px; }
+  .burnrow .b-name { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
+  .burnrow .b-name span { display: block; font-size: 0.74rem; color: var(--ink-3); font-weight: 400; }
+  .burnrow .track { position: relative; height: 20px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .burnrow .fill { position: absolute; inset-block: 0; left: 0; background: var(--neg); opacity: 0.8; border-radius: 3px 0 0 3px; }
+  .burnrow .pct { font-family: "IBM Plex Mono", monospace; font-size: 0.86rem; font-weight: 700; text-align: right; }
+  .loss-group { display: flex; flex-direction: column; gap: 8px; }
+  .loss-group h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.05rem; margin: 0; }
+  .loss-group .cap { font-size: 0.85rem; color: var(--ink-2); margin: 0; max-width: 74ch; }
+  .rules { display: flex; flex-direction: column; gap: 10px; }
+  .rule-row { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 4px; padding: 12px 16px; }
+  .rule-row.fail { background: var(--failbg); border-color: var(--failrule); }
+  .rule-row.check { background: var(--warnbg); border-color: var(--warnrule); }
+  .rule-row.pass { background: var(--passbg); border-color: var(--passrule); }
+  .rule-row.note { background: var(--surface-2); }
+  .pill { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 3px 8px; border-radius: 20px; flex: 0 0 auto; white-space: nowrap; margin-top: 2px; }
+  .rule-row.fail .pill { background: var(--failrule); color: var(--failink); }
+  .rule-row.check .pill { background: var(--warnrule); color: var(--warnink); }
+  .rule-row.pass .pill { background: var(--passrule); color: var(--passink); }
+  .rule-row.note .pill { background: var(--rule-2); color: var(--ink-2); }
+  .rule-body { display: flex; flex-direction: column; gap: 3px; font-size: 0.88rem; }
+  .rule-row.fail .rule-body { color: var(--failink); }
+  .rule-row.check .rule-body { color: var(--warnink); }
+  .rule-row.pass .rule-body { color: var(--passink); }
+  .rule-row.note .rule-body { color: var(--ink-2); }
+  .rule-body .r-t { font-weight: 700; }
+  .rule-body .r-c { font-size: 0.82rem; opacity: 0.85; }
+  ul.notes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  ul.notes li { padding-inline-start: 14px; border-inline-start: 2px solid var(--rule-2); color: var(--ink-2);
+    max-width: 72ch; font-size: 0.88rem; }
+  footer.foot { border-top: 1px solid var(--rule); padding-top: 18px; font-size: 0.82rem; color: var(--ink-3);
+    display: flex; flex-direction: column; gap: 8px; max-width: 74ch; }
+  footer.foot code { font-family: "IBM Plex Mono", monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.8em; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <div class="kicker">Weekly Options Ledger</div>
+    <h1>Sep 14-18, 2026 week, net -$15,440</h1>
+    <p class="dek">103 filtered exits across 28 tickers, 25% win rate, -14.9% return on premium deployed.</p>
+    <div class="stamp">
+      <span>Trading week <b>Sep 14-18, 2026</b></span>
+      <span>Source <b>Interactive Brokers</b></span>
+      <span><b>103</b> exits &middot; <b>28</b> tickers</span>
+    </div>
+  </header>
+
+  <div class="kpis" id="topKpis">
+    <div class="kpi"><div class="lab">Net P&amp;L</div><div class="val neg" id="kpiNet">-$15,440</div><div class="sub" id="kpiNetSub">after commissions &middot; 103 exits</div></div>
+    <div class="kpi"><div class="lab">Win rate</div><div class="val" id="kpiWinRate">25%</div><div class="sub" id="kpiWinSub">26 wins &middot; 74 losses</div></div>
+    <div class="kpi"><div class="lab">Profit factor</div><div class="val" id="kpiPF">0.606</div><div class="sub">gross win &divide; gross loss</div></div>
+    <div class="kpi"><div class="lab">Return on premium</div><div class="val neg" id="kpiRet">-14.9%</div><div class="sub" id="kpiRetSub">$85,398 option premium deployed</div></div>
+    <div class="kpi"><div class="lab">Commission</div><div class="val" id="kpiComm">$993</div><div class="sub" id="kpiCommSub">+1.06% on option premium</div></div>
+  </div>
+  <p class="cap" id="kpiFilterNote" style="display:none;max-width:70ch;margin:-24px 0 0">
+    KPIs above reflect the ticker filter in "Account balance over time" below.</p>
+
+  <section>
+    <div class="sec-head"><h2>Account balance over time</h2><span class="tag">103 exits</span></div>
+    <p>Starting capital plus the running total, plotted on real time — not evenly spaced within a day, so
+      a burst of trades minutes apart moves the line in a cluster and a quiet stretch is flat. Scaled
+      against the full account (from $0), not auto-fit tight to the week's swing, so the drawdown reads
+      at its real size. Every exit is still its own point on the line, colored by whether that individual
+      trade won or lost.</p>
+    <div class="tickerfilter"><label class="chip"><input type="checkbox" id="pnlAll" checked> All</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="AAPL" checked> AAPL</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="CL" checked> CL</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="CRWD" checked> CRWD</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="CVX" checked> CVX</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="ES" checked> ES</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="GOOGL" checked> GOOGL</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="HOOD" checked> HOOD</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="HPE" checked> HPE</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="IBIT" checked> IBIT</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="INTC" checked> INTC</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="IREN" checked> IREN</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="META" checked> META</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MNQ" checked> MNQ</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MRNA" checked> MRNA</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MSFT" checked> MSFT</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MSTR" checked> MSTR</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="MU" checked> MU</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="NQ" checked> NQ</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="NVDA" checked> NVDA</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="NVO" checked> NVO</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="OKLO" checked> OKLO</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="PLTR" checked> PLTR</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="QCOM" checked> QCOM</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="SMCI" checked> SMCI</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="SNDK" checked> SNDK</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="SPCX" checked> SPCX</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="TSLA" checked> TSLA</label>
+<label class="chip"><input type="checkbox" class="pnlTickerChk" value="WIX" checked> WIX</label></div>
+    <div class="figure">
+      <div class="chart-scroll"><svg id="pnlSvg" viewBox="0 0 700 340" role="img" aria-label="Account balance over the week"></svg></div>
+      <div class="legend">
+        <span><i class="dotswatch" style="background:var(--pos)"></i> Winning trade</span>
+        <span><i class="dotswatch" style="background:var(--neg)"></i> Losing trade</span>
+        <span>Line &middot; account balance</span>
+        <span>X-axis &middot; actual time</span>
+      </div>
+      <div class="cap"><b>Account balance, starting capital $100,000.</b>
+        <span id="pnlStatus">Showing all tickers, 103 exits.</span>
+        Untick a ticker to see the balance path with only the rest; hover a point for that trade's
+        own result and the balance right after it.</div>
+    </div>
+    
+    <script>
+    (function() {
+      var DATA = {"trades": [{"t": "2026-09-13T18:06:00", "ticker": "CL", "date": "2026-09-13", "time": "18:06", "pnl": -134.16, "sec": "FUT", "prem": 308384.16, "comm": 7.08}, {"t": "2026-09-13T18:06:00", "ticker": "CL", "date": "2026-09-13", "time": "18:06", "pnl": 15.28, "sec": "FUT", "prem": 102794.72, "comm": 2.36}, {"t": "2026-09-13T18:21:00", "ticker": "CL", "date": "2026-09-13", "time": "18:21", "pnl": -444.72, "sec": "FUT", "prem": 103254.72, "comm": 2.36}, {"t": "2026-09-13T18:21:00", "ticker": "CL", "date": "2026-09-13", "time": "18:21", "pnl": -414.72, "sec": "FUT", "prem": 103254.72, "comm": 2.36}, {"t": "2026-09-14T11:06:00", "ticker": "CL", "date": "2026-09-14", "time": "11:06", "pnl": 0.0, "sec": "FUT", "prem": 102140.0, "comm": 2.36}, {"t": "2026-09-14T11:24:00", "ticker": "PLTR", "date": "2026-09-14", "time": "11:24", "pnl": -190.84, "sec": "OPT", "prem": 1940.84, "comm": 18.98}, {"t": "2026-09-14T11:31:00", "ticker": "MSFT", "date": "2026-09-14", "time": "11:31", "pnl": -531.39, "sec": "OPT", "prem": 981.39, "comm": 4.77}, {"t": "2026-09-14T12:10:00", "ticker": "CL", "date": "2026-09-14", "time": "12:10", "pnl": -994.72, "sec": "FUT", "prem": 103164.72, "comm": 2.36}, {"t": "2026-09-14T12:50:00", "ticker": "MSFT", "date": "2026-09-14", "time": "12:50", "pnl": 143.17, "sec": "OPT", "prem": 75.83, "comm": 0.47}, {"t": "2026-09-14T12:52:00", "ticker": "MSFT", "date": "2026-09-14", "time": "12:52", "pnl": 347.15, "sec": "OPT", "prem": 177.85, "comm": 2.02}, {"t": "2026-09-14T12:54:00", "ticker": "MSFT", "date": "2026-09-14", "time": "12:54", "pnl": 371.86, "sec": "OPT", "prem": 768.14, "comm": 14.55}, {"t": "2026-09-14T14:42:00", "ticker": "IBIT", "date": "2026-09-14", "time": "14:42", "pnl": -40.38, "sec": "OPT", "prem": 440.38, "comm": 6.22}, {"t": "2026-09-14T15:58:00", "ticker": "GOOGL", "date": "2026-09-14", "time": "15:58", "pnl": -35.55, "sec": "OPT", "prem": 505.55, "comm": 2.88}, {"t": "2026-09-15T06:38:00", "ticker": "CL", "date": "2026-09-15", "time": "06:38", "pnl": -1089.44, "sec": "FUT", "prem": 207529.44, "comm": 4.72}, {"t": "2026-09-15T08:47:00", "ticker": "CL", "date": "2026-09-15", "time": "08:47", "pnl": -954.72, "sec": "FUT", "prem": 103014.72, "comm": 2.36}, {"t": "2026-09-15T09:34:00", "ticker": "IBIT", "date": "2026-09-15", "time": "09:34", "pnl": -1462.14, "sec": "OPT", "prem": 2212.14, "comm": 38.32}, {"t": "2026-09-15T09:34:00", "ticker": "MSTR", "date": "2026-09-15", "time": "09:34", "pnl": -1126.15, "sec": "OPT", "prem": 1726.15, "comm": 8.13}, {"t": "2026-09-15T09:46:00", "ticker": "GOOGL", "date": "2026-09-15", "time": "09:46", "pnl": -1859.32, "sec": "OPT", "prem": 3539.32, "comm": 18.93}, {"t": "2026-09-15T09:48:00", "ticker": "CL", "date": "2026-09-15", "time": "09:48", "pnl": 1470.28, "sec": "FUT", "prem": 101809.72, "comm": 2.36}, {"t": "2026-09-15T10:06:00", "ticker": "META", "date": "2026-09-15", "time": "10:06", "pnl": -546.36, "sec": "OPT", "prem": 1834.36, "comm": 11.21}, {"t": "2026-09-15T10:06:00", "ticker": "META", "date": "2026-09-15", "time": "10:06", "pnl": -45.14, "sec": "OPT", "prem": 159.14, "comm": 0.61}, {"t": "2026-09-15T10:09:00", "ticker": "WIX", "date": "2026-09-15", "time": "10:09", "pnl": -1350.82, "sec": "OPT", "prem": 1950.82, "comm": 1.71}, {"t": "2026-09-15T10:27:00", "ticker": "ES", "date": "2026-09-15", "time": "10:27", "pnl": -339.1, "sec": "FOP", "prem": 1201.6, "comm": 7.05}, {"t": "2026-09-15T10:42:00", "ticker": "NQ", "date": "2026-09-15", "time": "10:42", "pnl": 0.0, "sec": "FUT", "prem": 585605.0, "comm": 2.24}, {"t": "2026-09-15T10:57:00", "ticker": "CRWD", "date": "2026-09-15", "time": "10:57", "pnl": -763.47, "sec": "OPT", "prem": 1963.47, "comm": 6.79}, {"t": "2026-09-15T10:59:00", "ticker": "CL", "date": "2026-09-15", "time": "10:59", "pnl": -197.76, "sec": "FOP", "prem": 2117.76, "comm": 18.88}, {"t": "2026-09-15T11:40:00", "ticker": "CL", "date": "2026-09-15", "time": "11:40", "pnl": -1247.2, "sec": "FOP", "prem": 1747.2, "comm": 23.6}, {"t": "2026-09-15T11:41:00", "ticker": "CL", "date": "2026-09-15", "time": "11:41", "pnl": 3045.56, "sec": "FUT", "prem": 205574.44, "comm": 4.72}, {"t": "2026-09-15T14:57:00", "ticker": "CL", "date": "2026-09-15", "time": "14:57", "pnl": -84.72, "sec": "FOP", "prem": 124.72, "comm": 2.36}, {"t": "2026-09-15T15:46:00", "ticker": "QCOM", "date": "2026-09-15", "time": "15:46", "pnl": -513.61, "sec": "OPT", "prem": 1458.61, "comm": 14.25}, {"t": "2026-09-15T21:41:00", "ticker": "CL", "date": "2026-09-15", "time": "21:41", "pnl": -389.44, "sec": "FUT", "prem": 210669.44, "comm": 4.72}, {"t": "2026-09-16T02:48:00", "ticker": "CL", "date": "2026-09-16", "time": "02:48", "pnl": -1069.44, "sec": "FUT", "prem": 209369.44, "comm": 4.72}, {"t": "2026-09-16T04:21:00", "ticker": "CL", "date": "2026-09-16", "time": "04:21", "pnl": -609.44, "sec": "FUT", "prem": 209169.44, "comm": 4.72}, {"t": "2026-09-16T04:40:00", "ticker": "CL", "date": "2026-09-16", "time": "04:40", "pnl": -54.72, "sec": "FUT", "prem": 104754.72, "comm": 2.36}, {"t": "2026-09-16T06:07:00", "ticker": "CL", "date": "2026-09-16", "time": "06:07", "pnl": -954.72, "sec": "FUT", "prem": 104754.72, "comm": 2.36}, {"t": "2026-09-16T09:32:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:32", "pnl": 2.42, "sec": "OPT", "prem": 51.58, "comm": 1.04}, {"t": "2026-09-16T09:33:00", "ticker": "CVX", "date": "2026-09-16", "time": "09:33", "pnl": -952.31, "sec": "OPT", "prem": 1702.31, "comm": 14.29}, {"t": "2026-09-16T09:36:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:36", "pnl": -131.82, "sec": "OPT", "prem": 591.82, "comm": 10.67}, {"t": "2026-09-16T09:37:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:37", "pnl": -36.64, "sec": "OPT", "prem": 256.64, "comm": 3.96}, {"t": "2026-09-16T09:39:00", "ticker": "CL", "date": "2026-09-16", "time": "09:39", "pnl": -1289.44, "sec": "FUT", "prem": 208389.44, "comm": 4.72}, {"t": "2026-09-16T09:43:00", "ticker": "AAPL", "date": "2026-09-16", "time": "09:43", "pnl": -697.59, "sec": "OPT", "prem": 1737.59, "comm": 36.2}, {"t": "2026-09-16T09:48:00", "ticker": "INTC", "date": "2026-09-16", "time": "09:48", "pnl": -948.62, "sec": "OPT", "prem": 1788.62, "comm": 23.56}, {"t": "2026-09-16T09:57:00", "ticker": "SPCX", "date": "2026-09-16", "time": "09:57", "pnl": 164.28, "sec": "OPT", "prem": 1455.72, "comm": 2.62}, {"t": "2026-09-16T14:58:00", "ticker": "NQ", "date": "2026-09-16", "time": "14:58", "pnl": 0.0, "sec": "FUT", "prem": 584850.0, "comm": 2.24}, {"t": "2026-09-16T15:32:00", "ticker": "ES", "date": "2026-09-16", "time": "15:32", "pnl": -226.92, "sec": "FOP", "prem": 1966.92, "comm": 8.46}, {"t": "2026-09-16T15:45:00", "ticker": "CRWD", "date": "2026-09-16", "time": "15:45", "pnl": -896.21, "sec": "OPT", "prem": 1846.21, "comm": 13.06}, {"t": "2026-09-16T15:46:00", "ticker": "SMCI", "date": "2026-09-16", "time": "15:46", "pnl": -765.38, "sec": "OPT", "prem": 1465.38, "comm": 54.5}, {"t": "2026-09-17T04:13:00", "ticker": "NQ", "date": "2026-09-17", "time": "04:13", "pnl": -214.48, "sec": "FUT", "prem": 590259.48, "comm": 2.24}, {"t": "2026-09-17T09:31:00", "ticker": "NQ", "date": "2026-09-17", "time": "09:31", "pnl": 2695.52, "sec": "FUT", "prem": 591219.48, "comm": 2.24}, {"t": "2026-09-17T09:38:00", "ticker": "TSLA", "date": "2026-09-17", "time": "09:38", "pnl": -567.83, "sec": "OPT", "prem": 1422.83, "comm": 17.23}, {"t": "2026-09-17T09:39:00", "ticker": "IREN", "date": "2026-09-17", "time": "09:39", "pnl": -12.16, "sec": "OPT", "prem": 17.16, "comm": 1.04}, {"t": "2026-09-17T09:41:00", "ticker": "IREN", "date": "2026-09-17", "time": "09:41", "pnl": -1421.13, "sec": "OPT", "prem": 1619.13, "comm": 22.48}, {"t": "2026-09-17T09:44:00", "ticker": "NVDA", "date": "2026-09-17", "time": "09:44", "pnl": -143.47, "sec": "OPT", "prem": 713.47, "comm": 7.47}, {"t": "2026-09-17T10:25:00", "ticker": "TSLA", "date": "2026-09-17", "time": "10:25", "pnl": -575.69, "sec": "OPT", "prem": 1725.69, "comm": 27.55}, {"t": "2026-09-17T10:27:00", "ticker": "MU", "date": "2026-09-17", "time": "10:27", "pnl": -365.08, "sec": "OPT", "prem": 1377.08, "comm": 10.45}, {"t": "2026-09-17T10:39:00", "ticker": "INTC", "date": "2026-09-17", "time": "10:39", "pnl": -96.32, "sec": "OPT", "prem": 816.32, "comm": 9.83}, {"t": "2026-09-17T10:46:00", "ticker": "NVDA", "date": "2026-09-17", "time": "10:46", "pnl": 116.62, "sec": "OPT", "prem": 1493.38, "comm": 10.65}, {"t": "2026-09-17T11:12:00", "ticker": "INTC", "date": "2026-09-17", "time": "11:12", "pnl": -272.61, "sec": "OPT", "prem": 1412.61, "comm": 8.01}, {"t": "2026-09-17T11:12:00", "ticker": "INTC", "date": "2026-09-17", "time": "11:12", "pnl": -34.34, "sec": "OPT", "prem": 994.34, "comm": 9.21}, {"t": "2026-09-17T11:47:00", "ticker": "SMCI", "date": "2026-09-17", "time": "11:47", "pnl": -352.43, "sec": "OPT", "prem": 1352.43, "comm": 25.7}, {"t": "2026-09-17T12:25:00", "ticker": "MRNA", "date": "2026-09-17", "time": "12:25", "pnl": -788.84, "sec": "OPT", "prem": 1263.84, "comm": 10.41}, {"t": "2026-09-17T12:52:00", "ticker": "HPE", "date": "2026-09-17", "time": "12:52", "pnl": -46.31, "sec": "OPT", "prem": 118.31, "comm": 1.72}, {"t": "2026-09-17T12:52:00", "ticker": "HPE", "date": "2026-09-17", "time": "12:52", "pnl": -107.49, "sec": "OPT", "prem": 315.49, "comm": 4.59}, {"t": "2026-09-17T12:53:00", "ticker": "HPE", "date": "2026-09-17", "time": "12:53", "pnl": -208.63, "sec": "OPT", "prem": 740.63, "comm": 2.24}, {"t": "2026-09-17T13:03:00", "ticker": "GOOGL", "date": "2026-09-17", "time": "13:03", "pnl": -572.82, "sec": "OPT", "prem": 1772.82, "comm": 15.05}, {"t": "2026-09-17T13:07:00", "ticker": "OKLO", "date": "2026-09-17", "time": "13:07", "pnl": 670.69, "sec": "OPT", "prem": 329.31, "comm": 5.24}, {"t": "2026-09-17T13:08:00", "ticker": "OKLO", "date": "2026-09-17", "time": "13:08", "pnl": 2017.8, "sec": "OPT", "prem": 982.2, "comm": 9.98}, {"t": "2026-09-17T13:32:00", "ticker": "CL", "date": "2026-09-17", "time": "13:32", "pnl": -447.2, "sec": "FOP", "prem": 1847.2, "comm": 23.6}, {"t": "2026-09-17T14:57:00", "ticker": "INTC", "date": "2026-09-17", "time": "14:57", "pnl": -743.28, "sec": "OPT", "prem": 1535.28, "comm": 16.68}, {"t": "2026-09-17T15:30:00", "ticker": "MSTR", "date": "2026-09-17", "time": "15:30", "pnl": -455.29, "sec": "OPT", "prem": 1490.29, "comm": 12.2}, {"t": "2026-09-17T15:47:00", "ticker": "META", "date": "2026-09-17", "time": "15:47", "pnl": -4.85, "sec": "OPT", "prem": 86.85, "comm": 0.54}, {"t": "2026-09-17T15:47:00", "ticker": "META", "date": "2026-09-17", "time": "15:47", "pnl": 28.36, "sec": "OPT", "prem": 1471.64, "comm": 6.3}, {"t": "2026-09-17T15:53:00", "ticker": "NVO", "date": "2026-09-17", "time": "15:53", "pnl": -602.2, "sec": "OPT", "prem": 1502.2, "comm": 50.01}, {"t": "2026-09-17T15:58:00", "ticker": "AAPL", "date": "2026-09-17", "time": "15:58", "pnl": -161.32, "sec": "OPT", "prem": 1281.32, "comm": 5.39}, {"t": "2026-09-17T18:09:00", "ticker": "CL", "date": "2026-09-17", "time": "18:09", "pnl": 190.56, "sec": "FUT", "prem": 201929.44, "comm": 4.72}, {"t": "2026-09-18T02:37:00", "ticker": "MNQ", "date": "2026-09-18", "time": "02:37", "pnl": 4.78, "sec": "FUT", "prem": 59812.22, "comm": 0.61}, {"t": "2026-09-18T04:29:00", "ticker": "NQ", "date": "2026-09-18", "time": "04:29", "pnl": 925.52, "sec": "FUT", "prem": 597059.48, "comm": 2.24}, {"t": "2026-09-18T04:30:00", "ticker": "ES", "date": "2026-09-18", "time": "04:30", "pnl": -203.2, "sec": "FOP", "prem": 1228.2, "comm": 14.1}, {"t": "2026-09-18T05:40:00", "ticker": "NQ", "date": "2026-09-18", "time": "05:40", "pnl": -749.12, "sec": "FOP", "prem": 1805.12, "comm": 22.56}, {"t": "2026-09-18T07:17:00", "ticker": "NQ", "date": "2026-09-18", "time": "07:17", "pnl": -734.48, "sec": "FUT", "prem": 597339.48, "comm": 2.24}, {"t": "2026-09-18T08:05:00", "ticker": "CL", "date": "2026-09-18", "time": "08:05", "pnl": -1129.44, "sec": "FUT", "prem": 192509.44, "comm": 4.72}, {"t": "2026-09-18T09:33:00", "ticker": "META", "date": "2026-09-18", "time": "09:33", "pnl": -671.91, "sec": "OPT", "prem": 1301.91, "comm": 8.13}, {"t": "2026-09-18T09:55:00", "ticker": "MSTR", "date": "2026-09-18", "time": "09:55", "pnl": 1551.41, "sec": "OPT", "prem": 683.59, "comm": 4.34}, {"t": "2026-09-18T10:00:00", "ticker": "HOOD", "date": "2026-09-18", "time": "10:00", "pnl": 1201.09, "sec": "OPT", "prem": 278.91, "comm": 3.73}, {"t": "2026-09-18T10:04:00", "ticker": "HOOD", "date": "2026-09-18", "time": "10:04", "pnl": 2345.62, "sec": "OPT", "prem": 644.38, "comm": 11.47}, {"t": "2026-09-18T10:04:00", "ticker": "HOOD", "date": "2026-09-18", "time": "10:04", "pnl": 208.32, "sec": "OPT", "prem": 55.68, "comm": 0.64}, {"t": "2026-09-18T10:35:00", "ticker": "SNDK", "date": "2026-09-18", "time": "10:35", "pnl": -127.24, "sec": "OPT", "prem": 1362.24, "comm": 5.2}, {"t": "2026-09-18T10:42:00", "ticker": "MSTR", "date": "2026-09-18", "time": "10:42", "pnl": 1051.92, "sec": "OPT", "prem": 228.08, "comm": 1.66}, {"t": "2026-09-18T10:43:00", "ticker": "MSTR", "date": "2026-09-18", "time": "10:43", "pnl": 1659.27, "sec": "OPT", "prem": 364.73, "comm": 2.46}, {"t": "2026-09-18T10:43:00", "ticker": "MSTR", "date": "2026-09-18", "time": "10:43", "pnl": 422.38, "sec": "OPT", "prem": 91.62, "comm": 1.05}, {"t": "2026-09-18T11:06:00", "ticker": "SNDK", "date": "2026-09-18", "time": "11:06", "pnl": -703.27, "sec": "OPT", "prem": 1403.27, "comm": 6.48}, {"t": "2026-09-18T12:01:00", "ticker": "HOOD", "date": "2026-09-18", "time": "12:01", "pnl": -40.74, "sec": "OPT", "prem": 1751.74, "comm": 10.16}, {"t": "2026-09-18T12:01:00", "ticker": "HOOD", "date": "2026-09-18", "time": "12:01", "pnl": 0.13, "sec": "OPT", "prem": 29.87, "comm": 0.35}, {"t": "2026-09-18T12:04:00", "ticker": "CL", "date": "2026-09-18", "time": "12:04", "pnl": -656.64, "sec": "FOP", "prem": 1016.64, "comm": 28.32}, {"t": "2026-09-18T12:05:00", "ticker": "CL", "date": "2026-09-18", "time": "12:05", "pnl": -437.76, "sec": "FOP", "prem": 677.76, "comm": 18.88}, {"t": "2026-09-18T12:29:00", "ticker": "CL", "date": "2026-09-18", "time": "12:29", "pnl": -609.44, "sec": "FUT", "prem": 193109.44, "comm": 4.72}, {"t": "2026-09-18T13:18:00", "ticker": "SNDK", "date": "2026-09-18", "time": "13:18", "pnl": -797.55, "sec": "OPT", "prem": 1697.55, "comm": -12.81}, {"t": "2026-09-18T13:19:00", "ticker": "HOOD", "date": "2026-09-18", "time": "13:19", "pnl": -143.21, "sec": "OPT", "prem": 793.21, "comm": 7.07}, {"t": "2026-09-18T13:21:00", "ticker": "MSTR", "date": "2026-09-18", "time": "13:21", "pnl": 400.0, "sec": "OPT", "prem": 500.0, "comm": 13.36}, {"t": "2026-09-18T13:23:00", "ticker": "HOOD", "date": "2026-09-18", "time": "13:23", "pnl": -374.23, "sec": "OPT", "prem": 1109.23, "comm": 8.63}, {"t": "2026-09-18T14:41:00", "ticker": "MSTR", "date": "2026-09-18", "time": "14:41", "pnl": 2709.62, "sec": "OPT", "prem": 1490.38, "comm": 30.46}, {"t": "2026-09-18T15:29:00", "ticker": "MU", "date": "2026-09-18", "time": "15:29", "pnl": -108.07, "sec": "OPT", "prem": 438.07, "comm": 2.99}, {"t": "2026-09-18T15:46:00", "ticker": "IBIT", "date": "2026-09-18", "time": "15:46", "pnl": -130.8, "sec": "OPT", "prem": 975.8, "comm": 34.78}], "cap": 100000.0, "tickers": ["AAPL", "CL", "CRWD", "CVX", "ES", "GOOGL", "HOOD", "HPE", "IBIT", "INTC", "IREN", "META", "MNQ", "MRNA", "MSFT", "MSTR", "MU", "NQ", "NVDA", "NVO", "OKLO", "PLTR", "QCOM", "SMCI", "SNDK", "SPCX", "TSLA", "WIX"]};
+      function fmtMoney(v, sign) {
+        var s = v < 0 ? '-' : (sign && v > 0 ? '+' : '');
+        return s + '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+      }
+      function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      function fmtPct(v, digits) {
+        digits = digits === undefined ? 1 : digits;
+        return (v >= 0 ? '+' : '-') + Math.abs(v * 100).toFixed(digits) + '%';
+      }
+      function niceStep(vmax, n) {
+        n = n || 4;
+        if (vmax <= 0) return 1;
+        var raw = vmax / n, magnitude = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+        var mults = [1, 2, 2.5, 5, 10];
+        for (var i = 0; i < mults.length; i++) { if (raw <= mults[i] * magnitude) return mults[i] * magnitude; }
+        return 10 * magnitude;
+      }
+
+      function render(selected) {
+        var W = 700, H = 340, padL = 66, padR = 16, padT = 14, padB = 36;
+        var plotW = W - padL - padR, plotH = H - padT - padB;
+        var trades = DATA.trades, n = trades.length, cap = DATA.cap;
+        if (!n) return;
+        var tmin = new Date(trades[0].t).getTime(), tmax = new Date(trades[n - 1].t).getTime();
+        var trange = Math.max(1, (tmax - tmin) / 1000);
+        function xOf(ms) { return padL + plotW * ((ms - tmin) / 1000) / trange; }
+
+        var cum = 0, balances = [];
+        for (var i = 0; i < n; i++) {
+          if (selected.has(trades[i].ticker)) cum += trades[i].pnl;
+          balances.push(cap + cum);
+        }
+        var vmax = Math.max(cap, Math.max.apply(null, balances));
+        var vmin = Math.min(0, Math.min.apply(null, balances));
+        var vrange = (vmax - vmin) || 1;
+        function yOf(v) { return padT + plotH * (vmax - v) / vrange; }
+        var startY = yOf(cap);
+
+        var pts = trades.map(function(tr, i) { return [xOf(new Date(tr.t).getTime()), yOf(balances[i])]; });
+        var linePts = [[pts[0][0], startY]].concat(pts);
+        var poly = linePts.map(function(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+        var fill = linePts[0][0].toFixed(1) + ',' + startY.toFixed(1) + ' ' + poly + ' ' +
+          linePts[linePts.length - 1][0].toFixed(1) + ',' + startY.toFixed(1);
+
+        var circles = [];
+        for (i = 0; i < n; i++) {
+          var tr = trades[i];
+          if (!selected.has(tr.ticker)) continue;
+          var p = pts[i], color = tr.pnl >= 0 ? 'var(--pos)' : 'var(--neg)';
+          circles.push('<circle class="bar" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) +
+            '" r="3.2" fill="' + color + '" fill-opacity="0.9"><title>' + esc(tr.ticker) + ' ' + tr.date +
+            ' ' + esc(tr.time) + ' — ' + fmtMoney(tr.pnl, true) + ' this trade, ' +
+            fmtMoney(balances[i]) + ' balance</title></circle>');
+        }
+
+        var last = n - 1, endColor = balances[last] >= cap ? 'var(--pos)' : 'var(--neg)';
+        var endLabel = '<circle cx="' + pts[last][0].toFixed(1) + '" cy="' + pts[last][1].toFixed(1) +
+          '" r="4.5" fill="' + endColor + '"></circle><text class="end-lab" x="' +
+          (pts[last][0] - 6).toFixed(1) + '" y="' + (pts[last][1] - 8).toFixed(1) +
+          '" text-anchor="end">' + fmtMoney(balances[last]) + '</text>';
+
+        var seen = {}, dayLines = [], dayLabels = [];
+        for (i = 0; i < n; i++) {
+          var d = trades[i];
+          if (seen[d.date]) continue;
+          seen[d.date] = true;
+          var gx = xOf(new Date(d.t).getTime());
+          dayLines.push('<line class="grid-line" x1="' + gx.toFixed(1) + '" y1="' + padT + '" x2="' +
+            gx.toFixed(1) + '" y2="' + (H - padB) + '"></line>');
+          var wd = new Date(d.t).toLocaleDateString('en-US', { weekday: 'short' });
+          dayLabels.push('<text class="tick" x="' + Math.max(gx, padL).toFixed(1) + '" y="' + (H - 6) +
+            '" text-anchor="start">' + wd + ' ' + d.date.slice(5) + '</text>');
+        }
+
+        var step = niceStep(vmax), hgrid = [];
+        for (var v = 0; v <= vmax + step * 0.01; v += step) {
+          var y = yOf(v);
+          hgrid.push('<line class="grid-line" x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' +
+            (W - padR) + '" y2="' + y.toFixed(1) + '"></line>');
+          hgrid.push('<text class="tick" x="' + (padL - 6) + '" y="' + (y + 3.5).toFixed(1) +
+            '" text-anchor="end">' + fmtMoney(v) + '</text>');
+        }
+
+        var startLine = '';
+        if (cap && Math.abs(cap % step) > step * 0.02) {
+          startLine = '<line x1="' + padL + '" y1="' + startY.toFixed(1) + '" x2="' + (W - padR) +
+            '" y2="' + startY.toFixed(1) + '" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3,3">' +
+            '</line><text class="tick" x="' + padL + '" y="' + (startY - 4).toFixed(1) +
+            '" text-anchor="start">starting capital ' + fmtMoney(cap) + '</text>';
+        }
+
+        document.getElementById('pnlSvg').innerHTML =
+          '<defs><clipPath id="cuPos"><rect x="0" y="0" width="' + W + '" height="' + startY.toFixed(1) +
+          '"></rect></clipPath><clipPath id="cuNeg"><rect x="0" y="' + startY.toFixed(1) + '" width="' + W +
+          '" height="' + H + '"></rect></clipPath></defs>' + hgrid.join('') + startLine + dayLines.join('') +
+          '<polygon points="' + fill + '" fill="var(--pos)" fill-opacity="0.12" clip-path="url(#cuPos)"></polygon>' +
+          '<polygon points="' + fill + '" fill="var(--neg)" fill-opacity="0.12" clip-path="url(#cuNeg)"></polygon>' +
+          '<polyline fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" ' +
+          'stroke-linecap="round" points="' + poly + '"></polyline>' + circles.join('') + endLabel +
+          '<line class="axis-line" x1="' + padL + '" y1="' + (H - padB) + '" x2="' + (W - padR) + '" y2="' +
+          (H - padB) + '"></line>' + dayLabels.join('');
+
+        var status = document.getElementById('pnlStatus');
+        if (status) {
+          var included = trades.filter(function(tr) { return selected.has(tr.ticker); }).length;
+          status.textContent = selected.size >= DATA.tickers.length ?
+            'Showing all tickers, ' + n + ' exits.' :
+            'Showing ' + selected.size + ' of ' + DATA.tickers.length + ' tickers (' + included + ' of ' + n + ' exits).';
+        }
+      }
+
+      function updateKpis(selected) {
+        var trades = DATA.trades.filter(function(tr) { return selected.has(tr.ticker); });
+        var n = trades.length;
+        var net = trades.reduce(function(s, t) { return s + t.pnl; }, 0);
+        var wins = trades.filter(function(t) { return t.pnl > 0; });
+        var losses = trades.filter(function(t) { return t.pnl < 0; });
+        var winRate = n ? wins.length / n : 0;
+        var grossWin = wins.reduce(function(s, t) { return s + t.pnl; }, 0);
+        var grossLoss = -losses.reduce(function(s, t) { return s + t.pnl; }, 0);
+        var pf = losses.length ? grossWin / grossLoss : null;
+        var opt = trades.filter(function(t) { return t.sec !== 'FUT'; });
+        var optPrem = opt.reduce(function(s, t) { return s + t.prem; }, 0);
+        var optNet = opt.reduce(function(s, t) { return s + t.pnl; }, 0);
+        var ret = optPrem ? optNet / optPrem : null;
+        var totalComm = trades.reduce(function(s, t) { return s + t.comm; }, 0);
+        var optComm = opt.reduce(function(s, t) { return s + t.comm; }, 0);
+        var commRate = optPrem ? optComm / optPrem : null;
+
+        document.getElementById('kpiNet').textContent = fmtMoney(net, true);
+        document.getElementById('kpiNet').className = 'val ' + (net >= 0 ? 'pos' : 'neg');
+        document.getElementById('kpiNetSub').textContent = 'after commissions · ' + n + ' exits';
+        document.getElementById('kpiWinRate').textContent = (winRate * 100).toFixed(0) + '%';
+        document.getElementById('kpiWinSub').textContent = wins.length + ' wins · ' + losses.length + ' losses';
+        document.getElementById('kpiPF').textContent = pf === null ? '—' : pf.toFixed(3);
+        document.getElementById('kpiRet').textContent = ret === null ? '—' : fmtPct(ret);
+        document.getElementById('kpiRet').className = 'val ' + (ret !== null && ret < 0 ? 'neg' : 'pos');
+        document.getElementById('kpiRetSub').textContent = fmtMoney(optPrem) + ' option premium deployed';
+        document.getElementById('kpiComm').textContent = fmtMoney(totalComm);
+        document.getElementById('kpiCommSub').textContent = (commRate === null ? '—' : fmtPct(commRate, 2)) + ' on option premium';
+
+        var note = document.getElementById('kpiFilterNote');
+        if (note) note.style.display = (selected.size >= DATA.tickers.length) ? 'none' : 'block';
+      }
+
+      function update() {
+        var selected = new Set();
+        document.querySelectorAll('.pnlTickerChk').forEach(function(cb) { if (cb.checked) selected.add(cb.value); });
+        render(selected);
+        updateKpis(selected);
+      }
+      var allBox = document.getElementById('pnlAll');
+      allBox.addEventListener('change', function(e) {
+        document.querySelectorAll('.pnlTickerChk').forEach(function(cb) { cb.checked = e.target.checked; });
+        update();
+      });
+      document.querySelectorAll('.pnlTickerChk').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+          var boxes = document.querySelectorAll('.pnlTickerChk');
+          allBox.checked = Array.prototype.every.call(boxes, function(b) { return b.checked; });
+          update();
+        });
+      });
+      update();
+    })();
+    </script>
+    
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>By day</h2><span class="tag">6 sessions</span></div>
+    <div class="figure">
+      <div class="chart-scroll">
+    <svg viewBox="0 0 640 300" role="img" aria-label="Daily realised P&amp;L">
+      <line class="grid-line" x1="10" y1="111.0" x2="630" y2="111.0"></line>
+      <text class="tick" x="634" y="114.5">$0</text>
+      <rect class="bar" x="10.0" y="111.0" width="91.7" height="17.9" fill="var(--neg)" rx="2"><title>2026-09-13 -$978</title></rect>
+      <rect class="bar" x="115.7" y="111.0" width="91.7" height="17.0" fill="var(--neg)" rx="2"><title>2026-09-14 -$931</title></rect>
+      <rect class="bar" x="221.3" y="111.0" width="91.7" height="136.4" fill="var(--neg)" rx="2"><title>2026-09-15 -$7,454</title></rect>
+      <rect class="bar" x="327.0" y="111.0" width="91.7" height="155.0" fill="var(--neg)" rx="2"><title>2026-09-16 -$8,467</title></rect>
+      <rect class="bar" x="432.7" y="111.0" width="91.7" height="45.3" fill="var(--neg)" rx="2"><title>2026-09-17 -$2,474</title></rect>
+      <rect class="bar" x="538.3" y="22.0" width="91.7" height="89.0" fill="var(--pos)" rx="2"><title>2026-09-18 +$4,863</title></rect>
+      <text class="val-lab" x="55.8" y="142.9" text-anchor="middle">-$978</text>
+      <text class="val-lab" x="161.5" y="142.1" text-anchor="middle">-$931</text>
+      <text class="val-lab" x="267.2" y="261.5" text-anchor="middle">-$7,454</text>
+      <text class="val-lab" x="372.8" y="262.0" text-anchor="middle">-$8,467</text>
+      <text class="val-lab" x="478.5" y="170.3" text-anchor="middle">-$2,474</text>
+      <text class="val-lab" x="584.2" y="16.0" text-anchor="middle">+$4,863</text>
+      <line class="axis-line" x1="10" y1="266" x2="630" y2="266"></line>
+      <text class="tick" x="55.8" y="296" text-anchor="middle">Sun 09-13</text>
+      <text class="tick" x="161.5" y="296" text-anchor="middle">Mon 09-14</text>
+      <text class="tick" x="267.2" y="296" text-anchor="middle">Tue 09-15</text>
+      <text class="tick" x="372.8" y="296" text-anchor="middle">Wed 09-16</text>
+      <text class="tick" x="478.5" y="296" text-anchor="middle">Thu 09-17</text>
+      <text class="tick" x="584.2" y="296" text-anchor="middle">Fri 09-18</text>
+    </svg>
+    </div>
+      <div class="cap"><b>Realised P&amp;L per session.</b> Already net of commissions on both legs.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>By ticker</h2><span class="tag">28 names traded</span></div>
+    <p>Top winners and losers, ranked by size.</p>
+    <div class="figure">
+      <div class="chart-scroll"><svg viewBox="0 0 640 420" role="img" aria-label="Top movers by ticker"><line class="axis-line" x1="384.0" y1="4" x2="384.0" y2="414" stroke="var(--rule-2)"></line>
+      <rect class="bar" x="384.0" y="10.0" width="186.0" height="24" fill="var(--pos)" rx="2"><title>MSTR +$6,213</title></rect><text class="row-lab" x="130" y="27.0">MSTR</text><text class="val-lab" x="578.0" y="27.0" text-anchor="start">+$6,213</text>
+      <rect class="bar" x="384.0" y="44.0" width="95.7" height="24" fill="var(--pos)" rx="2"><title>HOOD +$3,197</title></rect><text class="row-lab" x="130" y="61.0">HOOD</text><text class="val-lab" x="487.7" y="61.0" text-anchor="start">+$3,197</text>
+      <rect class="bar" x="384.0" y="78.0" width="80.5" height="24" fill="var(--pos)" rx="2"><title>OKLO +$2,688</title></rect><text class="row-lab" x="130" y="95.0">OKLO</text><text class="val-lab" x="472.5" y="95.0" text-anchor="start">+$2,688</text>
+      <rect class="bar" x="384.0" y="112.0" width="57.6" height="24" fill="var(--pos)" rx="2"><title>NQ +$1,923</title></rect><text class="row-lab" x="130" y="129.0">NQ</text><text class="val-lab" x="449.6" y="129.0" text-anchor="start">+$1,923</text>
+      <rect class="bar" x="384.0" y="146.0" width="9.9" height="24" fill="var(--pos)" rx="2"><title>MSFT +$331</title></rect><text class="row-lab" x="130" y="163.0">MSFT</text><text class="val-lab" x="401.9" y="163.0" text-anchor="start">+$331</text>
+      <rect class="bar" x="384.0" y="180.0" width="4.9" height="24" fill="var(--pos)" rx="2"><title>SPCX +$164</title></rect><text class="row-lab" x="130" y="197.0">SPCX</text><text class="val-lab" x="397.0" y="197.0" text-anchor="start">+$164</text>
+      <rect class="bar" x="335.3" y="214.0" width="48.7" height="24" fill="var(--neg)" rx="2"><title>SNDK -$1,628</title></rect><text class="row-lab" x="130" y="231.0">SNDK</text><text class="val-lab" x="327.3" y="231.0" text-anchor="end">-$1,628</text>
+      <rect class="bar" x="335.2" y="248.0" width="48.9" height="24" fill="var(--neg)" rx="2"><title>IBIT -$1,633</title></rect><text class="row-lab" x="130" y="265.0">IBIT</text><text class="val-lab" x="327.2" y="265.0" text-anchor="end">-$1,633</text>
+      <rect class="bar" x="334.4" y="282.0" width="49.7" height="24" fill="var(--neg)" rx="2"><title>CRWD -$1,660</title></rect><text class="row-lab" x="130" y="299.0">CRWD</text><text class="val-lab" x="326.4" y="299.0" text-anchor="end">-$1,660</text>
+      <rect class="bar" x="316.4" y="316.0" width="67.7" height="24" fill="var(--neg)" rx="2"><title>INTC -$2,261</title></rect><text class="row-lab" x="130" y="333.0">INTC</text><text class="val-lab" x="308.4" y="333.0" text-anchor="end">-$2,261</text>
+      <rect class="bar" x="310.2" y="350.0" width="73.9" height="24" fill="var(--neg)" rx="2"><title>GOOGL -$2,468</title></rect><text class="row-lab" x="130" y="367.0">GOOGL</text><text class="val-lab" x="302.2" y="367.0" text-anchor="end">-$2,468</text>
+      <rect class="bar" x="130.0" y="384.0" width="254.0" height="24" fill="var(--neg)" rx="2"><title>CL -$8,488</title></rect><text class="row-lab" x="130" y="401.0">CL</text><text class="val-lab" x="122.0" y="401.0" text-anchor="end">-$8,488</text></svg></div>
+      <div class="legend"><span><i class="swatch" style="background:var(--pos)"></i> Winners</span><span><i class="swatch" style="background:var(--neg)"></i> Losers</span></div>
+      <div class="cap"><b>Top movers.</b> Full breakdown below.</div>
+    </div>
+    <details class="tabledisc">
+      <summary>Show all 28 tickers</summary>
+      <div class="tbl-wrap"><table><thead><tr><th>Ticker</th><th style="text-align:right">Net P&amp;L</th></tr></thead>
+      <tbody><tr><td class="tkr">MSTR</td><td class="num pos">+$6,213</td></tr>
+<tr><td class="tkr">HOOD</td><td class="num pos">+$3,197</td></tr>
+<tr><td class="tkr">OKLO</td><td class="num pos">+$2,688</td></tr>
+<tr><td class="tkr">NQ</td><td class="num pos">+$1,923</td></tr>
+<tr><td class="tkr">MSFT</td><td class="num pos">+$331</td></tr>
+<tr><td class="tkr">SPCX</td><td class="num pos">+$164</td></tr>
+<tr><td class="tkr">MNQ</td><td class="num pos">+$5</td></tr>
+<tr><td class="tkr">NVDA</td><td class="num neg">-$27</td></tr>
+<tr><td class="tkr">PLTR</td><td class="num neg">-$191</td></tr>
+<tr><td class="tkr">HPE</td><td class="num neg">-$362</td></tr>
+<tr><td class="tkr">MU</td><td class="num neg">-$473</td></tr>
+<tr><td class="tkr">QCOM</td><td class="num neg">-$514</td></tr>
+<tr><td class="tkr">NVO</td><td class="num neg">-$602</td></tr>
+<tr><td class="tkr">ES</td><td class="num neg">-$769</td></tr>
+<tr><td class="tkr">MRNA</td><td class="num neg">-$789</td></tr>
+<tr><td class="tkr">AAPL</td><td class="num neg">-$859</td></tr>
+<tr><td class="tkr">CVX</td><td class="num neg">-$952</td></tr>
+<tr><td class="tkr">SMCI</td><td class="num neg">-$1,118</td></tr>
+<tr><td class="tkr">TSLA</td><td class="num neg">-$1,144</td></tr>
+<tr><td class="tkr">META</td><td class="num neg">-$1,240</td></tr>
+<tr><td class="tkr">WIX</td><td class="num neg">-$1,351</td></tr>
+<tr><td class="tkr">IREN</td><td class="num neg">-$1,433</td></tr>
+<tr><td class="tkr">SNDK</td><td class="num neg">-$1,628</td></tr>
+<tr><td class="tkr">IBIT</td><td class="num neg">-$1,633</td></tr>
+<tr><td class="tkr">CRWD</td><td class="num neg">-$1,660</td></tr>
+<tr><td class="tkr">INTC</td><td class="num neg">-$2,261</td></tr>
+<tr><td class="tkr">GOOGL</td><td class="num neg">-$2,468</td></tr>
+<tr><td class="tkr">CL</td><td class="num neg">-$8,488</td></tr></tbody></table></div>
+    </details>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>By hold time</h2><span class="tag">the cut IBKR can't give you</span></div>
+    <p>Every bucket shown with its largest name pulled back out &mdash; one outsized position routinely flips a bucket's apparent edge.</p>
+    <div class="buckets">
+      <div class="bucket">
+        <div class="b-lab">עד 5 דק׳</div>
+        <div class="b-val neg mono">-$635</div>
+        <div class="b-sub">8 exits &middot; $2,559 premium &middot; 3 wins &middot; -20.3% on premium</div>
+        <div class="b-guard">Without <b>CL</b> (largest): <span class="mono neg">-$650</span></div>
+      </div>
+
+      <div class="bucket">
+        <div class="b-lab">5–30 דק׳</div>
+        <div class="b-val neg mono">-$8,117</div>
+        <div class="b-sub">34 exits &middot; $31,994 premium &middot; 6 wins &middot; -19.0% on premium</div>
+        <div class="b-guard">Without <b>MSTR</b> (largest): <span class="mono neg">-$9,668</span></div>
+      </div>
+
+      <div class="bucket">
+        <div class="b-lab">30–120 דק׳</div>
+        <div class="b-val pos mono">+$1,740</div>
+        <div class="b-sub">27 exits &middot; $25,439 premium &middot; 9 wins &middot; -4.1% on premium</div>
+        <div class="b-guard">Without <b>CL</b> (largest): <span class="mono neg">-$1,306</span></div>
+      </div>
+
+      <div class="bucket">
+        <div class="b-lab">2–8 שעות</div>
+        <div class="b-val pos mono">+$2,545</div>
+        <div class="b-sub">11 exits &middot; $7,284 premium &middot; 4 wins &middot; +8.6% on premium</div>
+        <div class="b-guard">Without <b>MSTR</b> (largest): <span class="mono neg">-$164</span></div>
+      </div>
+
+      <div class="bucket">
+        <div class="b-lab">מעל לילה</div>
+        <div class="b-val neg mono">-$9,114</div>
+        <div class="b-sub">19 exits &middot; $14,582 premium &middot; 4 wins &middot; -26.1% on premium</div>
+        <div class="b-guard">Without <b>HOOD</b> (largest): <span class="mono neg">-$11,460</span></div>
+      </div></div>
+  </section>
+
+  
+  <section>
+    <div class="sec-head"><h2>Where the premium burned</h2><span class="tag">336 closing slices</span></div>
+    <p>Every closing slice classified by whether it was a decision or the risk already bought: intraday, overnight,
+      off-hours. $27,853 burned across 240 losing slices.</p>
+    <div class="figure"><div class="burnrows">
+        <div class="burnrow">
+          <div class="b-name">תוך יום<span>188 slices &middot; $50,134 prem</span></div>
+          <div class="track"><div class="fill" style="width:33%"></div></div>
+          <div class="pct">33% &middot; $16,734</div>
+        </div>
+
+        <div class="burnrow">
+          <div class="b-name">אוברנייט<span>46 slices &middot; $16,240 prem</span></div>
+          <div class="track"><div class="fill" style="width:61%"></div></div>
+          <div class="pct">61% &middot; $9,890</div>
+        </div>
+
+        <div class="burnrow">
+          <div class="b-name">מחוץ לשעות<span>6 slices &middot; $3,520 prem</span></div>
+          <div class="track"><div class="fill" style="width:35%"></div></div>
+          <div class="pct">35% &middot; $1,229</div>
+        </div></div></div>
+  </section>
+
+  
+  <section>
+    <div class="sec-head"><h2>Biggest losses explained</h2><span class="tag">over $750</span></div>
+    <p>20 exits lost more than $750 each, -$21,861 total &mdash; 56% of the week's gross loss.
+      Grouped by what actually happened to the position, not just by size.</p>
+    <div style="display:flex;flex-direction:column;gap:24px">
+    <div class="loss-group">
+      <h3>Outright futures &mdash; 7 losses, -$7,482</h3>
+      <p class="cap">Point losses on the futures contract itself, not option premium decay.
+        7 of these 7 were long positions. CL moved $102.79 &rarr; $96.25 (-6.4%) across the week</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Ticker</th><th>Exit</th><th>Side</th>
+        <th style="text-align:right">Entry&rarr;Exit</th><th style="text-align:right">Loss</th>
+        <th style="text-align:right">Held</th></tr></thead><tbody><tr><td class="tkr">CL</td><td>2026-09-16 09:39</td><td>long</td><td class="num">$104.19&rarr;$103.55</td><td class="num neg">-$1,289</td><td class="num">20.4h</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-18 08:05</td><td>long</td><td class="num">$96.25&rarr;$95.69</td><td class="num neg">-$1,129</td><td class="num">34.8h</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-15 06:38</td><td>long</td><td class="num">$103.76&rarr;$103.22</td><td class="num neg">-$1,089</td><td class="num">2.4h</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-16 02:48</td><td>long</td><td class="num">$104.68&rarr;$104.15</td><td class="num neg">-$1,069</td><td class="num">13.5h</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-14 12:10</td><td>long</td><td class="num">$103.16&rarr;$102.17</td><td class="num neg">-$995</td><td class="num">56m</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-15 08:47</td><td>long</td><td class="num">$103.01&rarr;$102.06</td><td class="num neg">-$955</td><td class="num">16m</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-16 06:07</td><td>long</td><td class="num">$104.75&rarr;$103.80</td><td class="num neg">-$955</td><td class="num">16.9h</td></tr></tbody></table></div>
+    </div>
+
+    <div class="loss-group">
+      <h3>Overnight options &mdash; 6 losses, -$7,647</h3>
+      <p class="cap">Average -59.6% of premium lost.</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Ticker</th><th>Exit</th>
+        <th style="text-align:right">Entry&rarr;Exit</th><th style="text-align:right">Loss</th>
+        <th style="text-align:right">% premium</th><th style="text-align:right">Held</th><th>Exit type</th></tr></thead>
+        <tbody><tr><td class="tkr">GOOGL</td><td>2026-09-15 09:46</td><td class="num">$0.506&rarr;$0.240</td><td class="num neg">-$1,859</td><td class="num">-52.5%</td><td class="num">unknown hold</td><td>no stop tag</td></tr>
+<tr><td class="tkr">IBIT</td><td>2026-09-15 09:34</td><td class="num">$0.177&rarr;$0.060</td><td class="num neg">-$1,462</td><td class="num">-66.1%</td><td class="num">19.1h</td><td>no stop tag</td></tr>
+<tr><td class="tkr">WIX</td><td>2026-09-15 10:09</td><td class="num">$1.30&rarr;$0.400</td><td class="num neg">-$1,351</td><td class="num">-69.2%</td><td class="num">23.3h</td><td>no stop tag</td></tr>
+<tr><td class="tkr">MSTR</td><td>2026-09-15 09:34</td><td class="num">$0.575&rarr;$0.200</td><td class="num neg">-$1,126</td><td class="num">-65.2%</td><td class="num">23.1h</td><td>no stop tag</td></tr>
+<tr><td class="tkr">CVX</td><td>2026-09-16 09:33</td><td class="num">$0.567&rarr;$0.250</td><td class="num neg">-$952</td><td class="num">-55.9%</td><td class="num">23.2h</td><td>no stop tag</td></tr>
+<tr><td class="tkr">CRWD</td><td>2026-09-16 15:45</td><td class="num">$0.739&rarr;$0.380</td><td class="num neg">-$896</td><td class="num">-48.5%</td><td class="num">28.7h</td><td>no stop tag</td></tr></tbody></table></div>
+    </div>
+
+    <div class="loss-group">
+      <h3>Intraday options &mdash; 7 losses, -$6,732</h3>
+      <p class="cap">Average -59.0% of premium lost. 2 of these fired an actual stop order.</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Ticker</th><th>Exit</th>
+        <th style="text-align:right">Entry&rarr;Exit</th><th style="text-align:right">Loss</th>
+        <th style="text-align:right">% premium</th><th style="text-align:right">Held</th><th>Exit type</th></tr></thead>
+        <tbody><tr><td class="tkr">IREN</td><td>2026-09-17 09:41</td><td class="num">$0.164&rarr;$0.020</td><td class="num neg">-$1,421</td><td class="num">-87.8%</td><td class="num">10m</td><td>no stop tag</td></tr>
+<tr><td class="tkr">CL</td><td>2026-09-15 11:40</td><td class="num">$0.175&rarr;$0.050</td><td class="num neg">-$1,247</td><td class="num">-71.4%</td><td class="num">40m</td><td>no stop tag</td></tr>
+<tr><td class="tkr">INTC</td><td>2026-09-16 09:48</td><td class="num">$0.256&rarr;$0.120</td><td class="num neg">-$949</td><td class="num">-53.0%</td><td class="num">17m</td><td>stop order</td></tr>
+<tr><td class="tkr">SNDK</td><td>2026-09-18 13:18</td><td class="num">$0.849&rarr;$0.450</td><td class="num neg">-$798</td><td class="num">-47.0%</td><td class="num">26m</td><td>no stop tag</td></tr>
+<tr><td class="tkr">MRNA</td><td>2026-09-17 12:25</td><td class="num">$0.505&rarr;$0.190</td><td class="num neg">-$789</td><td class="num">-62.4%</td><td class="num">1.3h</td><td>stop order</td></tr>
+<tr><td class="tkr">SMCI</td><td>2026-09-16 15:46</td><td class="num">$0.146&rarr;$0.070</td><td class="num neg">-$765</td><td class="num">-52.2%</td><td class="num">2.5h</td><td>no stop tag</td></tr>
+<tr><td class="tkr">CRWD</td><td>2026-09-15 10:57</td><td class="num">$0.785&rarr;$0.480</td><td class="num neg">-$763</td><td class="num">-38.9%</td><td class="num">1.2h</td><td>no stop tag</td></tr></tbody></table></div>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Commissions</h2><span class="tag">103 exits</span></div>
+    <p><strong>Net P&amp;L above already has commission subtracted</strong> &mdash; IBKR nets the commission on both the
+      opening and closing leg directly into <code class="mono">realized_pnl</code> before this report ever sees it. The
+      figures below are the reported sell-leg commission only, shown so the cost of trading this book is visible on
+      its own, not because anything still needs to be deducted.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="lab">Commission (sell leg, reported)</div><div class="val">$993</div><div class="sub">across 103 exits, options and futures</div></div>
+      <div class="kpi"><div class="lab">Average per exit</div><div class="val">$10</div></div>
+      <div class="kpi"><div class="lab">Rate on option premium</div><div class="val">+1.06%</div><div class="sub">$908 option commission &divide; $85,398 option premium</div></div>
+    </div>
+    <p class="cap" style="max-width:70ch">$36,103 of premium entered at or below $0.30 across 13 symbols; round-trip friction on that is roughly $1,805-$3,971</p>
+    <p class="cap" style="max-width:70ch"><b>CL</b> was the single largest source of commission this week
+      at $186, out of 28 tickers traded.</p>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Ticker</th><th style="text-align:right">Exits</th>
+        <th style="text-align:right">Commission</th><th style="text-align:right">Avg/exit</th>
+        <th style="text-align:right">% of total</th></tr></thead>
+      <tbody><tr><td class="tkr">CL</td><td class="num">25</td><td class="num">$186</td><td class="num">$7</td><td class="num">19%</td></tr>
+<tr><td class="tkr">INTC</td><td class="num">8</td><td class="num">$83</td><td class="num">$10</td><td class="num">8%</td></tr>
+<tr><td class="tkr">SMCI</td><td class="num">2</td><td class="num">$80</td><td class="num">$40</td><td class="num">8%</td></tr>
+<tr><td class="tkr">IBIT</td><td class="num">3</td><td class="num">$79</td><td class="num">$26</td><td class="num">8%</td></tr>
+<tr><td class="tkr">MSTR</td><td class="num">8</td><td class="num">$74</td><td class="num">$9</td><td class="num">7%</td></tr>
+<tr><td class="tkr">NVO</td><td class="num">1</td><td class="num">$50</td><td class="num">$50</td><td class="num">5%</td></tr>
+<tr><td class="tkr">TSLA</td><td class="num">2</td><td class="num">$45</td><td class="num">$22</td><td class="num">5%</td></tr>
+<tr><td class="tkr">HOOD</td><td class="num">7</td><td class="num">$42</td><td class="num">$6</td><td class="num">4%</td></tr></tbody></table>
+    </div>
+    
+    <details class="tabledisc">
+      <summary>Show all 28 tickers</summary>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Ticker</th><th style="text-align:right">Exits</th>
+          <th style="text-align:right">Commission</th><th style="text-align:right">Avg/exit</th>
+          <th style="text-align:right">% of total</th></tr></thead>
+        <tbody><tr><td class="tkr">CL</td><td class="num">25</td><td class="num">$186</td><td class="num">$7</td><td class="num">19%</td></tr>
+<tr><td class="tkr">INTC</td><td class="num">8</td><td class="num">$83</td><td class="num">$10</td><td class="num">8%</td></tr>
+<tr><td class="tkr">SMCI</td><td class="num">2</td><td class="num">$80</td><td class="num">$40</td><td class="num">8%</td></tr>
+<tr><td class="tkr">IBIT</td><td class="num">3</td><td class="num">$79</td><td class="num">$26</td><td class="num">8%</td></tr>
+<tr><td class="tkr">MSTR</td><td class="num">8</td><td class="num">$74</td><td class="num">$9</td><td class="num">7%</td></tr>
+<tr><td class="tkr">NVO</td><td class="num">1</td><td class="num">$50</td><td class="num">$50</td><td class="num">5%</td></tr>
+<tr><td class="tkr">TSLA</td><td class="num">2</td><td class="num">$45</td><td class="num">$22</td><td class="num">5%</td></tr>
+<tr><td class="tkr">HOOD</td><td class="num">7</td><td class="num">$42</td><td class="num">$6</td><td class="num">4%</td></tr>
+<tr><td class="tkr">AAPL</td><td class="num">2</td><td class="num">$42</td><td class="num">$21</td><td class="num">4%</td></tr>
+<tr><td class="tkr">GOOGL</td><td class="num">3</td><td class="num">$37</td><td class="num">$12</td><td class="num">4%</td></tr>
+<tr><td class="tkr">NQ</td><td class="num">7</td><td class="num">$36</td><td class="num">$5</td><td class="num">4%</td></tr>
+<tr><td class="tkr">ES</td><td class="num">3</td><td class="num">$30</td><td class="num">$10</td><td class="num">3%</td></tr>
+<tr><td class="tkr">META</td><td class="num">5</td><td class="num">$27</td><td class="num">$5</td><td class="num">3%</td></tr>
+<tr><td class="tkr">IREN</td><td class="num">2</td><td class="num">$24</td><td class="num">$12</td><td class="num">2%</td></tr>
+<tr><td class="tkr">MSFT</td><td class="num">4</td><td class="num">$22</td><td class="num">$5</td><td class="num">2%</td></tr>
+<tr><td class="tkr">CRWD</td><td class="num">2</td><td class="num">$20</td><td class="num">$10</td><td class="num">2%</td></tr>
+<tr><td class="tkr">PLTR</td><td class="num">1</td><td class="num">$19</td><td class="num">$19</td><td class="num">2%</td></tr>
+<tr><td class="tkr">NVDA</td><td class="num">2</td><td class="num">$18</td><td class="num">$9</td><td class="num">2%</td></tr>
+<tr><td class="tkr">OKLO</td><td class="num">2</td><td class="num">$15</td><td class="num">$8</td><td class="num">2%</td></tr>
+<tr><td class="tkr">CVX</td><td class="num">1</td><td class="num">$14</td><td class="num">$14</td><td class="num">1%</td></tr>
+<tr><td class="tkr">QCOM</td><td class="num">1</td><td class="num">$14</td><td class="num">$14</td><td class="num">1%</td></tr>
+<tr><td class="tkr">MU</td><td class="num">2</td><td class="num">$13</td><td class="num">$7</td><td class="num">1%</td></tr>
+<tr><td class="tkr">MRNA</td><td class="num">1</td><td class="num">$10</td><td class="num">$10</td><td class="num">1%</td></tr>
+<tr><td class="tkr">HPE</td><td class="num">3</td><td class="num">$9</td><td class="num">$3</td><td class="num">1%</td></tr>
+<tr><td class="tkr">SPCX</td><td class="num">1</td><td class="num">$3</td><td class="num">$3</td><td class="num">0%</td></tr>
+<tr><td class="tkr">WIX</td><td class="num">1</td><td class="num">$2</td><td class="num">$2</td><td class="num">0%</td></tr>
+<tr><td class="tkr">MNQ</td><td class="num">1</td><td class="num">$1</td><td class="num">$1</td><td class="num">0%</td></tr>
+<tr><td class="tkr">SNDK</td><td class="num">3</td><td class="num">-$1</td><td class="num">-$0</td><td class="num">-0%</td></tr></tbody></table>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Risk rules check</h2><span class="tag">account $127,258</span></div>
+    <p>Checked against <code class="mono">docs/risk-rules.md</code>. 4 of 15 rules are checkable from the trade feed.</p>
+    <div class="rules">
+      <div class="rule-row fail">
+        <span class="pill">FAIL</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 15 &middot; a day down 7% ends the day</div>
+          <div>2026-09-15 -9,536</div>
+          <div class="r-c">Caveat: Realised P&amp;L plus premium written off at expiry. The rule is written against account value, which also moves with open positions, so a day can breach it without showing here.</div>
+        </div>
+      </div>
+
+      <div class="rule-row note">
+        <span class="pill">NOTE</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 4 &middot; check the commission below $0.30</div>
+          <div>$36,103 of premium entered at or below $0.30 across 13 symbols; round-trip friction on that is roughly $1,805-$3,971</div>
+          
+        </div>
+      </div>
+
+      <div class="rule-row pass">
+        <span class="pill">PASS</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 12 &middot; total open exposure under 12%</div>
+          <div>peak open cost $10,500 (8.3% of account), cap $15,271; above the cap at 0 of 416 points in the week</div>
+          <div>worst at Fri 18.09 10:15</div>
+        </div>
+      </div>
+
+      <div class="rule-row pass">
+        <span class="pill">PASS</span>
+        <div class="rule-body">
+          <div class="r-t">Rule 6 &middot; no unprotected position over 5% overnight</div>
+          <div>nothing above the cap at a session boundary</div>
+          <div class="r-c">Caveat: Market value is approximated from the last traded price of that symbol, and the feed cannot separate strikes, so a position spanning several strikes is marked at one price. Treat flagged nights as candidates to review, not as confirmed breaches. A live stop also satisfies the rule and is invisible here.</div>
+        </div>
+      </div></div>
+    <details class="tabledisc">
+      <summary>11 rules not checkable from the trade feed</summary>
+      <ul class="notes"><li><strong>Rule 1</strong> &mdash; 3+ days at 2%: needs the expiry date to know the tier and the stop budget.</li>
+<li><strong>Rule 2</strong> &mdash; 0-2 days at 1%: needs the expiry date.</li>
+<li><strong>Rule 3</strong> &mdash; 0-2 days A-game at 2%: needs the expiry date and an A-game marker in the journal.</li>
+<li><strong>Rule 5</strong> &mdash; a risen position is not cut for having risen: intent, not visible in fills.</li>
+<li><strong>Rule 7</strong> &mdash; a position in a move gets a stop: stop levels come back empty; an untriggered stop leaves no trace.</li>
+<li><strong>Rule 8</strong> &mdash; correlated positions count as one: needs a correlation call, not in the data.</li>
+<li><strong>Rule 9</strong> &mdash; a loss does not exceed the stop budget: the budget depends on the expiry date.</li>
+<li><strong>Rule 10</strong> &mdash; zone 3 is not counted as security: intent.</li>
+<li><strong>Rule 11</strong> &mdash; no profit target: intent.</li>
+<li><strong>Rule 13</strong> &mdash; size halves at every rung: needs the account equity curve, not the trade feed.</li>
+<li><strong>Rule 14</strong> &mdash; expansion only on a new high: needs the account equity curve.</li></ul>
+    </details>
+  </section>
+
+  <footer class="foot">
+    <p>Full detail and the raw exit list live alongside this report in the same week's data folder.</p>
+  </footer>
+</div>

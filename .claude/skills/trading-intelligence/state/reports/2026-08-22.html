@@ -1,0 +1,807 @@
+<title>Catalyst Desk</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    color-scheme: light;
+    --bg: #F2F3F6;
+    --bg-plane: #E7E9EE;
+    --surface: #FFFFFF;
+    --surface-2: #ECEEF2;
+    --ink: #14171F;
+    --ink-secondary: #4B5160;
+    --ink-muted: #767C8C;
+    --border: rgba(20,23,31,0.12);
+    --border-strong: rgba(20,23,31,0.22);
+    --accent: #8A611F;
+    --accent-soft: rgba(138,97,31,0.12);
+    --accent-ink: #14171F;
+    --good: #0ca30c;
+    --warning: #fab219;
+    --serious: #ec835a;
+    --critical: #d03b3b;
+    --shadow: 0 1px 2px rgba(20,23,31,0.06), 0 8px 24px rgba(20,23,31,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #12151C;
+      --bg-plane: #0D0F15;
+      --surface: #1B1F2A;
+      --surface-2: #232838;
+      --ink: #EDEFF4;
+      --ink-secondary: #B8BECC;
+      --ink-muted: #868EA0;
+      --border: rgba(237,239,244,0.12);
+      --border-strong: rgba(237,239,244,0.22);
+      --accent: #D4A257;
+      --accent-soft: rgba(212,162,87,0.16);
+      --accent-ink: #12151C;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg: #12151C;
+    --bg-plane: #0D0F15;
+    --surface: #1B1F2A;
+    --surface-2: #232838;
+    --ink: #EDEFF4;
+    --ink-secondary: #B8BECC;
+    --ink-muted: #868EA0;
+    --border: rgba(237,239,244,0.12);
+    --border-strong: rgba(237,239,244,0.22);
+    --accent: #D4A257;
+    --accent-soft: rgba(212,162,87,0.16);
+    --accent-ink: #12151C;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+    scroll-behavior:smooth;
+  }
+  @media (prefers-reduced-motion: reduce){
+    body{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important;}
+  }
+  .num{font-family:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace; font-variant-numeric: tabular-nums;}
+  a{color:inherit;}
+  h1,h2,h3,h4{text-wrap:balance; margin:0;}
+  p{margin:0; line-height:1.55;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:30;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; padding:14px 22px;
+    background:var(--surface); border-bottom:1px solid var(--border);
+  }
+  .brand{display:flex; align-items:baseline; gap:10px;}
+  .brand-mark{
+    font-family:"IBM Plex Mono", monospace; font-weight:700; font-size:13px;
+    letter-spacing:0.14em; color:var(--accent); text-transform:uppercase;
+    border:1px solid var(--border-strong); border-radius:4px; padding:3px 7px;
+  }
+  .brand-name{font-weight:800; font-size:19px; letter-spacing:-0.01em;}
+  .brand-sub{color:var(--ink-muted); font-size:13px; display:none;}
+  @media (min-width:760px){ .brand-sub{display:inline;} }
+  .meta{display:flex; align-items:center; gap:14px; font-size:12.5px; color:var(--ink-muted); font-family:"IBM Plex Mono",monospace;}
+  @media (max-width:480px){ .meta span:last-child{display:none;} }
+  .meta .dot{width:7px; height:7px; border-radius:50%; background:var(--good); display:inline-block; margin-right:6px; box-shadow:0 0 0 3px var(--accent-soft);}
+
+  /* ---------- Ticker strip ---------- */
+  .ticker-wrap{
+    background:var(--bg-plane); border-bottom:1px solid var(--border);
+    overflow:hidden; white-space:nowrap; position:sticky; top:57px; z-index:29;
+  }
+  .ticker-track{display:inline-flex; gap:0; animation:scroll-strip 46s linear infinite;}
+  @media (prefers-reduced-motion: reduce){ .ticker-track{animation:none;} .ticker-wrap{overflow-x:auto;} }
+  .ticker-wrap:hover .ticker-track{animation-play-state:paused;}
+  @keyframes scroll-strip{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .tick{
+    display:inline-flex; align-items:baseline; gap:8px; padding:9px 20px;
+    border-right:1px solid var(--border); font-family:"IBM Plex Mono",monospace; font-size:13px;
+  }
+  .tick b{font-weight:600;}
+  .tick .px{color:var(--ink-secondary);}
+  .chg-up{color:var(--good);}
+  .chg-down{color:var(--critical);}
+  .chg-flat{color:var(--ink-muted);}
+
+  /* ---------- Layout ---------- */
+  .layout{display:flex; flex-direction:column; align-items:stretch; max-width:1360px; margin:0 auto;}
+  @media (min-width:920px){ .layout{flex-direction:row; align-items:flex-start;} }
+
+  /* Mobile default: horizontal scrollable tab strip, sticky under the ticker */
+  nav.rail{
+    position:sticky; top:97px; z-index:20;
+    display:flex; flex-direction:row; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    gap:6px; padding:10px 14px; width:100%;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    scrollbar-width:none;
+  }
+  nav.rail::-webkit-scrollbar{display:none;}
+  nav.rail a{
+    display:flex; align-items:center; gap:6px; flex:0 0 auto; white-space:nowrap;
+    padding:7px 12px; border-radius:100px; background:var(--surface-2);
+    font-size:12.5px; font-weight:600; color:var(--ink-secondary); text-decoration:none;
+  }
+  nav.rail a:hover{background:var(--accent-soft); color:var(--ink);}
+  nav.rail a.active{background:var(--accent); color:var(--accent-ink);}
+  nav.rail .rail-icon{font-family:"IBM Plex Mono",monospace; font-size:12px; opacity:0.85;}
+  nav.rail .rail-title{display:none;}
+
+  /* Desktop: vertical sidebar */
+  @media (min-width:920px){
+    nav.rail{
+      position:sticky; top:98px; flex:0 0 216px; padding:26px 14px 40px 22px;
+      flex-direction:column; overflow-x:visible; width:auto;
+      background:transparent; border-bottom:none; gap:0;
+    }
+    nav.rail a{
+      width:100%; border-radius:7px; background:transparent; padding:8px 10px;
+      font-size:13.5px; margin-bottom:2px;
+    }
+    nav.rail a:hover{background:var(--surface-2); color:var(--ink);}
+    nav.rail a.active{background:var(--accent-soft); color:var(--accent);}
+    nav.rail .rail-icon{width:16px; text-align:center;}
+    nav.rail .rail-title{
+      display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.12em;
+      color:var(--ink-muted); margin:18px 10px 8px; font-weight:700;
+    }
+    nav.rail .rail-title:first-child{margin-top:2px;}
+  }
+
+  main{flex:1 1 auto; min-width:0; padding:28px 22px 90px;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-progress{
+    font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-muted);
+    margin-bottom:6px; letter-spacing:0.04em;
+  }
+  .section-head{display:flex; align-items:baseline; gap:12px; margin-bottom:16px; flex-wrap:wrap;}
+  .section-head h2{font-size:21px; font-weight:800; letter-spacing:-0.01em;}
+  .section-num{font-family:"IBM Plex Mono",monospace; color:var(--accent); font-weight:700; font-size:13px;}
+  .section-dek{color:var(--ink-muted); font-size:13.5px; margin-top:2px;}
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow);
+  }
+
+  /* ---------- Positions strip ---------- */
+  .positions-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px;}
+  .pos-card{padding:14px 16px;}
+  .pos-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px;}
+  .pos-ticker{font-family:"IBM Plex Mono",monospace; font-weight:700; font-size:15px;}
+  .pos-contract{color:var(--ink-muted); font-size:12px; margin-top:2px;}
+  .dte{
+    font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:700; padding:3px 7px;
+    border-radius:5px; white-space:nowrap;
+  }
+  .dte-tight{background:rgba(208,59,59,0.14); color:var(--critical);}
+  .dte-near{background:rgba(250,178,25,0.16); color:#9a6600;}
+  :root:not([data-theme="light"]) .dte-near{color:var(--warning);}
+  :root[data-theme="dark"] .dte-near{color:var(--warning);}
+  .pos-row{display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0; color:var(--ink-secondary);}
+  .pos-row b{color:var(--ink); font-family:"IBM Plex Mono",monospace; font-weight:600;}
+  .pos-pnl-pos{color:var(--good);}
+  .pos-pnl-neg{color:var(--critical);}
+  .pos-need{margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); font-size:12px; color:var(--ink-muted);}
+  .pos-need b{color:var(--ink-secondary); font-family:"IBM Plex Mono",monospace;}
+
+  /* ---------- Warnings (Positions page only) ---------- */
+  .warn-stack{display:flex; flex-direction:column; gap:10px; margin-bottom:22px;}
+  .warn-item{
+    display:flex; gap:12px; align-items:flex-start; padding:13px 16px; border-radius:10px;
+    border:1px solid var(--border); background:var(--surface);
+  }
+  .warn-item.critical{border-left:4px solid var(--critical);}
+  .warn-item.warning{border-left:4px solid var(--warning);}
+  .warn-glyph{font-family:"IBM Plex Mono",monospace; font-weight:800; font-size:13px; flex:0 0 auto; padding-top:1px;}
+  .warn-item.critical .warn-glyph{color:var(--critical);}
+  .warn-item.warning .warn-glyph{color:#9a6600;}
+  :root:not([data-theme="light"]) .warn-item.warning .warn-glyph{color:var(--warning);}
+  :root[data-theme="dark"] .warn-item.warning .warn-glyph{color:var(--warning);}
+  .warn-text{font-size:13.5px; color:var(--ink-secondary); line-height:1.55;}
+  .warn-text b{color:var(--ink);}
+
+  /* ---------- Pager ---------- */
+  .pager{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    margin-top:36px; padding-top:20px; border-top:1px solid var(--border);
+  }
+  .pager a{
+    display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ink-secondary);
+    text-decoration:none; padding:8px 4px;
+  }
+  .pager a:hover{color:var(--accent);}
+  .pager a.disabled{visibility:hidden;}
+  .pager-next{margin-left:auto; text-align:right;}
+
+  /* ---------- Priority badge ---------- */
+  .badge{
+    display:inline-flex; align-items:center; gap:5px; font-family:"IBM Plex Mono",monospace;
+    font-size:11px; font-weight:700; letter-spacing:0.04em; padding:4px 9px; border-radius:6px;
+    text-transform:uppercase; white-space:nowrap;
+  }
+  .badge-critical{background:var(--critical); color:#fff;}
+  .badge-serious{background:var(--serious); color:#241206;}
+  .badge-warning{background:var(--warning); color:#241206;}
+  .badge-score{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-muted);}
+
+  /* ---------- Event cards (Top 5 / Next 7) ---------- */
+  .event-card{padding:20px 22px; margin-bottom:14px;}
+  .event-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:6px;}
+  .event-title{font-size:16.5px; font-weight:700; letter-spacing:-0.005em;}
+  .event-timing{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--accent); margin-top:4px; font-weight:600;}
+  .event-badges{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .event-grid{display:grid; grid-template-columns:1fr; gap:10px 22px; margin-top:14px;}
+  @media (min-width:680px){ .event-grid{grid-template-columns:1fr 1fr;} }
+  .field-label{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-muted);
+    font-weight:700; margin-bottom:3px;
+  }
+  .field-value{font-size:13.5px; color:var(--ink-secondary); line-height:1.5;}
+  .field-value.full{grid-column:1/-1;}
+  .chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:2px;}
+  .chip{
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600; padding:3px 9px;
+    border-radius:100px; background:var(--surface-2); border:1px solid var(--border); color:var(--ink-secondary);
+  }
+  .transmission{
+    font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-secondary);
+    background:var(--surface-2); border-radius:8px; padding:9px 12px; line-height:1.9;
+  }
+
+  /* ---------- 7-day timeline ---------- */
+  .timeline{position:relative; padding-left:26px;}
+  .timeline::before{content:"";position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--border);}
+  .tl-item{position:relative; padding-bottom:22px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-dot{position:absolute; left:-26px; top:3px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--surface); box-shadow:0 0 0 2px var(--border-strong);}
+  .tl-date{font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:700; color:var(--accent); margin-bottom:3px;}
+  .tl-body{font-size:13.5px; color:var(--ink-secondary);}
+  .tl-body b{color:var(--ink);}
+
+  /* ---------- Developing list ---------- */
+  .dev-card{padding:16px 18px; margin-bottom:10px; display:flex; gap:14px; align-items:flex-start;}
+  .dev-window{
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:700; color:var(--ink-muted);
+    white-space:nowrap; padding-top:2px; flex:0 0 auto; width:88px;
+  }
+  .dev-text b{color:var(--ink);}
+  .dev-text{font-size:13.5px; color:var(--ink-secondary); line-height:1.6;}
+
+  /* ---------- Regime grid ---------- */
+  .regime-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:20px;}
+  .stat-tile{padding:15px 16px;}
+  .stat-label{font-size:10.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-muted); font-weight:700; margin-bottom:8px;}
+  .stat-state{font-size:14.5px; font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:7px;}
+  .stat-state .dir{font-family:"IBM Plex Mono",monospace; font-size:13px;}
+  .stat-note{font-size:12px; color:var(--ink-muted); line-height:1.5;}
+  .narrative-card{padding:22px; display:grid; gap:16px;}
+  @media (min-width:760px){ .narrative-card{grid-template-columns:1.3fr 1fr;} }
+  .narrative-block h4{font-size:12px; text-transform:uppercase; letter-spacing:0.09em; color:var(--accent); margin-bottom:8px; font-weight:800;}
+  .narrative-block p{font-size:14px; color:var(--ink-secondary);}
+
+  /* ---------- Thesis cards ---------- */
+  .thesis-grid{display:grid; grid-template-columns:1fr; gap:14px;}
+  @media (min-width:760px){ .thesis-grid{grid-template-columns:1fr 1fr;} }
+  .thesis-card{padding:18px 20px;}
+  .thesis-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .thesis-ticker{font-family:"IBM Plex Mono",monospace; font-weight:800; font-size:16px;}
+  .thesis-dir{font-size:12px; font-weight:700; margin-top:3px; display:flex; align-items:center; gap:5px;}
+  .dir-bull{color:var(--good);} .dir-bear{color:var(--critical);} .dir-neutral{color:var(--ink-muted);}
+  .status-pill{font-size:11px; font-weight:700; padding:3px 9px; border-radius:100px; font-family:"IBM Plex Mono",monospace; white-space:nowrap;}
+  .status-new{background:var(--accent-soft); color:var(--accent);}
+  .source-position{background:rgba(208,59,59,0.12); color:var(--critical);}
+  .source-watchlist{background:rgba(12,163,12,0.12); color:var(--good);}
+  .rank-tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:700;
+    color:var(--ink-muted); letter-spacing:0.06em; margin-bottom:4px;
+  }
+  .rank-tag.rank-top{color:var(--accent);}
+  .conf-row{display:flex; align-items:center; gap:10px; margin:12px 0 14px;}
+  .conf-track{flex:1; height:6px; border-radius:100px; background:var(--surface-2); overflow:hidden;}
+  .conf-fill{height:100%; border-radius:100px;}
+  .conf-val{font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:700; color:var(--ink-secondary); white-space:nowrap;}
+  .thesis-text{font-size:13.5px; color:var(--ink-secondary); margin-bottom:12px;}
+  .thesis-sub{display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:12px;}
+  .thesis-sub-label{font-weight:700; text-transform:uppercase; letter-spacing:0.08em; font-size:10px; margin-bottom:4px;}
+  .conf-label{color:var(--good);} .inval-label{color:var(--critical);}
+  .thesis-sub ul{margin:0; padding-left:15px; color:var(--ink-secondary); line-height:1.6;}
+
+  /* ---------- What changed ---------- */
+  .changed-card{padding:22px; display:flex; gap:12px; align-items:flex-start;}
+  .changed-icon{font-family:"IBM Plex Mono",monospace; font-size:20px; color:var(--accent); flex:0 0 auto;}
+  .changed-text{font-size:14px; color:var(--ink-secondary); line-height:1.6;}
+  .changed-text b{color:var(--ink);}
+
+  /* ---------- Research further ---------- */
+  .research-list{display:flex; flex-direction:column; gap:10px;}
+  .research-item{padding:14px 18px; display:flex; gap:12px; align-items:flex-start;}
+  .research-num{font-family:"IBM Plex Mono",monospace; font-weight:700; color:var(--accent); font-size:13px; flex:0 0 auto; padding-top:1px;}
+  .research-text{font-size:13.5px; color:var(--ink-secondary); line-height:1.6;}
+  .research-text b{color:var(--ink);}
+
+  footer{
+    max-width:1360px; margin:0 auto; padding:26px 22px 60px;
+    color:var(--ink-muted); font-size:12px; line-height:1.7; border-top:1px solid var(--border);
+  }
+  footer code{font-family:"IBM Plex Mono",monospace; background:var(--surface-2); padding:1px 5px; border-radius:4px;}
+
+  .label-known{color:var(--good);} .label-likely{color:var(--accent);} .label-unconfirmed{color:var(--serious);}
+</style>
+
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-mark">01</span>
+    <span class="brand-name">Catalyst Desk</span>
+    <span class="brand-sub">Trading Intelligence — Planner &amp; Analyst</span>
+  </div>
+  <div class="meta">
+    <span><span class="dot"></span>IBKR live · Run 1 (first run)</span>
+    <span>Generated Sat, Aug 22 2026</span>
+  </div>
+</div>
+
+<div class="ticker-wrap" aria-label="Watchlist price strip">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<div class="layout">
+  <nav class="rail" id="rail">
+    <div class="rail-title">Dashboard</div>
+    <a href="#positions"><span class="rail-icon">◆</span>Open Positions</a>
+    <a href="#top5"><span class="rail-icon">①</span>Top 5 to Watch</a>
+    <a href="#next7"><span class="rail-icon">▤</span>Next 7 Days</a>
+    <a href="#developing"><span class="rail-icon">◔</span>Developing 2–8wk</a>
+    <a href="#regime"><span class="rail-icon">≋</span>Market Regime</a>
+    <a href="#theses"><span class="rail-icon">◎</span>Active Theses</a>
+    <a href="#changed"><span class="rail-icon">Δ</span>What Changed</a>
+    <a href="#research"><span class="rail-icon">?</span>Research Further</a>
+  </nav>
+
+  <main>
+
+    <section id="positions" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <h2>Open Positions</h2>
+        <span class="section-dek">— live from IBKR, this run</span>
+      </div>
+      <p class="section-dek" style="margin-bottom:14px;">5 option positions open. Warnings below call out anything that needs attention — the rest of this dashboard stays market-wide and doesn't repeat your book's specifics.</p>
+      <div class="warn-stack" id="warnStack"></div>
+      <div class="positions-grid" id="positionsGrid"></div>
+      <div class="pager" data-pager="positions"></div>
+    </section>
+
+    <section id="top5" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <h2>🔥 Top 5 Things to Watch</h2>
+      </div>
+      <p class="section-dek" style="margin-bottom:16px;">Market-wide catalysts only — for how these intersect your specific positions, see Open Positions.</p>
+      <div id="top5List"></div>
+      <div class="pager" data-pager="top5"></div>
+    </section>
+
+    <section id="next7" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <h2>Next 7 Days</h2>
+      </div>
+      <div class="card" style="padding:22px 24px;">
+        <div class="timeline" id="timeline"></div>
+      </div>
+      <div class="pager" data-pager="next7"></div>
+    </section>
+
+    <section id="developing" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">03</span>
+        <h2>Developing — 2–8 Weeks</h2>
+      </div>
+      <div id="devList"></div>
+      <div class="pager" data-pager="developing"></div>
+    </section>
+
+    <section id="regime" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">04</span>
+        <h2>Current Market Regime</h2>
+      </div>
+      <div class="regime-grid" id="regimeGrid"></div>
+      <div class="card narrative-card">
+        <div class="narrative-block">
+          <h4>Dominant Narrative</h4>
+          <p>Treasury liquidity support — a decision to at least double long-duration debt buybacks — plus three consecutive soft data prints (jobs, CPI, PPI) have pulled the market's implied hike odds from 50% to 31% this month. That single lever is repricing duration, gold, and Bitcoin together: Gold is up ~10% in August (best month since January) and Bitcoin is up ~22% on the week, both credited to the same yields-down / dollar-down mechanism. Jackson Hole (Aug 27–29) is the fulcrum — new Fed Chair Kevin Warsh's first keynote as chair (Fri Aug 28 AM) is the first real test of whether that dovish read holds.</p>
+        </div>
+        <div class="narrative-block">
+          <h4>What Could Invalidate It</h4>
+          <p>A hawkish-leaning Warsh keynote, any sign the Treasury slows its buyback pace, or a hot September CPI print would unwind the yields-down thesis quickly — symmetrically bad for TLT, Gold, and Bitcoin, since all three are currently trading the same macro driver rather than independent stories.</p>
+        </div>
+      </div>
+      <div class="pager" data-pager="regime"></div>
+    </section>
+
+    <section id="theses" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">05</span>
+        <h2>🎯 Active Theses</h2>
+      </div>
+      <p class="section-dek" style="margin-bottom:16px;">Ranked by confidence, highest first. <span style="color:var(--good)">◇ Watchlist</span> theses are pure research — not tied to any open position; <span style="color:var(--critical)">◆ Position</span> theses back an existing holding.</p>
+      <div class="thesis-grid" id="thesisGrid"></div>
+      <div class="pager" data-pager="theses"></div>
+    </section>
+
+    <section id="changed" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">06</span>
+        <h2>⚠️ What Changed</h2>
+      </div>
+      <div class="card changed-card">
+        <div class="changed-icon">Δ</div>
+        <div class="changed-text"><b>First run.</b> No prior <code>state/</code> snapshot exists for this skill yet — there is nothing to diff against. Starting from this run, every future execution will compare against <code>state/theses.json</code> and <code>state/watchlist-enriched.json</code> and report new / changed / removed items and thesis confidence deltas here.</div>
+      </div>
+      <div class="pager" data-pager="changed"></div>
+    </section>
+
+    <section id="research" class="page">
+      <div class="page-progress" data-progress></div>
+      <div class="section-head">
+        <span class="section-num">07</span>
+        <h2>👀 Research Further</h2>
+      </div>
+      <div class="research-list" id="researchList"></div>
+      <div class="pager" data-pager="research"></div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p><b style="color:var(--ink-secondary)">Coverage note:</b> this run researched your five open positions (ANET, BABA, IBIT, MRNA, MU) plus one anchor name per major watchlist theme not otherwise represented in your book: CRM for software, AVGO for semis, OKLO for nuclear/energy, IONQ/RGTI/QBTS for quantum, RKLB/ASTS for space, NVO for biotech/GLP-1, HPE/DELL/CRWV/NBIS for AI infrastructure, plus the core macro/rates/gold/crypto thread. It did <b>not</b> exhaustively cover every name on every list (e.g. the rest of the software list beyond CRM, semis beyond MU/AVGO/NVDA, uranium equities beyond OKLO itself) — see Research Further for what's flagged for next pass.</p>
+  <p style="margin-top:8px;">Data provenance: prices, positions, IV, open interest and bid/ask are pulled live from IBKR via MCP (<span class="label-known">Known</span>). Calendar dates and news are from web research, labeled per item as <span class="label-known">Confirmed</span> / <span class="label-likely">Likely (multiple reports)</span> / <span class="label-unconfirmed">Single-source or unconfirmed</span> inline. Expected-move figures are a simplified IV × √(time) estimate, not a full options pricing model. This is a research and decision-support tool — it does not know the future, and the trade decision stays with the trader.</p>
+</footer>
+
+<script>
+(function(){
+  // ---------------- Data ----------------
+  var positions = [
+    {t:"ANET", contract:"Aug 28 '26 · 210 CALL", exp:"2026-08-28", dte:6, qty:51, avg:0.4216, mkt:0.4740, val:2417.56, pnl:267.51, pnlPct:12.4,
+     spot:189.08, strike:210, dir:"call", moveNeeded:11.06, iv:51.7, oi:410, bid:0.17, ask:0.50, expMove:6.6},
+    {t:"BABA", contract:"Aug 28 '26 · 110 PUT", exp:"2026-08-28", dte:6, qty:50, avg:0.2847, mkt:0.2273, val:1136.31, pnl:-287.42, pnlPct:-20.2,
+     spot:119.00, strike:110, dir:"put", moveNeeded:-7.56, iv:42.1, oi:796, bid:0.15, ask:0.23, expMove:5.4},
+    {t:"IBIT", contract:"Aug 28 '26 · 47 CALL", exp:"2026-08-28", dte:6, qty:200, avg:0.2460, mkt:0.3229, val:6458.10, pnl:1538.06, pnlPct:31.3,
+     spot:44.39, strike:47, dir:"call", moveNeeded:5.88, iv:54.2, oi:92, bid:0.30, ask:0.33, expMove:6.9},
+    {t:"MRNA", contract:"Aug 28 '26 · 200 CALL", exp:"2026-08-28", dte:6, qty:11, avg:1.0523, mkt:1.0800, val:1188.00, pnl:30.43, pnlPct:2.6,
+     spot:145.84, strike:200, dir:"call", moveNeeded:37.13, iv:154.1, oi:252, bid:1.02, ask:1.08, expMove:19.8},
+    {t:"MU", contract:"Aug 24 '26 · 900 PUT", exp:"2026-08-24", dte:2, qty:30, avg:0.5041, mkt:0.4800, val:1440.00, pnl:-72.32, pnlPct:-4.8,
+     spot:963.20, strike:900, dir:"put", moveNeeded:-6.56, iv:43.0, oi:941, bid:0.48, ask:0.59, expMove:3.2}
+  ];
+
+  var ticks = [
+    {t:"QQQ", px:714.25, chg:null},
+    {t:"NVDA", px:null, chg:null},
+    {t:"CRM", px:209.22, chg:null},
+    {t:"AVGO", px:369.00, chg:1.37},
+    {t:"MU", px:963.20, chg:null},
+    {t:"HPE", px:53.49, chg:1.13},
+    {t:"DELL", px:440.77, chg:null},
+    {t:"CRWV", px:87.68, chg:-2.32},
+    {t:"NBIS", px:219.00, chg:-0.50},
+    {t:"OKLO", px:42.19, chg:1.27},
+    {t:"RGTI", px:17.87, chg:11.25},
+    {t:"QBTS", px:20.40, chg:8.51},
+    {t:"IONQ", px:44.61, chg:null},
+    {t:"RKLB", px:73.00, chg:0.07},
+    {t:"ASTS", px:68.73, chg:null},
+    {t:"ANET", px:189.08, chg:2.90},
+    {t:"BABA", px:119.00, chg:-8.83},
+    {t:"MRNA", px:145.84, chg:null},
+    {t:"NVO", px:46.81, chg:1.45},
+    {t:"IBIT", px:44.39, chg:-3.15, chgLabel:"1w"},
+    {t:"PLTR", px:179.80, chg:3.36},
+    {t:"TLT", px:82.02, chg:-0.39},
+    {t:"GLD", px:423.09, chg:1.89}
+  ];
+
+  var top5 = [
+    {score:95, tier:"critical", title:"NVDA — Q2 FY27 Earnings", timing:"Wed Aug 26, after close",
+     why:"Sets the tone for the entire AI-capex trade — semis, AI infra, memory — and lands two days before Jackson Hole, compounding the week's volatility.",
+     expected:"<span class='label-likely'>Likely</span> — consensus looking for continued hyperscaler capex strength and next-gen GPU demand confirmation; no specific analyst print pulled this run.",
+     surprise:"Any guidance softness on AI infrastructure demand, fresh export-control commentary on China, or gross-margin compression from production ramp costs.",
+     assets:["NVDA","MU","AMD","AVGO","AMAT","ASML","ANET","QQQ","SOXX"],
+     transmission:"NVDA results  →  AI-capex confidence  →  semis-complex re-rating  →  QQQ / SOXX direction",
+     watch:"Data-center revenue growth rate, gross-margin trajectory, forward-quarter guidance, management tone on export restrictions.",
+     relevance:"High for anyone positioned in the semis/AI complex — see Open Positions for how this intersects your book specifically."},
+    {score:94, tier:"critical", title:"Jackson Hole Symposium — Fed Chair Warsh's First Keynote", timing:"Thu Aug 27 – Sat Aug 29 · keynote Fri Aug 28, AM",
+     why:"The first public monetary-policy signal from a brand-new Fed chair — markets have no track record to price off, a genuine known-unknown for rates, gold, dollar, and crypto.",
+     expected:"<span class='label-likely'>Likely</span> — symposium theme is \"Financial Innovation: Implications for Payments and Policy\"; market broadly expects Warsh to continue the dovish-leaning tone implied by the Treasury's recent buyback-driven liquidity push (hike odds fell 50%→31% in August on soft data).",
+     surprise:"A hawkish reassertion of inflation vigilance, or any signal Warsh diverges from the market's dovish assumption — genuinely un-priced, since there is no prior Warsh Fed-chair speech to calibrate against.",
+     assets:["TLT","GLD","IBIT","UUP / DXY","QQQ"],
+     transmission:"Warsh tone  →  rate-path expectations  →  Treasury yields  →  USD  →  Gold / BTC / duration assets",
+     watch:"Friday-morning keynote text and tone; 10Y/30Y yield and DXY reaction in the first hour after release.",
+     relevance:"High — directly upstream of the Gold/BTC macro thread (#4). Also lands the same day as standard monthly options expiration — see Open Positions for what that means for your book."},
+    {score:90, tier:"critical", title:"Software &amp; AI-Infra Earnings Cluster — CRM, HPE, Dell, All Within 72 Hours of NVDA", timing:"CRM Wed Aug 26 · HPE Thu Aug 27 · Dell ~Aug 28–29 (date unconfirmed, see below)",
+     why:"Three more major reports land in the same 72-hour window as NVDA and Jackson Hole, spanning two more watchlist themes entirely: Salesforce is the software sector's own AI-monetization read (moves the whole IGV complex — ADBE, NOW, CRWD, SNOW, WDAY and peers), while HPE and Dell are the next test of the AI-server buildout story after both stocks already ran +54–59% in a month on the same narrative.",
+     expected:"<span class='label-likely'>Likely</span> — the bar is already high: CoreWeave and Nebius (also AI-infra) both posted blowout Q2 prints on Aug 12 (CRWV +19%, NBIS +34%, huge backlog growth), so the market is pricing HPE/Dell to confirm the same AI-server demand strength.",
+     surprise:"A soft print or cautious guidance from CRM on enterprise software spend, or from HPE/Dell on AI-server margins, after such a strong run-up in the stocks — that gap between price action and results is exactly where surprises live.",
+     assets:["CRM","IGV","ADBE","NOW","CRWD","SNOW","HPE","DELL","CRWV","NBIS"],
+     transmission:"CRM results  →  enterprise/AI software-spend read  →  IGV complex  |  HPE/DELL results  →  AI-server margin confirmation  →  AI-infra complex (CRWV/NBIS already re-rated on this)",
+     watch:"CRM's AI-product (Agentforce) monetization commentary; HPE/Dell gross-margin trends on AI servers; exact Dell earnings date (sources cite both Aug 28 and Aug 29 — unconfirmed).",
+     relevance:"High — this is the software/AI-infra half of the watchlist's own earnings-and-macro pileup, distinct from NVDA's semis-side test."},
+    {score:84, tier:"serious", title:"Treasury Buybacks → Liquidity → Gold &amp; Bitcoin Repricing", timing:"Developing — ongoing through Jackson Hole",
+     why:"A real, developing macro thread directly touching two core watchlist themes: gold and crypto.",
+     expected:"<span class='label-likely'>Likely / multiple credible reports</span> — Treasury's move to at least double long-duration debt buybacks pushed yields and the dollar lower, credited as the key driver behind Gold's ~10% August rally (best month since January) and cited by Bernstein as a driver of Bitcoin's ~22% weekly surge, alongside $2.6B combined BTC/ETH ETF inflows across five sessions — the best week since October.",
+     surprise:"Any sign the Treasury slows or reverses buyback pace, or a hawkish Warsh keynote (#2) undercutting the dovish read — would hit Gold and BTC together, since both are currently trading the same driver, not independent stories.",
+     assets:["GLD","TLT","IBIT","MSTR","UUP"],
+     transmission:"Treasury buyback increase  →  duration demand / liquidity  →  yields down  →  USD down  →  Gold up + BTC up",
+     watch:"Continued BTC/ETH ETF net-inflow data; any fresh Treasury refunding or buyback announcement; 10Y/30Y yield direction after Jackson Hole.",
+     relevance:"High — the connective thesis behind the Gold (GLD) and crypto (IBIT) side of the watchlist."},
+    {score:80, tier:"serious", title:"Nuclear/AI-Power Buildout — Oklo's Criticality Milestone Re-Rates the Uranium/SMR Complex", timing:"Developing — since Aug 6 milestone, ongoing",
+     why:"A confirmed technical and regulatory milestone — not just sentiment — for a theme that spans most of the watchlist's Energy list: Oklo's Groves reactor reached \"criticality\" on Aug 6 (the 5th SMR of its kind globally to do so), Oklo was paired with Microsoft and Nvidia in a $200M federal AI-datacenter-power initiative (Jul 21), and Oklo acquired precision manufacturer ARMEC to control more of its build timeline.",
+     expected:"<span class='label-known'>Confirmed</span> — Bloomberg and multiple outlets confirmed the criticality milestone directly; this already happened, it's not a rumor.",
+     surprise:"Any regulatory setback or delay in the path from criticality to full commercial operation — SMR tech is still not commercially available in the US, so the gap between milestone and revenue is real and could disappoint if the market is pricing commercialization too soon.",
+     assets:["OKLO","SMR","CCJ","LEU","CEG","VST","URA","URNM"],
+     transmission:"AI datacenter power demand  →  federal/hyperscaler nuclear partnerships  →  SMR technical milestones  →  uranium-equity complex re-rating",
+     watch:"Further regulatory approvals, additional hyperscaler partnerships, uranium price action (URA/URNM) as a read on the broader complex, not just Oklo alone.",
+     relevance:"High — a genuine cross-sector theme (AI demand meets energy supply) distinct from the pure-software/semis catalysts above, worth tracking even though it isn't in your current book."}
+  ];
+
+  var timeline = [
+    {date:"Tue Aug 25", body:"Quiet macro day — markets positioning ahead of Wednesday's cluster. No confirmed scheduled catalysts found this run."},
+    {date:"Wed Aug 26", body:"<b>NVDA Q2 FY27 earnings</b> and <b>Salesforce (CRM) Q2 FY27 earnings</b>, both after close — see Top 5 #1 and #3. Semis/AI and enterprise software both get tested the same day."},
+    {date:"Thu Aug 27", body:"<b>Jackson Hole Economic Symposium opens</b> (Kansas City Fed, Jackson Lake Lodge, WY) — theme: \"Financial Innovation: Implications for Payments and Policy.\" Fed speakers begin. <b>Also:</b> HPE earnings — AI-server infrastructure's turn, see Top 5 #3."},
+    {date:"Fri Aug 28", body:"<b>Fed Chair Kevin Warsh's first keynote as chair</b>, AM — his first public policy signal since taking over from Powell in May 2026. <b>Also:</b> standard monthly options expiration, and possibly Dell earnings (sources disagree between Aug 28 and Aug 29 — unconfirmed). See Top 5 #2 and #3."},
+    {date:"Sat Aug 29", body:"Jackson Hole Symposium concludes — any weekend follow-up commentary from attendees worth a scan Monday morning. Dell earnings may also land here if not Friday (date unconfirmed)."}
+  ];
+
+  var developing = [
+    {window:"~3–4 wks", text:"<b>FOMC meeting — Sep 15–16, 2026.</b> Rate decision at 2:00pm ET, Chair press conference 2:30pm ET. The first scheduled rate decision after Warsh's Jackson Hole debut — whatever tone he sets there gets tested here."},
+    {window:"~3–4 wks", text:"<b>September CPI release</b> — mid-September per the usual BLS schedule, but an exact confirmed date was not found this run. <span class='label-unconfirmed'>Unconfirmed date</span> — flagged under Research Further."},
+    {window:"~5 wks", text:"<b>MU fiscal Q4 2026 earnings — Sep 29, 2026, after close (confirmed).</b> Memory/HBM/AI-capex pricing's next real test, independent of and later than NVDA's Aug 26 print."},
+    {window:"Ongoing", text:"<b>BABA regulatory/litigation overhang.</b> Post the Aug 20 earnings miss (EPS $1.26 vs $1.85 expected, adjusted EBITA –30% YoY on AI-capex-driven margin compression), Alibaba faces U.S. shareholder litigation alleging undisclosed ties to China's MIIT, plus continued inclusion on the U.S. DoD's Chinese military company list restricting institutional inflows. <span class='label-likely'>Multiple credible reports</span>, developing."},
+    {window:"Ongoing", text:"<b>Bitcoin/crypto liquidity-driven rally — durability question.</b> The current BTC/IBIT move is explicitly tied by Bernstein to the Treasury buyback thesis (Top 5 #4); worth tracking whether ETF inflows and ETF-flow-driven momentum persist past Jackson Hole or fade once the initial reaction passes."},
+    {window:"~1.5 wks", text:"<b>AVGO fiscal Q3 2026 earnings — Sep 2, 2026, after close (confirmed).</b> The other mega-cap semis name not yet tested this cycle — lands the week after NVDA, a second read on AI-capex demand from a different angle (networking/custom silicon vs. NVDA's GPUs)."},
+    {window:"Ongoing", text:"<b>Quantum computing sector re-rating.</b> After IONQ/RGTI/QBTS fell ~30% in a month through late July, three separate names delivered confirming fundamentals within two weeks: IonQ's record Q2 revenue + raised FY26 guidance (Aug 5), Rigetti's Dept. of Commerce CHIPS Act letter of intent for up to $100M (~Aug 17), and D-Wave's $550M Quantum Circuits acquisition plus a bookings jump from $3M to $36M in H1. RGTI and QBTS were up +11.3% and +8.5% in the latest session on this run's snapshot — real, not just narrative."},
+    {window:"Ongoing", text:"<b>Space sector — diverging fundamentals under shared momentum.</b> Rocket Lab (RKLB) landed multiple real U.S. Space Force contracts in mid-August (Space Data Network Consortium, NITE-STAR, a Viasat GEO satellite award) — genuine revenue diversification. AST SpaceMobile (ASTS), despite similar share-price strength, postponed its ~45-satellite deployment target from 2026 to early 2027 — a real execution-risk flag underneath the sector-wide rally."},
+    {window:"Ongoing", text:"<b>NVO — losing ground to Lilly on two fronts.</b> CagriSema missed vs. Lilly's tirzepatide in a head-to-head Type 2 diabetes trial, and Wegovy pill sales badly missed estimates ($494M vs. ~$3.6B kroner expected) this quarter. A new early-stage obesity-drug pipeline addition (Aug 17) is a long-term-only offset, not a near-term one."}
+  ];
+
+  var regime = [
+    {label:"Inflation", state:"Softening", dir:"↓", cls:"good", note:"Jobs, CPI and PPI prints all came in soft in August, pulling implied Fed hike odds from 50% to 31%."},
+    {label:"Growth", state:"Not assessed", dir:"—", cls:"muted", note:"Not independently verified this run — no growth-specific data pulled. Flag for next pass."},
+    {label:"Rates", state:"Roughly flat", dir:"→", cls:"muted", note:"TLT $82.02, essentially flat vs prior close ($82.34, –0.4%) after an earlier-August yield-relief rally on the Treasury buyback news."},
+    {label:"Liquidity", state:"Expanding", dir:"↑", cls:"good", note:"Treasury actively increasing long-duration debt buybacks — the single policy lever cited behind both Gold's and Bitcoin's August moves."},
+    {label:"USD", state:"Weakening", dir:"↓", cls:"good", note:"Cited as a co-driver of Gold's rally alongside lower real yields."},
+    {label:"Credit", state:"Not assessed", dir:"—", cls:"muted", note:"HYG / credit-spread read not pulled this run — flagged under Research Further."},
+    {label:"AI / Tech", state:"Bifurcated", dir:"↕", cls:"warning", note:"Confirmation running hot (PLTR +27% on Aug 3 earnings, CRWV +19%/NBIS +34% on Aug 12, quantum names re-rating on real fundamentals) against one real warning sign (BABA's AI-capex margin compression) — and NVDA/CRM/HPE/Dell all report within the same 72 hours to settle which read is right."}
+  ];
+
+  var theses = [
+    {t:"OKLO", dir:"bull", dirLabel:"Bullish", conf:7, source:"watchlist", text:"No position — pure watchlist research. Confirmed technical/regulatory milestone (Groves reactor reached criticality, Aug 6 — the 5th SMR globally to do so) plus a real federal partnership pairing Oklo with Microsoft and Nvidia ($200M AI-datacenter-power initiative, Jul 21). Highest-conviction idea this run precisely because the catalysts are already-confirmed facts, not narrative.",
+     confirm:["Further regulatory approvals toward commercial operation","Additional hyperscaler/federal partnerships","Uranium-equity complex (URA/URNM) confirming strength"],
+     invalidate:["Any safety/regulatory setback","Commercial-operation timeline slips further than expected"]},
+    {t:"IBIT", dir:"bull", dirLabel:"Bullish", conf:6, source:"position", text:"Long 200x Aug28 47 calls, +31% unrealized. Riding the Treasury-liquidity-driven BTC rally, but the Friday expiration lands on the same day as Warsh's first keynote — genuine two-sided risk with zero room to react.",
+     confirm:["Continued BTC ETF net inflows","BTC holding above ~$75K into Friday","Dovish or neutral Warsh tone"],
+     invalidate:["Hawkish Warsh keynote","ETF outflow reversal","Sharp DXY strength"]},
+    {t:"GLD", dir:"bull", dirLabel:"Bullish", conf:6, source:"watchlist", text:"No direct position, but on the core watchlist. Same Treasury-buyback / lower-real-yields thread as IBIT — up ~10% in August, best month since January. Thesis and invalidation are mechanically tied to the same Jackson Hole outcome as IBIT.",
+     confirm:["Further 10Y/30Y yield declines","Continued dollar weakness","Dovish Warsh tone"],
+     invalidate:["Warsh signals hawkish / inflation-vigilant tone","Yields turn back up","Treasury slows buyback pace"]},
+    {t:"IONQ / RGTI / QBTS", dir:"bull", dirLabel:"Bullish", conf:6, source:"watchlist", text:"No position — pure watchlist research. All three quantum names delivered separate, confirming fundamental catalysts within two weeks (IonQ record revenue + raised guidance; Rigetti CHIPS Act LOI; D-Wave $550M acquisition + bookings up 12x) right after a ~30% sector selloff. This run's own snapshot already shows RGTI +11.3% and QBTS +8.5% in the latest session — real follow-through, not just a thesis.",
+     confirm:["Continued bookings/revenue growth at any of the three","Further follow-through buying after the news"],
+     invalidate:["Sector-wide risk-off from a Jackson Hole surprise (high-beta names get hit hardest)","News proves already priced in, no follow-through"]},
+    {t:"HPE / DELL", dir:"neutral", dirLabel:"Neutral / Event risk", conf:6, source:"watchlist", text:"No position — pure watchlist research. Both stocks already ran +54–59% in a month on the AI-server-demand narrative; earnings this week (HPE Aug 27, Dell ~Aug 28-29) are the confirmation test. CoreWeave/Nebius already beat big on Aug 12, setting a high bar. Genuine two-sided event — not a directional call, a binary one.",
+     confirm:["Beat-and-raise on AI-server revenue and margin","Commentary matching CRWV/NBIS-level demand strength"],
+     invalidate:["Any margin disappointment given how much is already priced into the stocks"]},
+    {t:"BABA", dir:"bear", dirLabel:"Bearish lean", conf:5, source:"position", text:"Short via 50x Aug28 110 puts, –20% unrealized. Thesis: AI-capex-driven margin compression plus a real, developing litigation/regulatory overhang (MIIT ties allegations, DoD list). Needs a further –7.6% move to reach strike; IV-implied expected move (~5.4%) falls short of that on its own.",
+     confirm:["Further downgrades / capex-margin commentary","New litigation developments","Continued DoD-list-driven outflows"],
+     invalidate:["Stock stabilizes or rallies on Alibaba Cloud AI-demand strength","Litigation dismissed or narrows"]},
+    {t:"RKLB", dir:"bull", dirLabel:"Bullish", conf:5, source:"watchlist", text:"No position — pure watchlist research. Multiple real U.S. Space Force contract wins in mid-August (Space Data Network Consortium, NITE-STAR, a Viasat GEO satellite award) — genuine revenue diversification beyond launch, not just sentiment.",
+     confirm:["Additional government/defense contract wins","Continued launch-cadence execution"],
+     invalidate:["Contract wins prove smaller in dollar terms than the market's reaction implies"]},
+    {t:"NVO", dir:"bear", dirLabel:"Bearish lean", conf:5, source:"watchlist", text:"No position — pure watchlist research. Losing ground to Lilly on two fronts this quarter: CagriSema missed head-to-head vs. tirzepatide, and Wegovy pill sales badly missed estimates ($494M vs. ~$3.6B kroner expected). A new early-stage pipeline addition (Aug 17) is a long-term-only offset.",
+     confirm:["Continued share loss to Lilly in GLP-1 data/sales","No near-term pipeline catalyst to offset"],
+     invalidate:["Strong follow-through on the new early-stage asset","Wegovy pill sales recover next quarter"]},
+    {t:"ASTS", dir:"bear", dirLabel:"Bearish lean", conf:4, source:"watchlist", text:"No position — pure watchlist research. Postponed its ~45-satellite deployment target from 2026 to early 2027 — a real execution-risk flag sitting underneath a share price still riding the broader space-sector rally (+5% in early August alongside RKLB). A caution flag more than a directional call.",
+     confirm:["Further deployment delays or guidance cuts"],
+     invalidate:["Deployment timeline gets confirmed/accelerated instead"]},
+    {t:"CRM", dir:"neutral", dirLabel:"Neutral / Event risk", conf:5, source:"watchlist", text:"No position — pure watchlist research. Wed Aug 26 earnings is a binary read on enterprise software demand and AI-product (Agentforce) monetization for the whole IGV complex (ADBE, NOW, CRWD, SNOW, WDAY and peers) — no strong directional lean pre-print.",
+     confirm:["Beat-and-raise with strong AI-product monetization commentary"],
+     invalidate:["Soft guidance on enterprise software spend"]},
+    {t:"MRNA", dir:"neutral", dirLabel:"Neutral / Cautious", conf:4, source:"position", text:"Long 11x Aug28 200 calls, small +2.6% gain. Both major catalysts (mFlusiva approval, cancer-vaccine data) already fired — annualized IV sitting at 154% is very rich for a position with no confirmed news between now and expiry.",
+     confirm:["Continued volume/momentum without fresh news","Positive Merck-partnership read-through"],
+     invalidate:["Momentum pause + IV collapse (vol crush)","Any negative follow-up data"]},
+    {t:"MU", dir:"neutral", dirLabel:"Neutral / Cautious", conf:4, source:"position", text:"Short via 30x Aug24 900 puts, –4.8% unrealized. Position expires <b>Monday</b> — before Wednesday's NVDA print — so it captures none of that reaction. Needs –6.6% in two sessions; IV-implied expected move (~3.2%) is roughly half of what's required.",
+     confirm:["Weak pre-NVDA semis positioning / memory-pricing headlines"],
+     invalidate:["No catalyst before Monday close — most likely outcome given the short window"]},
+    {t:"ANET", dir:"neutral", dirLabel:"Neutral", conf:3, source:"position", text:"Long 51x Aug28 210 calls, +12% unrealized. Pure momentum/technical play into Friday expiry — last earnings already reported Aug 4, so there's no fresh company-specific catalyst between now and expiry. Needs +11.1% to reach strike; IV-implied expected move (~6.6%) covers roughly 60% of that distance.",
+     confirm:["Broad semis-complex strength off NVDA's Wed print","General market risk-on into month-end"],
+     invalidate:["No new catalyst emerges before Friday","Semis complex sells off on NVDA guidance"]}
+  ];
+  theses.sort(function(a,b){ return b.conf - a.conf; });
+
+  var research = [
+    "<b>Exact September CPI release date</b> — search did not return a confirmed BLS calendar date this run; needed to finalize the Developing-window timeline.",
+    "<b>HYG / credit-spread read</b> on the AI-capex-and-China-regulatory risk cluster (BABA, semis broadly) — not pulled this run; would sharpen the Credit regime tile above.",
+    "<b>MU's Sep 29 earnings</b> as its own distinct trade setup for the memory/AI-capex theme — worth a dedicated pass as the date approaches.",
+    "<b>Kevin Warsh's public track record</b> — as a genuinely new Fed chair there's thin published reaction-function data; any prior speeches/writings worth surfacing ahead of Aug 28.",
+    "<b>Dell's exact earnings date</b> — sources disagree between Aug 28 and Aug 29; needs a confirmed source before the Positions/Next-7-Days pages can be fully trusted on it.",
+    "<b>Uranium-equity specifics beyond Oklo</b> (CCJ, LEU, URA, URNM individually) — this run only researched Oklo itself as the theme's anchor name; the rest of the nuclear cluster deserves its own pass.",
+    "<b>Broader software list beyond CRM</b> (ADBE, NOW, CRWD, SNOW, WDAY, DDOG, TEAM…) and <b>semis beyond MU/AVGO/NVDA</b> (AMD, ASML, AMAT, MRVL…) — CRM and AVGO anchor those two themes this run, not full coverage."
+  ];
+
+  // ---------------- Render ----------------
+  function fmtChg(v, label){
+    if(v===null || v===undefined) return '<span class="chg-flat">— n/a</span>';
+    var cls = v>0 ? 'chg-up' : (v<0 ? 'chg-down' : 'chg-flat');
+    var sign = v>0 ? '+' : '';
+    return '<span class="'+cls+'">'+sign+v.toFixed(2)+'%'+(label?(' '+label):'')+'</span>';
+  }
+
+  var trackHtml = '';
+  ticks.forEach(function(x){
+    trackHtml += '<span class="tick"><b>'+x.t+'</b><span class="px">'+(x.px!==null ? '$'+x.px.toFixed(2) : 'n/a') +'</span>'+fmtChg(x.chg, x.chgLabel)+'</span>';
+  });
+  document.getElementById('tickerTrack').innerHTML = trackHtml + trackHtml; // duplicate for seamless loop
+
+  // Warnings: computed from position data, plus known cross-position/macro collisions.
+  var warnings = [
+    {tier:"critical", text:"<b>4 of 5 positions (ANET, BABA, IBIT, MRNA) expire Fri Aug 28</b> — the same day as Fed Chair Warsh's first Jackson Hole keynote. Zero adjustment window if it surprises. Only the MU put is clear of this."}
+  ];
+  positions.forEach(function(p){
+    if(p.dte <= 2){
+      warnings.push({tier:"warning", text:'<b>'+p.t+'</b> expires in '+p.dte+' day'+(p.dte===1?'':'s')+' — needs '+(p.moveNeeded>=0?'+':'')+p.moveNeeded.toFixed(1)+'%, but the IV-implied expected move is only ~'+p.expMove.toFixed(1)+'% over that window.'});
+    }
+    if(p.iv >= 100){
+      warnings.push({tier:"warning", text:'<b>'+p.t+'</b> carries unusually rich implied volatility ('+p.iv.toFixed(0)+'% annualized) with no confirmed catalyst before expiry — vol-crush risk even if the stock holds steady.'});
+    }
+    if(Math.abs(p.moveNeeded) > p.expMove * 1.3){
+      warnings.push({tier:"warning", text:'<b>'+p.t+'</b> needs a '+Math.abs(p.moveNeeded).toFixed(1)+'% move to reach strike — noticeably beyond its ~'+p.expMove.toFixed(1)+'% IV-implied expected move by expiry.'});
+    }
+  });
+  var warnHtml = '';
+  warnings.forEach(function(w){
+    var glyph = w.tier === 'critical' ? '⛔' : '⚠';
+    warnHtml += '<div class="warn-item '+w.tier+'"><span class="warn-glyph">'+glyph+'</span><div class="warn-text">'+w.text+'</div></div>';
+  });
+  document.getElementById('warnStack').innerHTML = warnHtml || '<div class="warn-text" style="color:var(--ink-muted)">Nothing flagged this run.</div>';
+
+  var posHtml = '';
+  positions.forEach(function(p){
+    var pnlCls = p.pnl >= 0 ? 'pos-pnl-pos' : 'pos-pnl-neg';
+    var dteCls = p.dte <= 2 ? 'dte-tight' : 'dte-near';
+    posHtml += '<div class="card pos-card">'
+      + '<div class="pos-top"><div><div class="pos-ticker">'+p.t+'</div><div class="pos-contract">'+p.contract+'</div></div>'
+      + '<span class="dte '+dteCls+'">'+p.dte+'d left</span></div>'
+      + '<div class="pos-row"><span>Qty × avg</span><b>'+p.qty+' @ $'+p.avg.toFixed(2)+'</b></div>'
+      + '<div class="pos-row"><span>Mkt value</span><b>$'+p.val.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+'</b></div>'
+      + '<div class="pos-row"><span>Unrealized P&amp;L</span><b class="'+pnlCls+'">'+(p.pnl>=0?'+':'')+'$'+p.pnl.toFixed(2)+' ('+(p.pnlPct>=0?'+':'')+p.pnlPct.toFixed(1)+'%)</b></div>'
+      + '<div class="pos-row"><span>IV · OI</span><b>'+p.iv.toFixed(1)+'% · '+p.oi+'</b></div>'
+      + '<div class="pos-row"><span>Bid / Ask</span><b>$'+p.bid.toFixed(2)+' / $'+p.ask.toFixed(2)+'</b></div>'
+      + '<div class="pos-need">Spot $'+p.spot.toFixed(2)+' → strike $'+p.strike+' needs <b>'+(p.moveNeeded>=0?'+':'')+p.moveNeeded.toFixed(1)+'%</b> · ~IV-implied expected move by exp: <b>±'+p.expMove.toFixed(1)+'%</b></div>'
+      + '</div>';
+  });
+  document.getElementById('positionsGrid').innerHTML = posHtml;
+
+  var t5Html = '';
+  top5.forEach(function(e, i){
+    t5Html += '<div class="card event-card">'
+      + '<div class="event-head"><div><div class="event-title">'+(i+1)+'. '+e.title+'</div><div class="event-timing">'+e.timing+'</div></div>'
+      + '<div class="event-badges"><span class="badge badge-'+e.tier+'">'+e.tier+'</span><span class="badge-score">'+e.score+'/100</span></div></div>'
+      + '<div class="event-grid">'
+      + '<div class="field-value full"><div class="field-label">Why it matters</div>'+e.why+'</div>'
+      + '<div><div class="field-label">Expected</div><div class="field-value">'+e.expected+'</div></div>'
+      + '<div><div class="field-label">Potential surprise</div><div class="field-value">'+e.surprise+'</div></div>'
+      + '<div class="field-value full"><div class="field-label">Affected assets</div><div class="chip-row">'+e.assets.map(function(a){return '<span class="chip">'+a+'</span>';}).join('')+'</div></div>'
+      + '<div class="field-value full"><div class="field-label">Transmission</div><div class="transmission">'+e.transmission+'</div></div>'
+      + '<div><div class="field-label">What to watch</div><div class="field-value">'+e.watch+'</div></div>'
+      + '<div><div class="field-label">Trading relevance</div><div class="field-value">'+e.relevance+'</div></div>'
+      + '</div></div>';
+  });
+  document.getElementById('top5List').innerHTML = t5Html;
+
+  var tlHtml = '';
+  timeline.forEach(function(x){
+    tlHtml += '<div class="tl-item"><div class="tl-dot"></div><div class="tl-date">'+x.date+'</div><div class="tl-body">'+x.body+'</div></div>';
+  });
+  document.getElementById('timeline').innerHTML = tlHtml;
+
+  var devHtml = '';
+  developing.forEach(function(x){
+    devHtml += '<div class="card dev-card"><div class="dev-window">'+x.window+'</div><div class="dev-text">'+x.text+'</div></div>';
+  });
+  document.getElementById('devList').innerHTML = devHtml;
+
+  var dirGlyph = {good:'↑', warning:'↕', muted:'→'};
+  var regHtml = '';
+  regime.forEach(function(r){
+    regHtml += '<div class="card stat-tile"><div class="stat-label">'+r.label+'</div>'
+      + '<div class="stat-state"><span class="dir" style="color:var(--'+(r.cls==='muted'?'ink-muted':r.cls)+')">'+r.dir+'</span>'+r.state+'</div>'
+      + '<div class="stat-note">'+r.note+'</div></div>';
+  });
+  document.getElementById('regimeGrid').innerHTML = regHtml;
+
+  var thHtml = '';
+  theses.forEach(function(th, i){
+    var dirCls = th.dir==='bull' ? 'dir-bull' : (th.dir==='bear' ? 'dir-bear' : 'dir-neutral');
+    var arrow = th.dir==='bull' ? '▲' : (th.dir==='bear' ? '▼' : '●');
+    var fillColor = th.dir==='bull' ? 'var(--good)' : (th.dir==='bear' ? 'var(--critical)' : 'var(--ink-muted)');
+    var sourceTag = th.source === 'position'
+      ? '<span class="status-pill source-position">◆ Position</span>'
+      : '<span class="status-pill source-watchlist">◇ Watchlist</span>';
+    var rankTag = i < 3 ? '<span class="rank-tag rank-top">#'+(i+1)+' TOP</span>' : '<span class="rank-tag">#'+(i+1)+'</span>';
+    thHtml += '<div class="card thesis-card">'
+      + '<div class="thesis-head"><div>'+rankTag+'<div class="thesis-ticker">'+th.t+'</div><div class="thesis-dir '+dirCls+'">'+arrow+' '+th.dirLabel+'</div></div>'
+      + '<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">'+sourceTag+'<span class="status-pill status-new">● NEW</span></div></div>'
+      + '<div class="conf-row"><div class="conf-track"><div class="conf-fill" style="width:'+(th.conf*10)+'%; background:'+fillColor+'"></div></div><div class="conf-val">'+th.conf+'/10</div></div>'
+      + '<div class="thesis-text">'+th.text+'</div>'
+      + '<div class="thesis-sub"><div><div class="thesis-sub-label conf-label">Confirmation</div><ul>'+th.confirm.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul></div>'
+      + '<div><div class="thesis-sub-label inval-label">Invalidation</div><ul>'+th.invalidate.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul></div></div>'
+      + '</div>';
+  });
+  document.getElementById('thesisGrid').innerHTML = thHtml;
+
+  var rsHtml = '';
+  research.forEach(function(r, i){
+    rsHtml += '<div class="card research-item"><span class="research-num">0'+(i+1)+'</span><div class="research-text">'+r+'</div></div>';
+  });
+  document.getElementById('researchList').innerHTML = rsHtml;
+
+  // ---------------- Page routing (each nav item is its own page) ----------------
+  var pageOrder = ["positions","top5","next7","developing","regime","theses","changed","research"];
+  var pageLabels = {
+    positions:"Open Positions", top5:"Top 5 to Watch", next7:"Next 7 Days",
+    developing:"Developing 2–8wk", regime:"Market Regime", theses:"Active Theses",
+    changed:"What Changed", research:"Research Further"
+  };
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.rail a'));
+  var pages = pageOrder.map(function(id){ return document.getElementById(id); });
+
+  function renderPager(id){
+    var idx = pageOrder.indexOf(id);
+    var prevId = idx > 0 ? pageOrder[idx-1] : null;
+    var nextId = idx < pageOrder.length-1 ? pageOrder[idx+1] : null;
+    var html = prevId
+      ? '<a href="#'+prevId+'">◂ '+pageLabels[prevId]+'</a>'
+      : '<a class="disabled">◂</a>';
+    html += nextId
+      ? '<a class="pager-next" href="#'+nextId+'">'+pageLabels[nextId]+' ▸</a>'
+      : '<a class="pager-next disabled">▸</a>';
+    var el = document.querySelector('.pager[data-pager="'+id+'"]');
+    if(el) el.innerHTML = html;
+  }
+  pageOrder.forEach(renderPager);
+
+  function showPage(id){
+    if(pageOrder.indexOf(id) === -1) id = pageOrder[0];
+    pages.forEach(function(p){ if(p) p.classList.toggle('active', p.id===id); });
+    links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href') === '#'+id); });
+    var idx = pageOrder.indexOf(id);
+    document.querySelectorAll('[data-progress]').forEach(function(el){
+      el.textContent = (idx+1)+' / '+pageOrder.length+' · '+pageLabels[id];
+    });
+    window.scrollTo(0,0);
+  }
+  window.addEventListener('hashchange', function(){ showPage(location.hash.slice(1)); });
+  showPage(location.hash.slice(1) || pageOrder[0]);
+})();
+</script>
+</body>

@@ -1,0 +1,269 @@
+{
+  "last_updated": "2026-08-23",
+  "theses": [
+    {
+      "asset": "NEM",
+      "direction": "Bullish",
+      "confidence": 7,
+      "source": "discovered",
+      "thesis": "Not on the IBKR watchlist - surfaced via this run's news-discovery pass. Barrick/Newmont finalized the long-disputed Nevada Gold Mines JV contribution in August; record Q2 free cash flow ($2.2B) and operating cash flow ($2.9B, Jul 23 release); gold near a 3-month high on softer dollar and bond-market moves. Multiple analyst PT raises (Scotiabank to $149, CIBC to $170) this month. Same Treasury-buyback/lower-real-yields thread as GLD/IBIT, but with mining operating leverage on top.",
+      "confirmation": ["Continued gold price strength into/through Jackson Hole", "Nevada JV synergies flowing through guidance", "Further analyst PT raises"],
+      "invalidation": ["Hawkish Warsh keynote reverses the dollar-weakness/gold thread", "Gold gives back the recent rally"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 7, "note": "New card this run (news-discovered)"}]
+    },
+    {
+      "asset": "OKLO",
+      "direction": "Bullish",
+      "confidence": 7,
+      "source": "watchlist",
+      "thesis": "Confirmed technical/regulatory milestone (Groves reactor reached criticality, Aug 6 - the 5th SMR globally) plus a real federal partnership pairing Oklo with Microsoft and Nvidia ($200M AI-datacenter-power initiative, Jul 21). No new confirming or disconfirming news found this run. Note: OKLO did NOT make this run's volume-ranked Energy top-5 (PLUG, PURR, XOM, COP, CVX ranked higher by trading volume) - it stays on the board purely because the thesis was already active and unrefuted, not because the new selection mechanism resurfaced it. That is a genuine methodology artifact worth watching: a real catalyst can go quiet-but-valid even as volume rotates elsewhere.",
+      "confirmation": ["Further regulatory approvals toward commercial operation", "Additional hyperscaler/federal partnerships", "Uranium-equity complex (URA/URNM) confirming strength"],
+      "invalidation": ["Any safety/regulatory setback", "Commercial-operation timeline slips further than expected"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 7}]
+    },
+    {
+      "asset": "IONQ / RGTI / QBTS / QUBT / LAES",
+      "direction": "Bullish",
+      "confidence": 7,
+      "source": "watchlist",
+      "thesis": "Quantum complex now has a FOURTH confirming, independent catalyst this run: SEALSQ (LAES) CEO letter (Aug 13) reported ~120% YoY H1 revenue growth, a $485M cash position, and a new Chief Quantum Officer hire, on top of IonQ's record revenue/raised guidance, Rigetti's CHIPS Act LOI, and D-Wave's $550M acquisition + 12x bookings growth. Confidence raised from 6 to 7 - multiple independently-sourced, real fundamental catalysts across the sector rather than one name carrying the thesis.",
+      "confirmation": ["Continued bookings/revenue growth at any of the five", "LAES Phase 2 of its $200M quantum investment plan (begins Sep 2026)", "Further follow-through buying"],
+      "invalidation": ["Sector-wide risk-off from a Jackson Hole surprise (high-beta names hit hardest)", "News proves already priced in, no follow-through"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 6}, {"date": "2026-08-23", "confidence": 7, "note": "LAES adds a 4th independent confirming catalyst"}]
+    },
+    {
+      "asset": "GLD",
+      "direction": "Bullish",
+      "confidence": 7,
+      "source": "watchlist",
+      "thesis": "Same Treasury-buyback / lower-real-yields / softer-dollar thread as IBIT and the newly-discovered NEM. Gold near a 3-month high; Bitcoin briefly topped $78K over the weekend before a sharp pullback ($109.7M in BTC/ETH liquidations, 80% long-side) - the two assets are trading the same liquidity narrative but crypto is showing much more two-sided volatility than gold right now. Confidence raised from 6 to 7 given NEM's independent confirmation of the same thread from the equity side.",
+      "confirmation": ["Further 10Y/30Y yield declines", "Continued dollar weakness", "Dovish Warsh tone", "NEM/gold-miner strength holding"],
+      "invalidation": ["Warsh signals hawkish/inflation-vigilant tone", "Yields turn back up", "Treasury slows buyback pace"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 6}, {"date": "2026-08-23", "confidence": 7}]
+    },
+    {
+      "asset": "IBIT",
+      "direction": "Bullish, two-sided into Friday",
+      "confidence": 6,
+      "source": "position",
+      "thesis": "Long 200x Aug28 47 calls, +31% unrealized as of this run's snapshot. BTC topped $78K over the weekend on continued Treasury-liquidity/dollar-weakness themes and $1.9B in weekly Bitcoin-product inflows, but then saw a sharp weekend pullback with heavy long-side liquidations - genuinely two-sided right now, not a clean momentum tape. The dominant structural fact is unchanged: expiration lands the exact same day as Fed Chair Warsh's first keynote.",
+      "confirmation": ["Continued BTC ETF net inflows", "BTC holding above the mid-$70Ks into Friday", "Dovish or neutral Warsh tone"],
+      "invalidation": ["Hawkish Warsh keynote", "ETF outflow reversal", "Sharp DXY strength", "Weekend liquidation cascade extends into the week"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 6}]
+    },
+    {
+      "asset": "MRVL",
+      "direction": "Bullish, event risk",
+      "confidence": 6,
+      "source": "watchlist",
+      "thesis": "New this run (volume-ranked into the semis top-5). Google extended and expanded its custom AI-ASIC deal with Marvell to $12B, validating the custom-silicon platform thesis. Stock ran from a $162.93 July low to $252 this week before retreating to ~$235 as chips pulled back with the broader SOX selloff. Earnings date has a genuine source conflict (see What Changed) - treat exact timing as single-source until closer to the date.",
+      "confirmation": ["Earnings beat-and-raise with strong custom-silicon/ASIC commentary", "Further hyperscaler ASIC deal announcements"],
+      "invalidation": ["Earnings miss or soft guidance after the recent run-up", "Broad semis complex sells off into NVDA's print"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 6, "note": "New card this run"}]
+    },
+    {
+      "asset": "INTC",
+      "direction": "Bullish, rich after the run",
+      "confidence": 6,
+      "source": "watchlist",
+      "thesis": "New this run (volume-ranked #1 in semis by a wide margin - 91.7M shares). Closed a $20B stock offering (upsized from $15B) at $95/share on Aug 12, backed by strong AI-compute demand signaling and a 10% US government equity stake. Stock up 175% YTD, quintupled over the last year. The offering itself supplies the elevated volume; no fresh dated catalyst beyond continued AI-capex-cycle momentum.",
+      "confirmation": ["Continued AI-compute/foundry demand commentary", "Successful integration of the $20B raise into capacity plans"],
+      "invalidation": ["Profit-taking after such a large run and dilutive offering", "AI-capex-cycle sentiment cools broadly"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 6, "note": "New card this run"}]
+    },
+    {
+      "asset": "COIN",
+      "direction": "Bullish",
+      "confidence": 6,
+      "source": "discovered",
+      "thesis": "Not on the IBKR watchlist - news-discovered. Direct BTC-rally beneficiary: gained ~9% as crypto shares rallied on a retreat in Treasury yields, then a short squeeze accelerated the move (~$2.7B in crypto shorts liquidated). Same macro thread as IBIT/GLD/NEM but with higher beta and added crypto-market-structure/regulatory sensitivity.",
+      "confirmation": ["Continued BTC strength and crypto-exchange volume", "Favorable SEC crypto-asset rulemaking progress"],
+      "invalidation": ["BTC pullback deepens beyond the weekend liquidation move", "Regulatory setback"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 6, "note": "New card this run (news-discovered)"}]
+    },
+    {
+      "asset": "HOOD",
+      "direction": "Bullish",
+      "confidence": 6,
+      "source": "discovered",
+      "thesis": "Not on the IBKR watchlist - news-discovered. Genuine developing regulatory catalyst: CEO Vlad Tenev publicly pushed (Aug 18) for tokenized-securities rules, and the SEC is reportedly working on an 'innovation exemption' that could allow approved platforms 24/7 tokenized-stock trading - would be a real structural unlock for Robinhood if it lands. Also a direct beneficiary of the BTC rally (stock +4.5% Fri Aug 21 alone).",
+      "confirmation": ["SEC innovation-exemption progress/announcement", "Continued crypto-rally tailwind"],
+      "invalidation": ["SEC rulemaking stalls or goes against tokenization", "Crypto rally reverses"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 6, "note": "New card this run (news-discovered)"}]
+    },
+    {
+      "asset": "ONDS",
+      "direction": "Bullish",
+      "confidence": 6,
+      "source": "watchlist",
+      "thesis": "New this run. Record Q2 revenue ($83.8M, +67% sequential, >13x YoY), FY26 revenue guidance raised to $525-550M, $1.4B cash. Real, dated military catalysts: a new >$50M US Army order for Lethal Unmanned Systems (total program awards now >$240M) and a strategic win with the Israeli MoD on next-gen low-cost attack drones. Multiple analysts (Oppenheimer, Ladenburg, Roth) maintain Buy/Outperform with raised targets.",
+      "confirmation": ["Further military contract wins", "Successful Cyberhawk/Aran Defense acquisition integration"],
+      "invalidation": ["Contract award pace slows", "Small-cap defense-tech names sell off on a broader risk-off move"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 6, "note": "New card this run"}]
+    },
+    {
+      "asset": "HPE / DELL",
+      "direction": "Neutral / Event risk",
+      "confidence": 6,
+      "source": "watchlist",
+      "thesis": "Both stocks already ran +54-59% in a month on the AI-server-demand narrative; earnings this week (HPE ~Aug 27, Dell ~Aug 28-29, exact date still unconfirmed) are the test. CoreWeave/Nebius already beat huge on Aug 12 (CRWV +19%, NBIS +34%), setting a very high bar for the rest of the AI-infra complex.",
+      "confirmation": ["Beat-and-raise on AI-server revenue and margin", "Commentary matching CRWV/NBIS-level demand strength"],
+      "invalidation": ["Any margin disappointment given how much is already priced into the stocks"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 6}]
+    },
+    {
+      "asset": "BABA",
+      "direction": "Bearish lean, slightly softened",
+      "confidence": 5,
+      "source": "position",
+      "thesis": "Short via 50x Aug28 110 puts, roughly -24% unrealized as of this run's snapshot. Core thesis unchanged (AI-capex margin compression, MIIT/DoD-list litigation overhang), but a new confirmed data point cuts slightly against it: Alibaba agreed (Aug 17) to sell its videogame business for at least $1.5B - a real capital-discipline/portfolio-simplification move, not just narrative. Doesn't invalidate the thesis but softens conviction slightly; confidence held at 5 rather than raised, pending how the market reads the divestiture.",
+      "confirmation": ["Further downgrades/capex-margin commentary", "New litigation developments", "Continued DoD-list-driven outflows"],
+      "invalidation": ["Stock stabilizes/rallies on Alibaba Cloud AI-demand strength or the videogame-sale capital discipline read", "Litigation dismissed or narrows"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 5}]
+    },
+    {
+      "asset": "RKLB",
+      "direction": "Bullish",
+      "confidence": 5,
+      "source": "watchlist",
+      "thesis": "Multiple real U.S. Space Force contract wins in mid-August (Space Data Network Consortium, NITE-STAR, a Viasat GEO satellite award). No new confirming or disconfirming news found this run; note RKLB is also the #2 holding (11.4%) in the newly-clarified 'NASA' ticker, which is actually the Tema Space Innovators ETF, not the space agency.",
+      "confirmation": ["Additional government/defense contract wins", "Continued launch-cadence execution"],
+      "invalidation": ["Contract wins prove smaller in dollar terms than the market's reaction implies"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 5}]
+    },
+    {
+      "asset": "NVO",
+      "direction": "Bearish lean",
+      "confidence": 5,
+      "source": "watchlist",
+      "thesis": "Losing ground to Lilly on two fronts: CagriSema missed head-to-head vs. tirzepatide, and Wegovy pill sales badly missed estimates. No new confirming or disconfirming news found this run.",
+      "confirmation": ["Continued share loss to Lilly in GLP-1 data/sales", "No near-term pipeline catalyst to offset"],
+      "invalidation": ["Strong follow-through on the new early-stage asset", "Wegovy pill sales recover next quarter"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 5}]
+    },
+    {
+      "asset": "CRM",
+      "direction": "Neutral / Event risk",
+      "confidence": 5,
+      "source": "watchlist",
+      "thesis": "Earnings this week is a binary read on enterprise software demand and Agentforce monetization for the whole IGV complex. No strong directional lean pre-print; note the exact reporting day has some cross-source date uncertainty this week (see What Changed).",
+      "confirmation": ["Beat-and-raise with strong AI-product monetization commentary"],
+      "invalidation": ["Soft guidance on enterprise software spend"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 5}]
+    },
+    {
+      "asset": "SOFI",
+      "direction": "Neutral, bullish lean",
+      "confidence": 5,
+      "source": "watchlist",
+      "thesis": "New this run (top volume name in two watchlists). Q2 beat with 35% member growth, 42% product growth, and raised FY26 guidance (32-35% revenue growth, 33-34% EBITDA margin). Two-sided analyst picture: Piper Sandler initiated Overweight ($22 PT) but Morgan Stanley cut its target to $15 from $16 on capital-intensity concerns.",
+      "confirmation": ["Continued member/product growth beats", "Positive read-through from new SoFi Invest private-market fund launches"],
+      "invalidation": ["Capital-intensity concerns (Morgan Stanley's thesis) prove out", "Growth deceleration"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 5, "note": "New card this run"}]
+    },
+    {
+      "asset": "NOK",
+      "direction": "Bullish",
+      "confidence": 5,
+      "source": "watchlist",
+      "thesis": "New this run. Q2 comparable EPS rose to EUR0.07 from EUR0.04 on EUR2.8B in AI & Cloud orders; launched a commercial AI-RAN platform with Nvidia (pilots this year, 2027 subscription rollout). A potential FCC ban on new Chinese optical transceivers could redirect data-center demand toward non-Chinese suppliers like Nokia. BofA raised its PT to $18.50 (Buy) on the Q2 print.",
+      "confirmation": ["FCC Chinese-transceiver ban progresses", "AI-RAN pilot wins", "Continued AI & Cloud order growth"],
+      "invalidation": ["FCC action stalls or is watered down", "AI order momentum fades"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 5, "note": "New card this run"}]
+    },
+    {
+      "asset": "GILD",
+      "direction": "Neutral / Event risk",
+      "confidence": 5,
+      "source": "discovered",
+      "thesis": "Not on the IBKR watchlist - news-discovered specifically because it fits the trader's stated interest in FDA/PDUFA-driven catalysts. PDUFA date Aug 27 (this week) for the bictegravir/lenacapavir combination (ARTISTRY-2). Binary regulatory event - no directional lean, pure event-risk/vol-catalyst framing.",
+      "confirmation": ["N/A - binary regulatory outcome"],
+      "invalidation": ["N/A - binary regulatory outcome"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 5, "note": "New card this run (news-discovered)"}]
+    },
+    {
+      "asset": "MRNA",
+      "direction": "Neutral / Cautious",
+      "confidence": 4,
+      "source": "position",
+      "thesis": "Long 11x Aug28 200 calls, small +2.6% gain as of this run. Both major catalysts (mFlusiva approval, cancer-vaccine data) already fired; deep OTM (~37% away from strike with 5 DTE) with previously-flagged rich IV and no confirmed news before expiry. No new MRNA-specific news found this run - vol-crush/moneyness risk stands.",
+      "confirmation": ["Continued volume/momentum without fresh news", "Positive Merck-partnership read-through"],
+      "invalidation": ["Momentum pause + IV collapse (vol crush)", "Any negative follow-up data"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 4}]
+    },
+    {
+      "asset": "MU",
+      "direction": "Neutral / Cautious",
+      "confidence": 4,
+      "source": "position",
+      "thesis": "Short via 30x Aug24 900 puts, roughly -5% unrealized. Now just 1 DTE (expires Monday Aug 24) - needs a ~6.6% down move in a single session with no identified catalyst before Monday's close. Tightest timeline of any open position this run.",
+      "confirmation": ["Weak pre-NVDA semis positioning/memory-pricing headlines over the weekend or Monday"],
+      "invalidation": ["No catalyst before Monday close - most likely outcome given the one-session window"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 4}]
+    },
+    {
+      "asset": "ASTS",
+      "direction": "Bearish lean",
+      "confidence": 4,
+      "source": "watchlist",
+      "thesis": "Postponed its ~45-satellite deployment target from 2026 to early 2027 - a real execution-risk flag sitting underneath a share price still riding the broader space-sector rally. No new confirming or disconfirming news found this run.",
+      "confirmation": ["Further deployment delays or guidance cuts"],
+      "invalidation": ["Deployment timeline gets confirmed/accelerated instead"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 4}]
+    },
+    {
+      "asset": "RKT",
+      "direction": "Neutral / Mixed",
+      "confidence": 4,
+      "source": "watchlist",
+      "thesis": "New this run. Record Q2 profitability (adjusted EBITDA $766M, most profitable quarter in four years) and record purchase/refinance market share, but Q3 revenue guidance ($2.5-2.7B) landed below the $2.91B consensus, and mortgage rates near a near-one-year high are choking purchase activity. Genuinely mixed - Morgan Stanley upgraded to Overweight ($19 PT) same week Stephens cut its target to $20.",
+      "confirmation": ["Mortgage rates ease", "Q3 guidance beat despite the soft outlook"],
+      "invalidation": ["Housing/mortgage-rate headwind persists or worsens"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 4, "note": "New card this run"}]
+    },
+    {
+      "asset": "REGN",
+      "direction": "Neutral / Event risk",
+      "confidence": 4,
+      "source": "discovered",
+      "thesis": "Not on the IBKR watchlist - news-discovered. PDUFA date Aug 31 (garetosmab, OPTIMA) - binary regulatory event slightly further out than GILD's. Included for the trader's stated PDUFA-calendar interest, not because of any directional read.",
+      "confirmation": ["N/A - binary regulatory outcome"],
+      "invalidation": ["N/A - binary regulatory outcome"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-23", "confidence": 4, "note": "New card this run (news-discovered)"}]
+    },
+    {
+      "asset": "ANET",
+      "direction": "Neutral",
+      "confidence": 3,
+      "source": "position",
+      "thesis": "Long 51x Aug28 210 calls, +11% unrealized. Pure momentum play into Friday expiry, no fresh company catalyst since Aug 4 earnings. Note: ANET did not make this run's volume-ranked semis top-5 (INTC/MRVL/CRWV/MU/NBIS ranked higher) - it is researched purely because it is an open position, exactly as the position-always-researched rule is designed to guarantee.",
+      "confirmation": ["Broad semis-complex strength off NVDA's Wed print", "General market risk-on into month-end"],
+      "invalidation": ["No new catalyst before Friday", "Semis complex sells off on NVDA guidance"],
+      "last_update": "2026-08-23",
+      "history": [{"date": "2026-08-22", "confidence": 3}]
+    }
+  ]
+}

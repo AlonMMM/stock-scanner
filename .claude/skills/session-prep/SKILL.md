@@ -113,3 +113,7 @@ No trade suggestions, no "buy this." It answers three questions — what do I ha
 I allowed to size, what's moving — and leaves the decision to the account holder. It also
 does not touch the ladder rung (see above), does not fetch news or earnings automatically,
 and does not persist anything — each run is a fresh snapshot, not a record.
+
+For catalyst research, a ranked "what should I be watching" list, and theses tracked over
+time with history, that is the separate `trading-intelligence` skill — this one stays
+narrow (account state and sizing math) on purpose.

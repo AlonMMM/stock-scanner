@@ -5,8 +5,10 @@ description: >-
   Brokers, work out support and resistance (pivots, swing highs/lows, volume
   profile / VWAP), find the options open-interest "magnets" (call wall, put
   wall, max pain) for the nearest expiry, measure how the stock is moving
-  relative to a benchmark (SPY by default) both intraday (beta-adjusted alpha,
-  a rolling beta that exposes regime shifts) and positionally (an IBD/Minervini
+  relative to a benchmark (SPY by default, but swapped for whatever actually
+  correlates best when a quick beta/correlation check says the official
+  sector or the broad market is the wrong fit) both intraday (beta-adjusted
+  alpha, a rolling beta that exposes regime shifts) and positionally (an IBD/Minervini
   relative-strength line plus an open reconstruction of a Relative Rotation
   Graph's RS-Ratio/RS-Momentum quadrant), and merge every level found into one
   trade-planning ladder with mechanical risk/reward for a long or short from
@@ -217,10 +219,39 @@ search_contracts(query=<TICKER>)
 ```
 Pick the row with an **exact symbol match** and `STK` in `sections` (primary
 US listing — watch for leveraged/inverse/income ETFs that share the ticker
-root, e.g. `NVDL`, `NVDY` are not `NVDA`). Do the same for the benchmark if
-it isn't already known (SPY's contract_id is `756733`; QQQ, IWM, or a sector
-SPDR are reasonable substitutes when the ticker doesn't track the broad
-market — ask if unsure, don't guess a sector).
+root, e.g. `NVDL`, `NVDY` are not `NVDA`).
+
+**Pick the benchmark by what actually moves the stock, not by its official
+sector classification.** GICS/official sector is a starting guess, not the
+answer — a name's real driver is frequently something else entirely (a
+commodity, a single dominant customer/theme, a currency). The MSTR case is
+the concrete example: its official sector is Software (→ IGV), but a quick
+60-day correlation check showed IGV at 0.43 and SPY at 0.39 — both weak —
+while IBIT (a spot-Bitcoin ETF, nothing to do with its GICS sector) came in
+at 0.82 with a clean ~2x beta, because MSTR's balance sheet is a leveraged
+bitcoin position. Default to SPY, but before committing to it (or to the
+"obvious" sector ETF) for a name where the fit looks like it might be
+loose, spend one cheap daily-bar pull on a plausible alternative — a sector
+SPDR, a commodity/crypto ETF, a mega-cap peer it's known to trade with —
+and compare correlation and beta the same way (see the benchmark-selection
+check below). Use whichever one actually fits; say so either way, including
+when SPY turns out to be the right answer. SPY's contract_id is `756733`.
+Ask the user if there's no clear candidate to test.
+
+**Quick benchmark-fit check (cheap, do this whenever the "obvious"
+benchmark is in doubt):** pull just the daily bars (`ONE_DAY`/`SIX_MONTHS`)
+for each candidate — no hourly/intraday/options needed yet — and compare:
+```python
+r = prices.pct_change().dropna()
+r60 = r.tail(60)
+beta = r60["stock"].cov(r60["candidate"]) / r60["candidate"].var()
+corr = r60["stock"].corr(r60["candidate"])
+```
+Report both `beta` and `corr` for every candidate tried, not just the
+winner — a low-correlation "winner" among weak options is still weak, and
+that's worth saying. Once a benchmark is picked this way, run the full
+workflow (steps 2-4 below) against it alone; don't fetch hourly/intraday/
+options data for every candidate.
 
 ### 2. Pull price history — three timeframes, both symbols
 
@@ -382,10 +413,16 @@ the risk/reward looks like if the first target doesn't hold the trade.
   stockcharts.com/relativerotationgraphs.com use are proprietary and this
   script does not claim to match them tick-for-tick. Treat the quadrant
   label as directionally informative, not as a precise reading.
-- **Relative strength needs a benchmark that actually applies.** SPY is a
-  reasonable default; a single-stock reader in a sector that diverges hard
-  from the S&P 500 (e.g. gold miners, biotech) is better served by a sector
-  ETF — ask if it isn't obvious.
+- **Relative strength needs a benchmark that actually applies, and the
+  official sector is only a guess at what that is.** SPY is a reasonable
+  default; a name that diverges hard from the S&P 500 needs a real
+  candidate check (see the benchmark-fit check in the Workflow), not an
+  automatic swap to its GICS sector ETF — the sector can fit worse than
+  SPY does. MSTR is the worked example: sector ETF (IGV) corr 0.43, SPY
+  corr 0.39, both weak, while IBIT (Bitcoin) corr 0.82 — the real driver
+  had nothing to do with its sector classification. Report the correlation
+  number for whatever benchmark is used either way, so a weak fit is
+  visible rather than implied by the choice of benchmark alone.
 - **The trade-plan scenarios are arithmetic, not a recommendation.** Both
   the long and the short case are always computed and reported together;
   never present only one of them, and never phrase the output as "you

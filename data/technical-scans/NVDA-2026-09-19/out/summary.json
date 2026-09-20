@@ -1,7 +1,7 @@
 {
   "ticker": "NVDA",
   "spot": 222.53,
-  "generated_at": "2026-09-20T06:20:19.933557+00:00",
+  "generated_at": "2026-09-20T08:26:50.035846+00:00",
   "pivots_from_prior_day": {
     "pp": 221.01,
     "r1": 223.99,
@@ -64,10 +64,13 @@
   },
   "relative_strength": {
     "benchmark": "SPY",
-    "beta": 1.93,
-    "beta_correlation": 0.55,
-    "beta_lookback_days": 60,
-    "alpha_now_pp": 1.15,
+    "beta_60d": 1.93,
+    "beta_60d_correlation": 0.55,
+    "beta_60d_lookback_days": 60,
+    "beta_recent": 2.81,
+    "beta_recent_window_days": 20,
+    "beta_regime_shift": 0.88,
+    "alpha_now_pp": 1.1,
     "pct_session_alpha_positive": 100.0,
     "divergence_windows": [
       {
@@ -97,7 +100,11 @@
         "stock_move_pp": -0.009,
         "bench_move_pp": 0.154
       }
-    ]
+    ],
+    "rs_line_at_new_high": false,
+    "rs_ratio_now": 100.61,
+    "rs_momentum_now": 99.24,
+    "rs_quadrant": "Weakening"
   },
   "trade_plan": {
     "spot": 222.53,
@@ -355,6 +362,7 @@
     "03_intraday_volume_profile.png",
     "04_options_oi.png",
     "05_relative_strength.png",
-    "06_trade_levels.png"
+    "06_trade_levels.png",
+    "07_rs_rotation.png"
   ]
 }

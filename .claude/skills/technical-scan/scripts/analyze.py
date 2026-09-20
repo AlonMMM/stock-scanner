@@ -6,11 +6,13 @@ Takes the raw JSON bar data and option open-interest table that Claude already
 pulled from the IBKR MCP tools (get_price_history / get_option_data /
 get_price_snapshot) and turns it into:
 
-  - a JSON summary (support/resistance, options magnets, relative strength)
+  - a JSON summary (support/resistance, options magnets, beta-adjusted
+    relative strength, RS-line/rotation, and a merged trade-level ladder)
     printed to stdout
-  - five PNG charts (daily, hourly, intraday+volume-profile, options OI/max
-    pain, relative strength vs benchmark) written to --outdir
-  - one self-contained HTML report that embeds all five charts plus the
+  - seven PNG charts (daily, hourly, intraday+volume-profile, options OI/max
+    pain, intraday relative strength vs benchmark, RS-line + rotation
+    quadrant, and the trade-level ladder) written to --outdir
+  - one self-contained HTML report that embeds all seven charts plus the
     numeric summary, written to --outdir/report.html
 
 This script does no network I/O. All data comes from the files Claude saved
@@ -226,6 +228,83 @@ def compute_beta(stock_daily, bench_daily, lookback=60):
     beta = float(r["s"].cov(r["b"]) / var_b) if var_b > 0 else 1.0
     corr = float(r["s"].corr(r["b"])) if len(r) > 2 else float("nan")
     return beta, corr, len(r)
+
+
+def rolling_beta_series(stock_daily, bench_daily, window=20):
+    """A trailing `window`-day rolling beta, not one static figure. Research
+    on beta estimation is consistent on two points that argue against the
+    single 60-day beta used elsewhere in this script for anything but
+    long-run context: a short window (~20 trading days, i.e. about a
+    month -- matched to how often a swing/day trader actually revisits the
+    thesis) reacts to a real regime change, where a long window smooths it
+    away; and beta measurably varies within and across days for the same
+    name, so a single flat multiplier is always somewhat wrong, just by a
+    varying amount. The trailing series lets a divergence between the
+    recent 20-day beta and the longer 60-day one be seen directly instead
+    of hidden inside one number. See SKILL.md for sources."""
+    joined = pd.DataFrame({"s": stock_daily["Close"], "b": bench_daily["Close"]}).dropna()
+    r = np.log(joined).diff().dropna()
+    cov = r["s"].rolling(window).cov(r["b"])
+    var = r["b"].rolling(window).var()
+    beta = (cov / var).dropna()
+    return beta
+
+
+def compute_rs_line(daily_stock, daily_bench, ma_window=50, new_high_lookback=63):
+    """The classic IBD/Minervini-style Relative Strength Line: price ratio
+    stock/benchmark * 100, plotted against its own moving average. This is
+    a different, complementary read from the beta-adjusted alpha above --
+    alpha is a same-day, intraday number; the RS Line is a slow, positional
+    read on whether the stock has been the better place to be over months.
+    A rising line with the line itself making a fresh N-day high (default
+    63 trading days ~ one quarter) is the textbook bullish relative-strength
+    signal, independent of whether the stock's own price has made a new
+    high -- the line can break out before price does."""
+    joined = pd.DataFrame({"s": daily_stock["Close"], "b": daily_bench["Close"]}).dropna()
+    rs = joined["s"] / joined["b"] * 100
+    rs_ma = rs.rolling(ma_window, min_periods=max(5, ma_window // 5)).mean()
+    rolling_max = rs.rolling(new_high_lookback, min_periods=10).max()
+    at_new_high = bool(len(rs) and rs.iloc[-1] >= rolling_max.iloc[-1] - 1e-9)
+    return rs, rs_ma, at_new_high
+
+
+def compute_rs_rotation(rs_line, smooth_window=10, z_window=25, momentum_shift=5):
+    """An open, non-proprietary approximation of the JdK RS-Ratio / RS-Momentum
+    pair behind Relative Rotation Graphs (RRG): both axes are z-scores (mean
+    100, spread controlled by trailing standard deviation) so a security's
+    relative TREND (RS-Ratio) and the ACCELERATION of that trend
+    (RS-Momentum) can be read as one point in one of four quadrants:
+      Leading    (ratio>100, momentum>100) -- outperforming and still gaining
+      Weakening  (ratio>100, momentum<100) -- still outperforming, losing steam
+      Lagging    (ratio<100, momentum<100) -- underperforming and still fading
+      Improving  (ratio<100, momentum>100) -- underperforming, but turning up
+    stockcharts.com/relativerotationgraphs.com's exact formula is
+    proprietary; this reconstructs the publicly-documented general method
+    (smoothed relative price -> z-score vs. its own recent history for the
+    ratio; rate of change of that ratio, z-scored the same way, for
+    momentum) rather than claiming to replicate their licensed indicator."""
+    rs_smooth = rs_line.rolling(smooth_window, min_periods=max(3, smooth_window // 3)).mean()
+    ratio_dev = rs_smooth - rs_smooth.rolling(z_window, min_periods=10).mean()
+    ratio_std = rs_smooth.rolling(z_window, min_periods=10).std()
+    rs_ratio = 100 + (ratio_dev / ratio_std)
+
+    mom_raw = rs_ratio - rs_ratio.shift(momentum_shift)
+    mom_dev = mom_raw - mom_raw.rolling(z_window, min_periods=10).mean()
+    mom_std = mom_raw.rolling(z_window, min_periods=10).std()
+    rs_momentum = 100 + (mom_dev / mom_std)
+    return rs_ratio, rs_momentum
+
+
+def classify_quadrant(ratio, momentum):
+    if ratio is None or momentum is None or math.isnan(ratio) or math.isnan(momentum):
+        return "unknown"
+    if ratio >= 100 and momentum >= 100:
+        return "Leading"
+    if ratio >= 100 and momentum < 100:
+        return "Weakening"
+    if ratio < 100 and momentum < 100:
+        return "Lagging"
+    return "Improving"
 
 
 def session_rebased_pct(df, day):
@@ -575,7 +654,7 @@ def plot_options(strikes, ticker, expiry, spot, outdir):
     return path, fig, call_wall, put_wall, mp_strike
 
 
-def plot_relative_strength(df_t, df_b, ticker, bench, beta, corr, outdir,
+def plot_relative_strength(df_t, df_b, ticker, bench, beta, corr, outdir, beta_label="beta",
                             smooth_window=3, div_window=6, div_bench_floor=0.15, div_stock_flat=0.07):
     """Beta-adjusted relative strength, intraday, continuous through the
     session -- not a single end-of-window number.
@@ -661,7 +740,7 @@ def plot_relative_strength(df_t, df_b, ticker, bench, beta, corr, outdir,
     ax1.legend(fontsize=8, loc="upper left")
     ax1.set_title(
         f"{ticker} vs {bench} - normalized intraday % move, rebased each session "
-        f"(60d beta={beta:.2f}, corr={corr:.2f})"
+        f"({beta_label}={beta:.2f}, corr={corr:.2f})"
     )
     ax2.axhline(0, color="black", linewidth=0.6)
     ax2.set_title(
@@ -681,6 +760,73 @@ def plot_relative_strength(df_t, df_b, ticker, bench, beta, corr, outdir,
     return path, fig, float(alpha_smooth.iloc[-1]), pct_positive, windows
 
 
+def plot_rs_rotation(daily, rs_line, rs_ma, rs_ratio, rs_momentum, rolling_beta, ticker, bench, outdir):
+    """Three panels answering "what has the stock been doing against the
+    index, positionally, and is that getting stronger or weaker":
+      1. The RS Line (price ratio, IBD/Minervini-style) with its own MA --
+         a slow, daily-timeframe read, independent of the intraday alpha
+         chart. A fresh high in this line is a real relative-strength
+         breakout signal even if the stock's own price hasn't broken out.
+      2. The rolling 20-day beta vs. the flat 60-day beta -- makes a
+         regime shift in the stock's sensitivity to the market visible
+         instead of buried inside one static number.
+      3. An RRG-style rotation quadrant: the last ~20 trading days'
+         (RS-Ratio, RS-Momentum) points as a fading trail, so the
+         direction of travel between Leading/Weakening/Lagging/Improving
+         is visible, not just today's dot.
+    """
+    idx = daily.index
+    fig = plt.figure(figsize=(11, 11))
+    gs = fig.add_gridspec(3, 1, height_ratios=[1.3, 0.8, 1.6], hspace=0.4)
+    ax1, ax2, ax3 = fig.add_subplot(gs[0]), fig.add_subplot(gs[1]), fig.add_subplot(gs[2])
+
+    ax1.plot(idx, rs_line.values, color="#0057d8", linewidth=1.4, label=f"RS line ({ticker}/{bench} x100)")
+    ax1.plot(idx, rs_ma.values, color="#c98a00", linewidth=1.0, linestyle="--", label="RS line MA")
+    ax1.legend(fontsize=8, loc="upper left")
+    ax1.set_title(f"{ticker} relative strength line vs {bench} (IBD/Minervini-style)", fontsize=10.5)
+
+    ax2.plot(rolling_beta.index, rolling_beta.values, color="#8a4fd6", linewidth=1.3, label="20d rolling beta")
+    ax2.axhline(rolling_beta.iloc[-1], color="#8a4fd6", linewidth=0.6, linestyle=":")
+    ax2.legend(fontsize=8, loc="upper left")
+    ax2.set_title("Rolling beta -- watch for the recent value drifting away from the long-run one", fontsize=9)
+
+    valid = rs_ratio.notna() & rs_momentum.notna()
+    rr, rm = rs_ratio[valid], rs_momentum[valid]
+    tail_n = min(20, len(rr))
+    if tail_n >= 2:
+        rr_tail, rm_tail = rr.iloc[-tail_n:], rm.iloc[-tail_n:]
+        colors = plt.cm.Blues(np.linspace(0.3, 1.0, tail_n))
+        ax3.scatter(rr_tail.values, rm_tail.values, c=colors, s=22, zorder=3)
+        ax3.plot(rr_tail.values, rm_tail.values, color="#0057d8", linewidth=0.8, alpha=0.5, zorder=2)
+        ax3.scatter([rr_tail.iloc[-1]], [rm_tail.iloc[-1]], color="black", s=90, zorder=4)
+        ax3.annotate("today", (rr_tail.iloc[-1], rm_tail.iloc[-1]), xytext=(8, 8),
+                     textcoords="offset points", fontsize=8.5, fontweight="bold")
+        pad = max(1.5, float(np.nanmax(np.abs(np.concatenate([rr_tail.values - 100, rm_tail.values - 100])))) * 1.3)
+    else:
+        pad = 3
+    ax3.axhline(100, color="#999999", linewidth=0.8)
+    ax3.axvline(100, color="#999999", linewidth=0.8)
+    ax3.set_xlim(100 - pad, 100 + pad)
+    ax3.set_ylim(100 - pad, 100 + pad)
+    ax3.text(0.98, 0.98, "LEADING", transform=ax3.transAxes, ha="right", va="top", color="#1a9e5c", fontweight="bold", fontsize=9)
+    ax3.text(0.98, 0.02, "WEAKENING", transform=ax3.transAxes, ha="right", va="bottom", color="#c98a00", fontweight="bold", fontsize=9)
+    ax3.text(0.02, 0.02, "LAGGING", transform=ax3.transAxes, ha="left", va="bottom", color="#d1453b", fontweight="bold", fontsize=9)
+    ax3.text(0.02, 0.98, "IMPROVING", transform=ax3.transAxes, ha="left", va="top", color="#0057d8", fontweight="bold", fontsize=9)
+    ax3.set_xlabel("RS-Ratio (trend of relative performance)")
+    ax3.set_ylabel("RS-Momentum (is that trend accelerating)")
+    ax3.set_title(f"Rotation vs {bench}, last {tail_n} sessions (open reconstruction, not the licensed RRG indicator)", fontsize=9)
+
+    fig.tight_layout()
+    path = os.path.join(outdir, "07_rs_rotation.png")
+    fig.savefig(path, dpi=140, bbox_inches="tight")
+
+    quadrant = classify_quadrant(
+        float(rr.iloc[-1]) if len(rr) else None,
+        float(rm.iloc[-1]) if len(rm) else None,
+    )
+    return path, fig, quadrant
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -694,7 +840,8 @@ def main():
     ap.add_argument("--intraday", required=True, help="IBKR intraday (1-5min) bars JSON, ticker")
     ap.add_argument("--bench-intraday", required=True, help="Same, for the benchmark")
     ap.add_argument("--bench-daily", required=True, help="IBKR ONE_DAY bars JSON for the benchmark (used to fit beta)")
-    ap.add_argument("--beta-lookback", type=int, default=60, help="Trading days used to fit beta (default 60)")
+    ap.add_argument("--beta-lookback", type=int, default=60, help="Trading days used to fit the long-run beta (default 60)")
+    ap.add_argument("--rolling-beta-window", type=int, default=20, help="Trading days for the rolling beta used in the alpha calc (default 20)")
     ap.add_argument("--options", required=True, help="options_oi.json (see SKILL.md schema)")
     ap.add_argument("--outdir", required=True)
     args = ap.parse_args()
@@ -709,6 +856,8 @@ def main():
     opt = load_options(args.options)
 
     beta, beta_corr, beta_n = compute_beta(daily, bench_daily, lookback=args.beta_lookback)
+    rolling_beta = rolling_beta_series(daily, bench_daily, window=args.rolling_beta_window)
+    beta_recent = float(rolling_beta.iloc[-1]) if len(rolling_beta) and not math.isnan(rolling_beta.iloc[-1]) else beta
 
     # --- pivots off the last completed daily bar ---
     prev = daily.iloc[-1]
@@ -740,7 +889,8 @@ def main():
     p3, f3 = plot_intraday_with_profile(intraday, args.ticker, args.outdir, vwap, vwap_u, vwap_l, centers, vol, poc, vah, val)
     p4, f4, call_wall, put_wall, mp_strike = plot_options(strikes, args.ticker, opt.get("expiry", "?"), spot, args.outdir)
     p5, f5, alpha_now, pct_time_positive, divergence_windows = plot_relative_strength(
-        intraday, bench_intraday, args.ticker, args.benchmark, beta, beta_corr, args.outdir
+        intraday, bench_intraday, args.ticker, args.benchmark, beta_recent, beta_corr, args.outdir,
+        beta_label=f"{args.rolling_beta_window}d beta",
     )
 
     # --- trade plan: every level found above, collapsed into one ladder ---
@@ -753,6 +903,14 @@ def main():
     )
     scenarios = trade_scenarios(spot, ladder)
     p6, f6 = plot_trade_levels(spot, ladder, args.ticker, args.outdir)
+
+    # --- RS line + rotation (positional relative strength, not just intraday) ---
+    rs_line, rs_ma, rs_at_new_high = compute_rs_line(daily, bench_daily)
+    rs_ratio, rs_momentum = compute_rs_rotation(rs_line)
+    p7, f7, quadrant = plot_rs_rotation(
+        daily, rs_line, rs_ma, rs_ratio, rs_momentum, rolling_beta,
+        args.ticker, args.benchmark, args.outdir,
+    )
 
     summary = {
         "ticker": args.ticker,
@@ -778,12 +936,19 @@ def main():
         },
         "relative_strength": {
             "benchmark": args.benchmark,
-            "beta": round(beta, 2),
-            "beta_correlation": round(beta_corr, 2),
-            "beta_lookback_days": beta_n,
+            "beta_60d": round(beta, 2),
+            "beta_60d_correlation": round(beta_corr, 2),
+            "beta_60d_lookback_days": beta_n,
+            "beta_recent": round(beta_recent, 2),
+            "beta_recent_window_days": args.rolling_beta_window,
+            "beta_regime_shift": round(beta_recent - beta, 2),
             "alpha_now_pp": round(alpha_now, 2),
             "pct_session_alpha_positive": round(pct_time_positive, 1),
             "divergence_windows": divergence_windows,
+            "rs_line_at_new_high": rs_at_new_high,
+            "rs_ratio_now": round(float(rs_ratio.dropna().iloc[-1]), 2) if rs_ratio.notna().any() else None,
+            "rs_momentum_now": round(float(rs_momentum.dropna().iloc[-1]), 2) if rs_momentum.notna().any() else None,
+            "rs_quadrant": quadrant,
         },
         "trade_plan": {
             "spot": spot,
@@ -791,14 +956,14 @@ def main():
             "support_ladder": ladder["support_ladder"],
             "scenarios": scenarios,
         },
-        "charts": [os.path.basename(p) for p in [p1, p2, p3, p4, p5, p6]],
+        "charts": [os.path.basename(p) for p in [p1, p2, p3, p4, p5, p6, p7]],
     }
 
     with open(os.path.join(args.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2)
 
     # --- self-contained HTML report ---
-    imgs_b64 = {os.path.basename(p): fig_to_b64(fig) for p, fig in [(p1, f1), (p2, f2), (p3, f3), (p4, f4), (p5, f5), (p6, f6)]}
+    imgs_b64 = {os.path.basename(p): fig_to_b64(fig) for p, fig in [(p1, f1), (p2, f2), (p3, f3), (p4, f4), (p5, f5), (p6, f6), (p7, f7)]}
     html = build_html_report(args.ticker, summary, imgs_b64)
     with open(os.path.join(args.outdir, "report.html"), "w") as f:
         f.write(html)
@@ -915,14 +1080,24 @@ td,th{{border:1px solid #ddd;padding:6px 10px;text-align:center}}
 
 <h2>5. חוזק יחסי מול {rs['benchmark']} — מתוקנן לבטא</h2>
 <p>
-  בטא (60 יום, קורלציה {rs['beta_correlation']}): <b>{rs['beta']}</b> &middot;
+  בטא {rs['beta_recent_window_days']} יום (בשימוש בחישוב): <b>{rs['beta_recent']}</b> &middot;
+  בטא {rs['beta_60d_lookback_days']} יום ארוך-טווח (הקשר): {rs['beta_60d']} (קורלציה {rs['beta_60d_correlation']}) &middot;
   אלפא נוכחי: <b>{rs['alpha_now_pp']:+.2f} נק' אחוז</b> &middot;
   אחוז מהזמן היום עם אלפא חיובי: <b>{rs['pct_session_alpha_positive']}%</b>
 </p>
+{"<p><b>שינוי משטר בטא:</b> הבטא הקצרה (%.2f) שונה מהותית מהארוכה (%.2f) — הרגישות של המניה למדד עצמה השתנתה לאחרונה, לא רק המחיר.</p>" % (rs['beta_recent'], rs['beta_60d']) if abs(rs['beta_regime_shift']) > 0.3 else ""}
 <p>{div_summary}</p>
 {img('05_relative_strength.png')}
 
-<h2>6. מפת מסחר — תמיכות, התנגדויות ויחס סיכוי:סיכון</h2>
+<h2>6. RS Line ו-Rotation — חוזק יחסי פוזיציוני, לא רק תוך-יומי</h2>
+<p>
+  קו החוזק היחסי הקלאסי (שיטת IBD/Minervini: יחס מחיר {summary['ticker']}/{rs['benchmark']}) {"נמצא כרגע ב<b>שיא חדש</b> — איתות חוזק יחסי חיובי, גם אם המניה עצמה לא בשיא מחיר" if rs['rs_line_at_new_high'] else "לא בשיא חדש כרגע"}.
+  הרביע הנוכחי ב-Rotation Graph (שחזור פתוח, לא האינדיקטור הקנייני): <b>{rs['rs_quadrant']}</b>
+  (RS-Ratio {rs['rs_ratio_now']}, RS-Momentum {rs['rs_momentum_now']}).
+</p>
+{img('07_rs_rotation.png')}
+
+<h2>7. מפת מסחר — תמיכות, התנגדויות ויחס סיכוי:סיכון</h2>
 <p>כל הרמות שהמודלים למעלה מצאו (Pivot, סווינג, פרופיל נפח, VWAP, שבוע קודם, מגנטים באופציות), ממוזגות לרשימה אחת ומדורגות לפי מרחק מהמחיר. רמות שכמה מקורות מסכימים עליהן (בטווח 0.6%) מוצגות כאזור אחד — קו עבה יותר בגרף. <b>זו מפת רמות, לא המלצת קנייה/מכירה</b> — התרחישים למטה הם החשבון האריתמטי בהנחה שנכנסים עכשיו, לא קריאת כיוון.</p>
 <div class="grid">
   <div class="card"><b>התנגדויות מעל המחיר</b>

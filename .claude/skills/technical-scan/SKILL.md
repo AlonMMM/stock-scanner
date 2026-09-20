@@ -5,17 +5,20 @@ description: >-
   Brokers, work out support and resistance (pivots, swing highs/lows, volume
   profile / VWAP), find the options open-interest "magnets" (call wall, put
   wall, max pain) for the nearest expiry, measure how the stock is moving
-  relative to a benchmark (SPY by default) during the session, and merge every
-  level found into one trade-planning ladder with mechanical risk/reward for a
-  long or short from the current price. Produces six charts and a one-page
-  report with the charts embedded, not just numbers. Use this whenever the
-  user asks for a technical read on a stock, "רמות טכניות", "תמיכות
-  והתנגדויות", "מגנטים באופציות", "איפה ה-Call wall / Put wall", "מה עושה
-  המניה מול השוק היום", "איפה לשים סטופ", "מה יחס הסיכוי-סיכון", or names a
-  ticker and asks "מה קורה בו טכנית" / "תן לי ניתוח טכני" / "אני שוקל לפתוח
-  פוזיציה, מה אתה רואה". Not for fundamental analysis, news, or earnings
-  commentary — this is levels and positioning only, and it never names a
-  direction (long/short) on its own initiative.
+  relative to a benchmark (SPY by default) both intraday (beta-adjusted alpha,
+  a rolling beta that exposes regime shifts) and positionally (an IBD/Minervini
+  relative-strength line plus an open reconstruction of a Relative Rotation
+  Graph's RS-Ratio/RS-Momentum quadrant), and merge every level found into one
+  trade-planning ladder with mechanical risk/reward for a long or short from
+  the current price. Produces seven charts and a one-page report with the
+  charts embedded, not just numbers. Use this whenever the user asks for a
+  technical read on a stock, "רמות טכניות", "תמיכות והתנגדויות", "מגנטים
+  באופציות", "איפה ה-Call wall / Put wall", "מה עושה המניה מול השוק היום",
+  "האם היא מובילה או נגררת אחרי המדד", "איפה לשים סטופ", "מה יחס הסיכוי-סיכון",
+  or names a ticker and asks "מה קורה בו טכנית" / "תן לי ניתוח טכני" / "אני
+  שוקל לפתוח פוזיציה, מה אתה רואה". Not for fundamental analysis, news, or
+  earnings commentary — this is levels and positioning only, and it never
+  names a direction (long/short) on its own initiative.
 ---
 
 # Technical scan: levels, volume, options magnets, relative strength, trade plan
@@ -114,8 +117,74 @@ bounce) and the divergence scan runs on the same rebased series with its
 own coarser window — the combination is what keeps the chart to a handful
 of real signals a day instead of a dozen-plus flickers.
 
-**5. A trade-planning ladder: every level above, merged into one map relative
-to spot.** The first four sections each answer a different question in a
+**5. Positional relative strength: rolling beta, the RS Line, and a rotation
+quadrant.** Section 4's alpha is a same-day number — it answers "is the
+stock beating the tape right now." It doesn't answer whether that's a
+one-day blip or the continuation of a weeks-long trend, and it silently
+assumes the 60-day beta is still the right multiplier. Researching how
+practitioners actually handle this (see Sources below) turned up three
+specific, well-established techniques this skill now runs on top of the
+intraday alpha, not instead of it:
+
+  - **A rolling beta, not one static number.** Academic work on intraday
+    beta variation (Kellogg/Todorov; arXiv:2310.19992) finds that a stock's
+    sensitivity to the market genuinely drifts within and across sessions —
+    a single 60-day estimate quietly assumes it hasn't. `rolling_beta_series`
+    computes a trailing 20-trading-day beta (a window matched to a
+    swing/day trader's decision cadence, per IBKR's own quant-research
+    writeup on rolling beta) and **that** recent value, not the 60-day one,
+    is what section 4's alpha is actually computed from. The 60-day figure
+    is kept alongside it purely as context: when the two disagree by more
+    than ~0.3, the report calls it out explicitly as a **beta regime
+    shift** — the stock's relationship to the market itself has moved, not
+    just its price. On the NVDA run this was not a hypothetical: 20-day
+    beta measured 2.81 against a 60-day beta of 1.93.
+  - **The classic RS Line (IBD/Minervini-style).** `compute_rs_line` plots
+    price(stock)/price(benchmark) × 100 against its own moving average on
+    the daily timeframe — a slow, positional read, deliberately separate
+    from the intraday alpha above. A fresh high in this *line* is a
+    documented relative-strength breakout signal in its own right, and can
+    lead a breakout in the stock's own price rather than follow it.
+  - **A rotation quadrant (RS-Ratio × RS-Momentum).** Relative Rotation
+    Graphs (RRGs, Julius de Kempenaer) plot a security's relative TREND
+    (RS-Ratio) against the RATE OF CHANGE of that trend (RS-Momentum), both
+    as z-scores centered on 100, landing every security in one of four
+    quadrants: **Leading** (outperforming, still gaining), **Weakening**
+    (outperforming, losing steam), **Lagging** (underperforming, still
+    fading), **Improving** (underperforming, turning up). The exact
+    StockCharts/relativerotationgraphs.com formula is proprietary;
+    `compute_rs_rotation` reconstructs the publicly documented general
+    method (smoothed relative price, z-scored against its own recent
+    history for the ratio; the ratio's own rate of change, z-scored the
+    same way, for momentum) rather than claiming to replicate the licensed
+    indicator — say this plainly if reporting the quadrant. On the NVDA run
+    this caught something the intraday chart alone did not: NVDA sat in
+    **Weakening** (RS-Ratio 100.6, still nominally ahead of SPY over the
+    lookback, but RS-Momentum 99.2 — that lead was losing steam) even on a
+    day where the intraday alpha chart showed it clearly leading the tape.
+    Both are true at once, at different timeframes; report both rather than
+    picking the one that tells a cleaner story.
+
+  *Sources for this section:* [Rolling Beta guide, Interactive Brokers
+  Campus](https://www.interactivebrokers.com/campus/ibkr-quant-news/rolling-beta-the-real-world-guide-to-measuring-stock-risk-against-the-market/) ·
+  [Recalcitrant Betas: Intraday Variation in the Cross-Sectional Beta, Todorov
+  et al. (Kellogg/Northwestern)](https://www.kellogg.northwestern.edu/faculty/todorov/htm/papers/sit.pdf) ·
+  [Robust Estimation of Realized Correlation: intraday beta fluctuations,
+  arXiv:2310.19992](https://arxiv.org/pdf/2310.19992) ·
+  [Relative Rotation Graphs, StockCharts
+  ChartSchool](https://chartschool.stockcharts.com/table-of-contents/chart-analysis/chart-types/relative-rotation-graphs-rrg-charts) ·
+  [RS-Ratio/RS-Momentum construction,
+  relativerotationgraphs.com](https://relativerotationgraphs.com/educational/the-building-blocks-for-rrg/) ·
+  [RS Ratio and Momentum calculations, RRG-Lite (open
+  implementation)](https://github.com/BennyThadikaran/RRG-Lite/wiki/RS-ratio-and-Momentum-calculations) ·
+  [Mark Minervini's Trend Template / RS Line,
+  Deepvue](https://deepvue.com/screener/minervini-trend-template/).
+  No extra IBKR calls are needed for any of this — it's computed entirely
+  from the daily bars (`--daily`/`--bench-daily`) already fetched for
+  section 1 and the beta fit.
+
+**6. A trade-planning ladder: every level above, merged into one map relative
+to spot.** The first five sections each answer a different question in a
 different frame (where has volume traded, where do swings cluster, where is
 dealer OI, how is the stock doing vs. the tape). None of them on its own
 answers what a trader actually opens the tool for: "if I'm putting a
@@ -228,9 +297,10 @@ ticker's own daily bars, used for pivots/swing S/R).
 This does no network I/O — it only reads the files above. It prints a JSON
 summary to stdout and writes to `--outdir`:
 - `01_daily.png`, `02_hourly.png`, `03_intraday_volume_profile.png`,
-  `04_options_oi.png`, `05_relative_strength.png`, `06_trade_levels.png`
+  `04_options_oi.png`, `05_relative_strength.png`, `06_trade_levels.png`,
+  `07_rs_rotation.png`
 - `summary.json` (the same summary, saved)
-- `report.html` — a self-contained page with all six charts embedded as
+- `report.html` — a self-contained page with all seven charts embedded as
   base64 and a Hebrew-language numeric summary, for handing over as a file
   or reading directly.
 
@@ -240,8 +310,8 @@ The user wants to *see* the levels, not just read strike numbers. Either:
 - Publish `report.html` (or a redesigned version of it) as an **Artifact**
   so it renders inline — load the `artifact-design` skill first if building
   a custom page rather than using the script's own `report.html` directly,
-  and embed the six PNGs as base64 `data:` URIs (they total well under 1MB,
-  comfortably inside the 16MB artifact limit).
+  and embed the seven PNGs as base64 `data:` URIs (they total well under
+  1.5MB, comfortably inside the 16MB artifact limit).
 - Or send the PNGs / `report.html` directly as files if the session isn't
   artifact-capable.
 
@@ -263,11 +333,15 @@ stays usable in any environment that has the JSON files, and so a fetch
 failure is visible to Claude (and reported to the user) rather than silently
 swallowed inside a script.
 
-`summary.json`'s `relative_strength` block: `beta` and `beta_correlation`
-(fit over `beta_lookback_days`, default 60), `alpha_now_pp` (beta-adjusted
-excess return at the last bar), `pct_session_alpha_positive`, and
-`divergence_windows` — a list of `{class: "against"|"held", start_time,
-end_time, stock_move_pp, bench_move_pp}`.
+`summary.json`'s `relative_strength` block: `beta_60d`/`beta_60d_correlation`
+(the long-run fit, for context), `beta_recent`/`beta_recent_window_days`
+(the rolling beta, default 20 days, actually used in the alpha calc),
+`beta_regime_shift` (`beta_recent - beta_60d` — flag it when `abs() > 0.3`),
+`alpha_now_pp` (beta-adjusted excess return at the last bar),
+`pct_session_alpha_positive`, `divergence_windows` (a list of `{class:
+"against"|"held", start_time, end_time, stock_move_pp, bench_move_pp}`),
+`rs_line_at_new_high` (bool), `rs_ratio_now`/`rs_momentum_now`, and
+`rs_quadrant` (one of `Leading`/`Weakening`/`Lagging`/`Improving`).
 
 `summary.json`'s `trade_plan` block: `resistance_ladder` and
 `support_ladder` — each a list of zones (`{level, distance_pct, labels:
@@ -291,10 +365,23 @@ the risk/reward looks like if the first target doesn't hold the trade.
   asked to scan several tickers, say so before doing all of them back to
   back, or narrow the strike range further.
 - **Beta fit over 60 days can have weak correlation for a single volatile
-  name** (a low `beta_correlation` in the summary) — say so when it's low.
-  A beta fit from a weak linear relationship still produces an alpha number,
-  but that alpha is picking up a lot of idiosyncratic noise, not just
-  genuine relative strength; don't report the number without the caveat.
+  name** (a low `beta_60d_correlation` in the summary) — say so when it's
+  low. A beta fit from a weak linear relationship still produces an alpha
+  number, but that alpha is picking up a lot of idiosyncratic noise, not
+  just genuine relative strength; don't report the number without the
+  caveat.
+- **The rolling 20-day beta is noisier than the 60-day one by construction**
+  — it's supposed to be, that's what lets it catch a regime shift, but it
+  also means a single overlooked earnings gap or one-day short squeeze
+  inside the window can swing it. Read `beta_regime_shift` as "worth a
+  second look," not as settled fact on its own.
+- **The RS-Ratio/RS-Momentum quadrant is an open reconstruction, not the
+  licensed RRG indicator** — say this explicitly whenever quoting a
+  quadrant. The general method (z-scored relative trend and its rate of
+  change) is publicly documented; the exact smoothing constants
+  stockcharts.com/relativerotationgraphs.com use are proprietary and this
+  script does not claim to match them tick-for-tick. Treat the quadrant
+  label as directionally informative, not as a precise reading.
 - **Relative strength needs a benchmark that actually applies.** SPY is a
   reasonable default; a single-stock reader in a sector that diverges hard
   from the S&P 500 (e.g. gold miners, biotech) is better served by a sector

@@ -4,17 +4,21 @@ description: >-
   Given one ticker, pull daily/hourly/intraday price and volume from Interactive
   Brokers, work out support and resistance (pivots, swing highs/lows, volume
   profile / VWAP), find the options open-interest "magnets" (call wall, put
-  wall, max pain) for the nearest expiry, and measure how the stock is moving
-  relative to a benchmark (SPY by default) during the session. Produces five
-  charts and a one-page report with the charts embedded, not just numbers.
-  Use this whenever the user asks for a technical read on a stock, "רמות
-  טכניות", "תמיכות והתנגדויות", "מגנטים באופציות", "איפה ה-Call wall / Put
-  wall", "מה עושה המניה מול השוק היום", or names a ticker and asks "מה קורה
-  בו טכנית" / "תן לי ניתוח טכני". Not for fundamental analysis, news, or
-  earnings commentary — this is levels and positioning only.
+  wall, max pain) for the nearest expiry, measure how the stock is moving
+  relative to a benchmark (SPY by default) during the session, and merge every
+  level found into one trade-planning ladder with mechanical risk/reward for a
+  long or short from the current price. Produces six charts and a one-page
+  report with the charts embedded, not just numbers. Use this whenever the
+  user asks for a technical read on a stock, "רמות טכניות", "תמיכות
+  והתנגדויות", "מגנטים באופציות", "איפה ה-Call wall / Put wall", "מה עושה
+  המניה מול השוק היום", "איפה לשים סטופ", "מה יחס הסיכוי-סיכון", or names a
+  ticker and asks "מה קורה בו טכנית" / "תן לי ניתוח טכני" / "אני שוקל לפתוח
+  פוזיציה, מה אתה רואה". Not for fundamental analysis, news, or earnings
+  commentary — this is levels and positioning only, and it never names a
+  direction (long/short) on its own initiative.
 ---
 
-# Technical scan: levels, volume, options magnets, relative strength
+# Technical scan: levels, volume, options magnets, relative strength, trade plan
 
 ## What this actually measures, and why each piece is there
 
@@ -110,6 +114,31 @@ bounce) and the divergence scan runs on the same rebased series with its
 own coarser window — the combination is what keeps the chart to a handful
 of real signals a day instead of a dozen-plus flickers.
 
+**5. A trade-planning ladder: every level above, merged into one map relative
+to spot.** The first four sections each answer a different question in a
+different frame (where has volume traded, where do swings cluster, where is
+dealer OI, how is the stock doing vs. the tape). None of them on its own
+answers what a trader actually opens the tool for: "if I'm putting a
+position on right now, where's my stop, where's my target, and does more
+than one thing agree on that level?" `build_level_ladder` collects
+**every** level the earlier steps produced — both pivots, both volume-profile
+bounds, VWAP, the prior week's H/L, both option walls, max pain, and every
+swing cluster — tags each with its source, and sorts them by distance from
+spot. Levels within 0.6% of each other are merged into one **zone**, so a
+level that is simultaneously the daily pivot, the VWAP, the volume-profile
+VAH, the POC and the S1 pivot (this happens — see the NVDA example) shows up
+as one six-source zone with real weight, not five separate lines a reader
+has to notice line up themselves. `trade_scenarios` then does the
+arithmetic — nearest support as a long's stop and nearest resistance as its
+target (mirrored for a short), plus a second, farther target for what
+happens if the first one breaks — entirely mechanically from the current
+price. **This never picks a direction.** It always returns both the long
+and the short scenario; which one, if either, applies is for the trader to
+decide from everything else in the report (trend, relative strength, where
+spot sits vs. VWAP and the pivot). Say this explicitly whenever reporting
+it — "here's the level map and what the risk/reward looks like from here"
+is the deliverable, not "you should go long/short."
+
 ## Workflow
 
 ### 1. Resolve the ticker and benchmark
@@ -199,9 +228,9 @@ ticker's own daily bars, used for pivots/swing S/R).
 This does no network I/O — it only reads the files above. It prints a JSON
 summary to stdout and writes to `--outdir`:
 - `01_daily.png`, `02_hourly.png`, `03_intraday_volume_profile.png`,
-  `04_options_oi.png`, `05_relative_strength.png`
+  `04_options_oi.png`, `05_relative_strength.png`, `06_trade_levels.png`
 - `summary.json` (the same summary, saved)
-- `report.html` — a self-contained page with all five charts embedded as
+- `report.html` — a self-contained page with all six charts embedded as
   base64 and a Hebrew-language numeric summary, for handing over as a file
   or reading directly.
 
@@ -211,14 +240,17 @@ The user wants to *see* the levels, not just read strike numbers. Either:
 - Publish `report.html` (or a redesigned version of it) as an **Artifact**
   so it renders inline — load the `artifact-design` skill first if building
   a custom page rather than using the script's own `report.html` directly,
-  and embed the five PNGs as base64 `data:` URIs (they total well under 1MB,
+  and embed the six PNGs as base64 `data:` URIs (they total well under 1MB,
   comfortably inside the 16MB artifact limit).
 - Or send the PNGs / `report.html` directly as files if the session isn't
   artifact-capable.
 
 Quote the numeric summary in the reply too (pivots, POC/VAH/VAL, call
-wall/put wall/max pain, beta, current alpha, and the named divergence
-windows) — the charts support the numbers, they don't replace saying them.
+wall/put wall/max pain, beta, current alpha, the named divergence windows,
+and — when the user is thinking about a position — the nearest support and
+resistance zones with their sources and the long/short risk-reward numbers
+from `trade_plan`) — the charts support the numbers, they don't replace
+saying them.
 
 ## Data schema reference
 
@@ -236,6 +268,14 @@ swallowed inside a script.
 excess return at the last bar), `pct_session_alpha_positive`, and
 `divergence_windows` — a list of `{class: "against"|"held", start_time,
 end_time, stock_move_pp, bench_move_pp}`.
+
+`summary.json`'s `trade_plan` block: `resistance_ladder` and
+`support_ladder` — each a list of zones (`{level, distance_pct, labels:
+[...]}`, nearest first, up to 5 per side) — and `scenarios.if_long` /
+`scenarios.if_short`, each `{entry, stop, stop_label, risk, target,
+target_label, reward, rr_ratio, target_2, target_2_label, reward_2,
+rr_ratio_2}`. `target_2`/`rr_ratio_2` describe the next zone out, for what
+the risk/reward looks like if the first target doesn't hold the trade.
 
 ## Caveats to say out loud every time
 
@@ -259,4 +299,12 @@ end_time, stock_move_pp, bench_move_pp}`.
   reasonable default; a single-stock reader in a sector that diverges hard
   from the S&P 500 (e.g. gold miners, biotech) is better served by a sector
   ETF — ask if it isn't obvious.
+- **The trade-plan scenarios are arithmetic, not a recommendation.** Both
+  the long and the short case are always computed and reported together;
+  never present only one of them, and never phrase the output as "you
+  should go long/short here" — the level map and the risk/reward numbers
+  are the deliverable, the direction is the user's call. A stop placed
+  exactly on a level (rather than a little beyond it) will get hit by
+  ordinary noise around that level; say so if asked where exactly to place
+  one.
 - **This is not investment advice**, and the report should say so.

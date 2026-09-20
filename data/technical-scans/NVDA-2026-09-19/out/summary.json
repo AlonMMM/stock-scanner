@@ -1,7 +1,7 @@
 {
   "ticker": "NVDA",
   "spot": 222.53,
-  "generated_at": "2026-09-20T06:11:03.502811+00:00",
+  "generated_at": "2026-09-20T06:20:19.933557+00:00",
   "pivots_from_prior_day": {
     "pp": 221.01,
     "r1": 223.99,
@@ -99,11 +99,262 @@
       }
     ]
   },
+  "trade_plan": {
+    "spot": 222.53,
+    "resistance_ladder": [
+      {
+        "members": [
+          {
+            "level": 223.99,
+            "label": "R1",
+            "source": "pivot",
+            "distance_pct": 0.66
+          }
+        ],
+        "level": 223.99,
+        "labels": [
+          "R1"
+        ],
+        "distance_pct": 0.66
+      },
+      {
+        "members": [
+          {
+            "level": 225.71,
+            "label": "R2",
+            "source": "pivot",
+            "distance_pct": 1.43
+          }
+        ],
+        "level": 225.71,
+        "labels": [
+          "R2"
+        ],
+        "distance_pct": 1.43
+      },
+      {
+        "members": [
+          {
+            "level": 228.69,
+            "label": "R3",
+            "source": "pivot",
+            "distance_pct": 2.77
+          }
+        ],
+        "level": 228.69,
+        "labels": [
+          "R3"
+        ],
+        "distance_pct": 2.77
+      },
+      {
+        "members": [
+          {
+            "level": 231.38,
+            "label": "swing (2x touched)",
+            "source": "swing",
+            "distance_pct": 3.98
+          }
+        ],
+        "level": 231.38,
+        "labels": [
+          "swing (2x touched)"
+        ],
+        "distance_pct": 3.98
+      },
+      {
+        "members": [
+          {
+            "level": 234.76,
+            "label": "prior week high",
+            "source": "prior_week",
+            "distance_pct": 5.5
+          },
+          {
+            "level": 235.65,
+            "label": "swing (2x touched)",
+            "source": "swing",
+            "distance_pct": 5.9
+          }
+        ],
+        "level": 235.2,
+        "labels": [
+          "prior week high",
+          "swing (2x touched)"
+        ],
+        "distance_pct": 5.69
+      }
+    ],
+    "support_ladder": [
+      {
+        "members": [
+          {
+            "level": 221.01,
+            "label": "PP",
+            "source": "pivot",
+            "distance_pct": -0.68
+          },
+          {
+            "level": 220.04,
+            "label": "VWAP",
+            "source": "vwap",
+            "distance_pct": -1.12
+          },
+          {
+            "level": 219.94,
+            "label": "VAH",
+            "source": "volume_profile",
+            "distance_pct": -1.16
+          },
+          {
+            "level": 219.55,
+            "label": "POC",
+            "source": "volume_profile",
+            "distance_pct": -1.34
+          },
+          {
+            "level": 219.29,
+            "label": "S1",
+            "source": "pivot",
+            "distance_pct": -1.46
+          },
+          {
+            "level": 218.69,
+            "label": "VAL",
+            "source": "volume_profile",
+            "distance_pct": -1.73
+          }
+        ],
+        "level": 219.75,
+        "labels": [
+          "PP",
+          "VWAP",
+          "VAH",
+          "POC",
+          "S1",
+          "VAL"
+        ],
+        "distance_pct": -1.25
+      },
+      {
+        "members": [
+          {
+            "level": 217.2,
+            "label": "prior week low",
+            "source": "prior_week",
+            "distance_pct": -2.4
+          },
+          {
+            "level": 216.31,
+            "label": "S2",
+            "source": "pivot",
+            "distance_pct": -2.8
+          }
+        ],
+        "level": 216.75,
+        "labels": [
+          "prior week low",
+          "S2"
+        ],
+        "distance_pct": -2.6
+      },
+      {
+        "members": [
+          {
+            "level": 215.0,
+            "label": "max pain",
+            "source": "options",
+            "distance_pct": -3.38
+          },
+          {
+            "level": 214.72,
+            "label": "swing (7x touched)",
+            "source": "swing",
+            "distance_pct": -3.51
+          },
+          {
+            "level": 214.59,
+            "label": "S3",
+            "source": "pivot",
+            "distance_pct": -3.57
+          }
+        ],
+        "level": 214.77,
+        "labels": [
+          "max pain",
+          "swing (7x touched)",
+          "S3"
+        ],
+        "distance_pct": -3.49
+      },
+      {
+        "members": [
+          {
+            "level": 210.0,
+            "label": "put wall (OI 3410)",
+            "source": "options",
+            "distance_pct": -5.63
+          }
+        ],
+        "level": 210.0,
+        "labels": [
+          "put wall (OI 3410)"
+        ],
+        "distance_pct": -5.63
+      },
+      {
+        "members": [
+          {
+            "level": 208.39,
+            "label": "swing (3x touched)",
+            "source": "swing",
+            "distance_pct": -6.35
+          }
+        ],
+        "level": 208.39,
+        "labels": [
+          "swing (3x touched)"
+        ],
+        "distance_pct": -6.35
+      }
+    ],
+    "scenarios": {
+      "if_long": {
+        "entry": 222.53,
+        "stop": 219.75,
+        "stop_label": "PP/VWAP/VAH/POC/S1/VAL",
+        "risk": 2.78,
+        "target": 223.99,
+        "target_label": "R1",
+        "reward": 1.46,
+        "rr_ratio": 0.53,
+        "target_2": 225.71,
+        "target_2_label": "R2",
+        "reward_2": 3.18,
+        "rr_ratio_2": 1.14
+      },
+      "if_short": {
+        "entry": 222.53,
+        "stop": 223.99,
+        "stop_label": "R1",
+        "risk": 1.46,
+        "target": 219.75,
+        "target_label": "PP/VWAP/VAH/POC/S1/VAL",
+        "reward": 2.78,
+        "rr_ratio": 1.9,
+        "target_2": 216.75,
+        "target_2_label": "prior week low/S2",
+        "reward_2": 5.78,
+        "rr_ratio_2": 3.96
+      }
+    }
+  },
   "charts": [
     "01_daily.png",
     "02_hourly.png",
     "03_intraday_volume_profile.png",
     "04_options_oi.png",
-    "05_relative_strength.png"
+    "05_relative_strength.png",
+    "06_trade_levels.png"
   ]
 }

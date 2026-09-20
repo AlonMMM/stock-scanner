@@ -294,6 +294,163 @@ def detect_divergence_windows(times, stock_ret, bench_ret, window=6, bench_floor
 
 
 # ---------------------------------------------------------------------------
+# Trade plan: a single ranked ladder of every level this script found,
+# collapsed into what's actually next above and below spot
+# ---------------------------------------------------------------------------
+
+def build_level_ladder(spot, pivots, sr_clusters, vp, prev_week, vwap_last, options, zone_tol_pct=0.006):
+    """Every support/resistance this script computed, from every source,
+    merged into one list and split into what's above spot (resistance) and
+    below it (support). This is the thing a chart full of separate lines
+    doesn't answer directly: "what's the very next level either way, and
+    does anything else agree with it?"
+
+    Each entry: {level, label, source}. Sources: pivot, swing (with its
+    touch count), volume_profile, prior_week, vwap, options.
+    """
+    raw = [
+        {"level": pivots["r1"], "label": "R1", "source": "pivot"},
+        {"level": pivots["r2"], "label": "R2", "source": "pivot"},
+        {"level": pivots["r3"], "label": "R3", "source": "pivot"},
+        {"level": pivots["pp"], "label": "PP", "source": "pivot"},
+        {"level": pivots["s1"], "label": "S1", "source": "pivot"},
+        {"level": pivots["s2"], "label": "S2", "source": "pivot"},
+        {"level": pivots["s3"], "label": "S3", "source": "pivot"},
+        {"level": vp["poc"], "label": "POC", "source": "volume_profile"},
+        {"level": vp["value_area_high"], "label": "VAH", "source": "volume_profile"},
+        {"level": vp["value_area_low"], "label": "VAL", "source": "volume_profile"},
+        {"level": vwap_last, "label": "VWAP", "source": "vwap"},
+        {"level": prev_week["high"], "label": "prior week high", "source": "prior_week"},
+        {"level": prev_week["low"], "label": "prior week low", "source": "prior_week"},
+        {"level": options["call_wall"]["strike"], "label": f"call wall (OI {options['call_wall']['call_oi']})", "source": "options"},
+        {"level": options["put_wall"]["strike"], "label": f"put wall (OI {options['put_wall']['put_oi']})", "source": "options"},
+        {"level": options["max_pain"], "label": "max pain", "source": "options"},
+    ]
+    for c in sr_clusters:
+        raw.append({"level": c["level"], "label": f"swing ({c['strength']}x touched)", "source": "swing"})
+
+    for r in raw:
+        r["level"] = round(float(r["level"]), 2)
+        r["distance_pct"] = round((r["level"] - spot) / spot * 100, 2)
+
+    resistances = sorted([r for r in raw if r["level"] > spot], key=lambda r: r["level"])
+    supports = sorted([r for r in raw if r["level"] < spot], key=lambda r: -r["level"])
+
+    def merge_zones(levels_sorted_by_distance):
+        """Collapse entries within zone_tol_pct of each other into one zone
+        -- a resistance that is simultaneously R1, the VAH and a 3x swing
+        touch is a much stronger level than any one of those alone, and
+        that only shows up if they're merged rather than listed separately."""
+        zones = []
+        for r in levels_sorted_by_distance:
+            if zones and abs(r["level"] - zones[-1]["level_avg"]) / zones[-1]["level_avg"] <= zone_tol_pct:
+                z = zones[-1]
+                z["members"].append(r)
+                z["level_avg"] = sum(m["level"] for m in z["members"]) / len(z["members"])
+            else:
+                zones.append({"level_avg": r["level"], "members": [r]})
+        for z in zones:
+            z["level"] = round(z["level_avg"], 2)
+            z["labels"] = [m["label"] for m in z["members"]]
+            z["distance_pct"] = round((z["level"] - spot) / spot * 100, 2)
+            del z["level_avg"]
+        return zones
+
+    resistance_zones = merge_zones(resistances)
+    support_zones = merge_zones(supports)
+
+    return {
+        "spot": spot,
+        "resistance_ladder": resistance_zones[:5],
+        "support_ladder": support_zones[:5],
+        "nearest_resistance": resistance_zones[0] if resistance_zones else None,
+        "nearest_support": support_zones[0] if support_zones else None,
+    }
+
+
+def trade_scenarios(spot, ladder):
+    """Mechanical risk/reward for a long using the nearest support as the
+    stop and nearest resistance as the target, and the mirror for a short --
+    not a directional call, just what the math says IF that trade is taken
+    at the current price. Both scenarios are always returned; which one (if
+    either) applies is for the trader to decide."""
+    res_ladder, sup_ladder = ladder["resistance_ladder"], ladder["support_ladder"]
+    ns = sup_ladder[0] if sup_ladder else None
+    nr = res_ladder[0] if res_ladder else None
+    ns2 = sup_ladder[1] if len(sup_ladder) > 1 else None
+    nr2 = res_ladder[1] if len(res_ladder) > 1 else None
+
+    def leg(entry, stop_zone, target_zone, target2_zone):
+        if not stop_zone:
+            return None
+        risk = abs(entry - stop_zone["level"])
+        d = {"entry": entry, "stop": stop_zone["level"], "stop_label": "/".join(stop_zone["labels"]),
+             "risk": round(risk, 2)}
+        if target_zone and risk > 0:
+            reward = abs(target_zone["level"] - entry)
+            d.update({"target": target_zone["level"], "target_label": "/".join(target_zone["labels"]),
+                       "reward": round(reward, 2), "rr_ratio": round(reward / risk, 2)})
+        if target2_zone and risk > 0:
+            reward2 = abs(target2_zone["level"] - entry)
+            d.update({"target_2": target2_zone["level"], "target_2_label": "/".join(target2_zone["labels"]),
+                       "reward_2": round(reward2, 2), "rr_ratio_2": round(reward2 / risk, 2)})
+        return d
+
+    out = {}
+    if ns is not None:
+        out["if_long"] = leg(spot, ns, nr, nr2)
+    if nr is not None:
+        out["if_short"] = leg(spot, nr, ns, ns2)
+    return out
+
+
+def plot_trade_levels(spot, ladder, ticker, outdir):
+    """A single vertical price ladder: spot in the middle, every resistance
+    zone above it and support zone below, labeled with source and distance.
+    This is the "what's actually next, and what agrees with it" chart that
+    the other five don't draw directly -- they each show one lens (pivots,
+    volume, options, ...) on its own timeframe; this collapses all of them
+    onto one line relative to where price is right now."""
+    res = list(reversed(ladder["resistance_ladder"]))
+    sup = ladder["support_ladder"]
+    all_levels = [z["level"] for z in res + sup] + [spot]
+    lo, hi = min(all_levels), max(all_levels)
+    pad = (hi - lo) * 0.08 or 1.0
+
+    fig, ax = plt.subplots(figsize=(8, 9))
+    ax.set_ylim(lo - pad, hi + pad)
+    ax.set_xlim(0, 1)
+    ax.axis("off")
+
+    def strength_style(z):
+        n = len(z["members"])
+        return (1.6 + 0.35 * n, 0.25 + min(0.55, 0.12 * n))
+
+    for z in res:
+        lw, alpha = strength_style(z)
+        ax.axhline(z["level"], color="#d1453b", linewidth=lw, alpha=alpha, xmax=0.62)
+        ax.text(0.65, z["level"], f"{z['level']:.2f}  ({z['distance_pct']:+.1f}%)\n{', '.join(z['labels'])}",
+                va="center", fontsize=8.5, color="#a02c26")
+
+    for z in sup:
+        lw, alpha = strength_style(z)
+        ax.axhline(z["level"], color="#1a9e5c", linewidth=lw, alpha=alpha, xmax=0.62)
+        ax.text(0.65, z["level"], f"{z['level']:.2f}  ({z['distance_pct']:+.1f}%)\n{', '.join(z['labels'])}",
+                va="center", fontsize=8.5, color="#12734a")
+
+    ax.axhline(spot, color="black", linewidth=2.2, xmax=0.62)
+    ax.plot([0.05], [spot], marker=">", color="black", markersize=10)
+    ax.text(0.08, spot, f"  SPOT {spot:.2f}", va="center", fontsize=10.5, fontweight="bold",
+            bbox=dict(facecolor="white", edgecolor="none", pad=1.5))
+
+    ax.set_title(f"{ticker} - trade level ladder (line weight = how many sources agree)", fontsize=11)
+    fig.tight_layout()
+    path = os.path.join(outdir, "06_trade_levels.png")
+    fig.savefig(path, dpi=140, bbox_inches="tight")
+    return path, fig
+
+
+# ---------------------------------------------------------------------------
 # Plot helpers
 # ---------------------------------------------------------------------------
 
@@ -586,6 +743,17 @@ def main():
         intraday, bench_intraday, args.ticker, args.benchmark, beta, beta_corr, args.outdir
     )
 
+    # --- trade plan: every level found above, collapsed into one ladder ---
+    ladder = build_level_ladder(
+        spot, pivots, sr_clusters,
+        {"poc": poc, "value_area_high": vah, "value_area_low": val},
+        {"high": prev_week_hi, "low": prev_week_lo},
+        float(vwap.iloc[-1]),
+        {"call_wall": call_wall, "put_wall": put_wall, "max_pain": mp_strike},
+    )
+    scenarios = trade_scenarios(spot, ladder)
+    p6, f6 = plot_trade_levels(spot, ladder, args.ticker, args.outdir)
+
     summary = {
         "ticker": args.ticker,
         "spot": spot,
@@ -617,14 +785,20 @@ def main():
             "pct_session_alpha_positive": round(pct_time_positive, 1),
             "divergence_windows": divergence_windows,
         },
-        "charts": [os.path.basename(p) for p in [p1, p2, p3, p4, p5]],
+        "trade_plan": {
+            "spot": spot,
+            "resistance_ladder": ladder["resistance_ladder"],
+            "support_ladder": ladder["support_ladder"],
+            "scenarios": scenarios,
+        },
+        "charts": [os.path.basename(p) for p in [p1, p2, p3, p4, p5, p6]],
     }
 
     with open(os.path.join(args.outdir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2)
 
     # --- self-contained HTML report ---
-    imgs_b64 = {os.path.basename(p): fig_to_b64(fig) for p, fig in [(p1, f1), (p2, f2), (p3, f3), (p4, f4), (p5, f5)]}
+    imgs_b64 = {os.path.basename(p): fig_to_b64(fig) for p, fig in [(p1, f1), (p2, f2), (p3, f3), (p4, f4), (p5, f5), (p6, f6)]}
     html = build_html_report(args.ticker, summary, imgs_b64)
     with open(os.path.join(args.outdir, "report.html"), "w") as f:
         f.write(html)
@@ -641,6 +815,7 @@ def build_html_report(ticker, summary, imgs_b64):
     vp = summary["volume_profile"]
     pw = summary["prior_week_range"]
     rs = summary["relative_strength"]
+    tp = summary["trade_plan"]
 
     rows = "".join(
         f"<tr><td>{c['level']:.2f}</td><td>{c['strength']}</td></tr>"
@@ -662,6 +837,35 @@ def build_html_report(ticker, summary, imgs_b64):
         div_summary = " &middot; ".join(parts)
     else:
         div_summary = "לא זוהו חלונות סטייה משמעותיים מהמדד היום (מעבר לרעש)."
+
+    def ladder_rows(zones, color):
+        return "".join(
+            f"<tr><td class='val' style='color:{color}'>{z['level']:.2f}</td>"
+            f"<td class='val'>{z['distance_pct']:+.1f}%</td>"
+            f"<td>{', '.join(z['labels'])}</td></tr>"
+            for z in zones
+        )
+    res_rows = ladder_rows(tp["resistance_ladder"], "#c23b32")
+    sup_rows = ladder_rows(tp["support_ladder"], "#1a8f5c")
+
+    sc = tp["scenarios"]
+    def scenario_card(title, s, color):
+        if not s or "target" not in s:
+            return f"<div class='card'><b>{title}</b><br>אין מספיק נתונים לחשב.</div>"
+        ext = ""
+        if "target_2" in s:
+            ext = (f"<br>יעד מורחב (אם נשבר היעד הראשון): <span style='color:#1a8f5c'>{s['target_2']:.2f}</span> "
+                   f"({s['target_2_label']}) &middot; יחס סיכוי:סיכון מורחב = <b>{s['rr_ratio_2']:.2f}</b>")
+        return (
+            f"<div class='card'><b>{title}</b><br>"
+            f"כניסה {s['entry']:.2f} &middot; סטופ <span style='color:#c23b32'>{s['stop']:.2f}</span> ({s['stop_label']}) "
+            f"&middot; יעד <span style='color:#1a8f5c'>{s['target']:.2f}</span> ({s['target_label']})<br>"
+            f"סיכון {s['risk']:.2f} / סיכוי {s['reward']:.2f} &middot; <b>יחס סיכוי:סיכון = {s['rr_ratio']:.2f}</b>"
+            f"{ext}"
+            f"</div>"
+        )
+    scenarios_html = scenario_card("אם נכנסים לונג", sc.get("if_long"), "#1a8f5c") + \
+        scenario_card("אם נכנסים שורט", sc.get("if_short"), "#c23b32")
 
     return f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
@@ -717,6 +921,19 @@ td,th{{border:1px solid #ddd;padding:6px 10px;text-align:center}}
 </p>
 <p>{div_summary}</p>
 {img('05_relative_strength.png')}
+
+<h2>6. מפת מסחר — תמיכות, התנגדויות ויחס סיכוי:סיכון</h2>
+<p>כל הרמות שהמודלים למעלה מצאו (Pivot, סווינג, פרופיל נפח, VWAP, שבוע קודם, מגנטים באופציות), ממוזגות לרשימה אחת ומדורגות לפי מרחק מהמחיר. רמות שכמה מקורות מסכימים עליהן (בטווח 0.6%) מוצגות כאזור אחד — קו עבה יותר בגרף. <b>זו מפת רמות, לא המלצת קנייה/מכירה</b> — התרחישים למטה הם החשבון האריתמטי בהנחה שנכנסים עכשיו, לא קריאת כיוון.</p>
+<div class="grid">
+  <div class="card"><b>התנגדויות מעל המחיר</b>
+    <table><tr><th>רמה</th><th>מרחק</th><th>מקורות</th></tr>{res_rows}</table>
+  </div>
+  <div class="card"><b>תמיכות מתחת למחיר</b>
+    <table><tr><th>רמה</th><th>מרחק</th><th>מקורות</th></tr>{sup_rows}</table>
+  </div>
+</div>
+<div class="grid" style="margin-top:12px">{scenarios_html}</div>
+{img('06_trade_levels.png')}
 
 </body></html>"""
 

@@ -207,6 +207,93 @@ def max_pain(strikes):
 
 
 # ---------------------------------------------------------------------------
+# Beta-adjusted relative strength
+# ---------------------------------------------------------------------------
+
+def compute_beta(stock_daily, bench_daily, lookback=60):
+    """Beta of the stock vs. the benchmark from daily log returns:
+    beta = cov(r_stock, r_bench) / var(r_bench), estimated over the trailing
+    `lookback` trading days (default ~3 months) so it reflects the current
+    regime rather than a stale full-history figure. Also returns the
+    correlation, since a beta computed from a weak relationship is worth
+    flagging rather than trusting blindly."""
+    joined = pd.DataFrame(
+        {"s": stock_daily["Close"], "b": bench_daily["Close"]}
+    ).dropna()
+    r = np.log(joined).diff().dropna()
+    r = r.tail(lookback)
+    var_b = r["b"].var()
+    beta = float(r["s"].cov(r["b"]) / var_b) if var_b > 0 else 1.0
+    corr = float(r["s"].corr(r["b"])) if len(r) > 2 else float("nan")
+    return beta, corr, len(r)
+
+
+def session_rebased_pct(df, day):
+    """Cumulative % return from each session's own first bar (not the whole
+    window's first bar), so a multi-day chart never carries one day's drift
+    into the next day's normalization."""
+    pct = pd.Series(index=df.index, dtype=float)
+    for d in pd.unique(day):
+        mask = day == d
+        pct[mask] = (df["Close"][mask] / df["Close"][mask].iloc[0] - 1) * 100
+    return pct
+
+
+def detect_divergence_windows(times, stock_ret, bench_ret, window=6, bench_floor=0.15, stock_flat=0.07):
+    """Scan a rolling `window`-bar return for two things worth calling out
+    explicitly, not just leaving buried in a continuous line:
+
+      - 'against': the stock's window return has the OPPOSITE SIGN of the
+        benchmark's, i.e. it moved against the tape, not just less with it.
+      - 'held': the benchmark moved by a real amount (>= bench_floor) while
+        the stock stayed inside a small flat band (< stock_flat) -- it
+        shrugged off a real index move rather than trading through it.
+
+    Both thresholds are in percentage points over the window and exist so a
+    single-bar bid/ask flicker doesn't get reported as "the stock fought the
+    tape" -- the default window is 6 bars (30 minutes on 5-min data) with
+    floors calibrated to a typical SPY half-hour move, deliberately coarser
+    than the bar interval so only a sustained, real divergence gets flagged.
+    Consecutive flagged bars of the same class are merged into a single
+    interval. Returns a list of dicts with start/end index, start/end time,
+    class, and the two window returns."""
+    n = len(stock_ret)
+    labels = [None] * n
+    for i in range(window, n):
+        sr = stock_ret[i] - stock_ret[i - window]
+        br = bench_ret[i] - bench_ret[i - window]
+        if abs(br) < bench_floor:
+            continue
+        if np.sign(sr) != np.sign(br) and abs(sr) >= stock_flat:
+            labels[i] = "against"
+        elif abs(sr) < stock_flat:
+            labels[i] = "held"
+
+    windows = []
+    i = 0
+    while i < n:
+        if labels[i] is None:
+            i += 1
+            continue
+        j = i
+        while j + 1 < n and labels[j + 1] == labels[i]:
+            j += 1
+        windows.append(
+            {
+                "class": labels[i],
+                "start_idx": i - window,
+                "end_idx": j,
+                "start_time": times[max(i - window, 0)].isoformat(),
+                "end_time": times[j].isoformat(),
+                "stock_move_pp": round(float(stock_ret[j] - stock_ret[max(i - window, 0)]), 3),
+                "bench_move_pp": round(float(bench_ret[j] - bench_ret[max(i - window, 0)]), 3),
+            }
+        )
+        i = j + 1
+    return windows
+
+
+# ---------------------------------------------------------------------------
 # Plot helpers
 # ---------------------------------------------------------------------------
 
@@ -331,48 +418,100 @@ def plot_options(strikes, ticker, expiry, spot, outdir):
     return path, fig, call_wall, put_wall, mp_strike
 
 
-def plot_relative_strength(df_t, df_b, ticker, bench, outdir):
-    """Normalized intraday % move, ticker vs benchmark, re-based to 0 at the
-    start of EACH session (so a multi-day window doesn't carry yesterday's
-    drift into today) and plotted on a positional x-axis so the overnight
-    gap doesn't get drawn as a sloped line connecting two sessions."""
-    joined = pd.DataFrame({"t": df_t["Close"], "b": df_b["Close"]}).dropna()
+def plot_relative_strength(df_t, df_b, ticker, bench, beta, corr, outdir,
+                            smooth_window=3, div_window=6, div_bench_floor=0.15, div_stock_flat=0.07):
+    """Beta-adjusted relative strength, intraday, continuous through the
+    session -- not a single end-of-window number.
+
+    Noise handling:
+      - Bars with zero volume on either side (halts, stale prints, a data
+        hiccup) are dropped before anything is computed, so a flat artifact
+        can't masquerade as "the stock held."
+      - Every session is re-based to 0 at ITS OWN open and plotted on a
+        positional x-axis with a hard break at each session boundary, so
+        non-trading hours (overnight, weekend) never draw as a sloped line
+        or get treated as a real move.
+      - alpha(t) = stock_cum_pct(t) - beta * bench_cum_pct(t): the excess
+        return net of what the stock's own beta to the benchmark would
+        predict, not the raw spread (a 1.8-beta name is SUPPOSED to move
+        more than the index in both directions -- alpha asks whether it
+        moved more than THAT).
+      - The drawn alpha line is lightly smoothed (`smooth_window` bars,
+        rolling median) purely to stop single-bar bid/ask bounce from
+        reading as a signal on the chart. The divergence SCAN below uses a
+        separate, longer `div_window` (default 6 bars / 30 min) with its own
+        floors -- a shorter window with tight floors flags a dozen-plus
+        one-bar flickers a day, which is exactly the noise this is supposed
+        to filter out; 30 minutes with real-move floors reliably surfaces
+        only sustained decoupling.
+
+    Returns the path, figure, beta-adjusted alpha's current value, the
+    fraction of the (combined) session spent with positive alpha, and the
+    list of explicit divergence windows (see detect_divergence_windows).
+    """
+    joined = pd.DataFrame({"t": df_t["Close"], "b": df_b["Close"], "tv": df_t["Volume"], "bv": df_b["Volume"]}).dropna()
+    joined = joined[(joined["tv"] > 0) & (joined["bv"] > 0)]  # drop halted/stale bars
     day = joined.index.date
-    t_pct = pd.Series(index=joined.index, dtype=float)
-    b_pct = pd.Series(index=joined.index, dtype=float)
-    for d in pd.unique(day):
-        mask = day == d
-        t_pct[mask] = (joined["t"][mask] / joined["t"][mask].iloc[0] - 1) * 100
-        b_pct[mask] = (joined["b"][mask] / joined["b"][mask].iloc[0] - 1) * 100
-    spread = t_pct - b_pct
+
+    t_pct = session_rebased_pct(joined.rename(columns={"t": "Close"}), day)
+    b_pct = session_rebased_pct(joined.rename(columns={"b": "Close"}), day)
+    alpha_raw = t_pct - beta * b_pct
+    alpha_smooth = alpha_raw.rolling(smooth_window, min_periods=1, center=True).median()
 
     x = np.arange(len(joined))
-    # break the connecting line at each session boundary
     session_start = np.array([d != day[i - 1] if i > 0 else False for i, d in enumerate(day)])
-    t_plot, b_plot, s_plot = t_pct.values.copy(), b_pct.values.copy(), spread.values.copy()
+    bounds = [0] + list(np.where(session_start)[0]) + [len(x)]
+
+    windows = detect_divergence_windows(
+        list(joined.index), t_pct.values, b_pct.values,
+        window=div_window, bench_floor=div_bench_floor, stock_flat=div_stock_flat,
+    )
 
     fig, (ax1, ax2) = plt.subplots(
-        2, 1, figsize=(11, 6.5), sharex=True, gridspec_kw={"height_ratios": [2, 1]}
+        2, 1, figsize=(11, 7), sharex=True, gridspec_kw={"height_ratios": [2, 1.4]}
     )
-    # plot each session as its own segment so matplotlib never bridges the gap
-    bounds = [0] + list(np.where(session_start)[0]) + [len(x)]
+
+    band_color = {"against": "#3a86ff", "held": "#f4a300"}
+    band_label = {"against": "against tape", "held": "held flat"}
+    for w in windows:
+        a = max(w["start_idx"], 0)
+        b = min(w["end_idx"] + 1, len(x))
+        for ax in (ax1, ax2):
+            ax.axvspan(a, b, color=band_color[w["class"]], alpha=0.16, linewidth=0)
+        t0 = pd.Timestamp(w["start_time"]).strftime("%H:%M")
+        ax1.text(
+            (a + b) / 2, 0.98, f"{band_label[w['class']]}\n{t0}",
+            transform=ax1.get_xaxis_transform(), ha="center", va="top",
+            fontsize=7, color=band_color[w["class"]], fontweight="bold",
+        )
+
     for i in range(len(bounds) - 1):
         a, b = bounds[i], bounds[i + 1]
-        label_t = f"{ticker} % chg" if i == 0 else None
-        label_b = f"{bench} % chg" if i == 0 else None
-        ax1.plot(x[a:b], t_plot[a:b], color="#0057d8", label=label_t)
-        ax1.plot(x[a:b], b_plot[a:b], color="#7a7a7a", label=label_b)
-        ax2.fill_between(x[a:b], s_plot[a:b], 0, where=(s_plot[a:b] >= 0), color="#1a9e5c", alpha=0.6)
-        ax2.fill_between(x[a:b], s_plot[a:b], 0, where=(s_plot[a:b] < 0), color="#d1453b", alpha=0.6)
+        ax1.plot(x[a:b], t_pct.values[a:b], color="#0057d8", linewidth=1.3,
+                  label=f"{ticker} % chg" if i == 0 else None)
+        ax1.plot(x[a:b], b_pct.values[a:b], color="#9a9a9a", linewidth=1.1,
+                  label=f"{bench} % chg" if i == 0 else None)
+        av = alpha_smooth.values[a:b]
+        xv = x[a:b]
+        ax2.fill_between(xv, av, 0, where=(av >= 0), color="#1a9e5c", alpha=0.65)
+        ax2.fill_between(xv, av, 0, where=(av < 0), color="#d1453b", alpha=0.65)
+        ax2.plot(xv, alpha_raw.values[a:b], color="#00000033", linewidth=0.6)
     for b in bounds[1:-1]:
         ax1.axvline(b, color="#cccccc", linewidth=0.8, linestyle=":")
         ax2.axvline(b, color="#cccccc", linewidth=0.8, linestyle=":")
 
     ax1.axhline(0, color="black", linewidth=0.6)
-    ax1.legend(fontsize=8)
-    ax1.set_title(f"{ticker} vs {bench} - normalized intraday % move, rebased each session")
+    ax1.legend(fontsize=8, loc="upper left")
+    ax1.set_title(
+        f"{ticker} vs {bench} - normalized intraday % move, rebased each session "
+        f"(60d beta={beta:.2f}, corr={corr:.2f})"
+    )
     ax2.axhline(0, color="black", linewidth=0.6)
-    ax2.set_title(f"Relative strength spread ({ticker} - {bench}), pp", fontsize=9)
+    ax2.set_title(
+        f"Beta-adjusted alpha ({ticker} - {beta:.2f}×{bench}), pp — "
+        f"blue = moved against the tape, amber = held flat through a real index move",
+        fontsize=8.5,
+    )
 
     tick_idx = np.linspace(0, len(x) - 1, min(10, len(x))).astype(int)
     ax2.set_xticks(tick_idx)
@@ -380,7 +519,9 @@ def plot_relative_strength(df_t, df_b, ticker, bench, outdir):
     fig.tight_layout()
     path = os.path.join(outdir, "05_relative_strength.png")
     fig.savefig(path, dpi=140, bbox_inches="tight")
-    return path, fig, float(spread.iloc[-1])
+
+    pct_positive = float((alpha_smooth > 0).mean() * 100)
+    return path, fig, float(alpha_smooth.iloc[-1]), pct_positive, windows
 
 
 # ---------------------------------------------------------------------------
@@ -395,6 +536,8 @@ def main():
     ap.add_argument("--hourly", required=True, help="IBKR ONE_HOUR bars JSON")
     ap.add_argument("--intraday", required=True, help="IBKR intraday (1-5min) bars JSON, ticker")
     ap.add_argument("--bench-intraday", required=True, help="Same, for the benchmark")
+    ap.add_argument("--bench-daily", required=True, help="IBKR ONE_DAY bars JSON for the benchmark (used to fit beta)")
+    ap.add_argument("--beta-lookback", type=int, default=60, help="Trading days used to fit beta (default 60)")
     ap.add_argument("--options", required=True, help="options_oi.json (see SKILL.md schema)")
     ap.add_argument("--outdir", required=True)
     args = ap.parse_args()
@@ -405,7 +548,10 @@ def main():
     hourly = load_bars_df(args.hourly)
     intraday = load_bars_df(args.intraday)
     bench_intraday = load_bars_df(args.bench_intraday)
+    bench_daily = load_bars_df(args.bench_daily)
     opt = load_options(args.options)
+
+    beta, beta_corr, beta_n = compute_beta(daily, bench_daily, lookback=args.beta_lookback)
 
     # --- pivots off the last completed daily bar ---
     prev = daily.iloc[-1]
@@ -436,7 +582,9 @@ def main():
     p2, f2 = plot_hourly(hourly, args.ticker, args.outdir, pivots)
     p3, f3 = plot_intraday_with_profile(intraday, args.ticker, args.outdir, vwap, vwap_u, vwap_l, centers, vol, poc, vah, val)
     p4, f4, call_wall, put_wall, mp_strike = plot_options(strikes, args.ticker, opt.get("expiry", "?"), spot, args.outdir)
-    p5, f5, rs_spread_now = plot_relative_strength(intraday, bench_intraday, args.ticker, args.benchmark, args.outdir)
+    p5, f5, alpha_now, pct_time_positive, divergence_windows = plot_relative_strength(
+        intraday, bench_intraday, args.ticker, args.benchmark, beta, beta_corr, args.outdir
+    )
 
     summary = {
         "ticker": args.ticker,
@@ -460,7 +608,15 @@ def main():
             "put_wall": put_wall,
             "max_pain": mp_strike,
         },
-        "relative_strength_vs_benchmark_pp": round(rs_spread_now, 2),
+        "relative_strength": {
+            "benchmark": args.benchmark,
+            "beta": round(beta, 2),
+            "beta_correlation": round(beta_corr, 2),
+            "beta_lookback_days": beta_n,
+            "alpha_now_pp": round(alpha_now, 2),
+            "pct_session_alpha_positive": round(pct_time_positive, 1),
+            "divergence_windows": divergence_windows,
+        },
         "charts": [os.path.basename(p) for p in [p1, p2, p3, p4, p5]],
     }
 
@@ -484,11 +640,28 @@ def build_html_report(ticker, summary, imgs_b64):
     piv = summary["pivots_from_prior_day"]
     vp = summary["volume_profile"]
     pw = summary["prior_week_range"]
+    rs = summary["relative_strength"]
 
     rows = "".join(
         f"<tr><td>{c['level']:.2f}</td><td>{c['strength']}</td></tr>"
         for c in summary["swing_sr_clusters"]
     )
+
+    against = [w for w in rs["divergence_windows"] if w["class"] == "against"]
+    held = [w for w in rs["divergence_windows"] if w["class"] == "held"]
+    if against or held:
+        def fmt_w(w):
+            t0 = w["start_time"][11:16]
+            t1 = w["end_time"][11:16]
+            return f"{t0}–{t1} (מניה {w['stock_move_pp']:+.2f} / בנצ'מרק {w['bench_move_pp']:+.2f})"
+        parts = []
+        if against:
+            parts.append("נגד המגמה: " + "; ".join(fmt_w(w) for w in against))
+        if held:
+            parts.append("החזיקה ברמה: " + "; ".join(fmt_w(w) for w in held))
+        div_summary = " &middot; ".join(parts)
+    else:
+        div_summary = "לא זוהו חלונות סטייה משמעותיים מהמדד היום (מעבר לרעש)."
 
     return f"""<!doctype html>
 <html lang="he" dir="rtl"><head><meta charset="utf-8">
@@ -536,8 +709,13 @@ td,th{{border:1px solid #ddd;padding:6px 10px;text-align:center}}
 <h2>4. מגנטים באופציות — Open Interest לפי סטרייק</h2>
 {img('04_options_oi.png')}
 
-<h2>5. חוזק יחסי מול {summary.get('relative_strength_vs_benchmark_pp') and 'הבנצ׳מרק'}</h2>
-<p>פער נוכחי: <b>{summary['relative_strength_vs_benchmark_pp']:+.2f} נק' אחוז</b> (המניה פחות הבנצ׳מרק, מנורמל מתחילת החלון)</p>
+<h2>5. חוזק יחסי מול {rs['benchmark']} — מתוקנן לבטא</h2>
+<p>
+  בטא (60 יום, קורלציה {rs['beta_correlation']}): <b>{rs['beta']}</b> &middot;
+  אלפא נוכחי: <b>{rs['alpha_now_pp']:+.2f} נק' אחוז</b> &middot;
+  אחוז מהזמן היום עם אלפא חיובי: <b>{rs['pct_session_alpha_positive']}%</b>
+</p>
+<p>{div_summary}</p>
 {img('05_relative_strength.png')}
 
 </body></html>"""

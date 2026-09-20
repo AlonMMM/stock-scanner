@@ -1,7 +1,7 @@
 {
   "ticker": "NVDA",
   "spot": 222.53,
-  "generated_at": "2026-09-19T19:07:56.375835+00:00",
+  "generated_at": "2026-09-20T06:11:03.502811+00:00",
   "pivots_from_prior_day": {
     "pp": 221.01,
     "r1": 223.99,
@@ -62,7 +62,43 @@
     },
     "max_pain": 215
   },
-  "relative_strength_vs_benchmark_pp": 1.56,
+  "relative_strength": {
+    "benchmark": "SPY",
+    "beta": 1.93,
+    "beta_correlation": 0.55,
+    "beta_lookback_days": 60,
+    "alpha_now_pp": 1.15,
+    "pct_session_alpha_positive": 100.0,
+    "divergence_windows": [
+      {
+        "class": "held",
+        "start_idx": 19,
+        "end_idx": 25,
+        "start_time": "2026-09-17T15:05:00+00:00",
+        "end_time": "2026-09-17T15:35:00+00:00",
+        "stock_move_pp": 0.014,
+        "bench_move_pp": 0.165
+      },
+      {
+        "class": "against",
+        "start_idx": 78,
+        "end_idx": 86,
+        "start_time": "2026-09-18T13:30:00+00:00",
+        "end_time": "2026-09-18T14:10:00+00:00",
+        "stock_move_pp": 0.938,
+        "bench_move_pp": -0.242
+      },
+      {
+        "class": "held",
+        "start_idx": 135,
+        "end_idx": 141,
+        "start_time": "2026-09-18T18:15:00+00:00",
+        "end_time": "2026-09-18T18:45:00+00:00",
+        "stock_move_pp": -0.009,
+        "bench_move_pp": 0.154
+      }
+    ]
+  },
   "charts": [
     "01_daily.png",
     "02_hourly.png",

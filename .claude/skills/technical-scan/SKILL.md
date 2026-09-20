@@ -73,13 +73,42 @@ IBKR returns directly per contract and requires no modeling:
    hedging is most concentrated in time, which is right before expiry, not
    the monthly.
 
-**4. Relative strength vs. a benchmark, intraday, rebased every session.**
-"NVDA is up 2% today" means something different if SPY is up 1.8% (broad
-tape) vs. flat (stock-specific). This skill normalizes both the ticker and
-the benchmark to their own session-open and plots the spread — this is what
-separates "the market carried it" from "this name is doing its own thing,"
-which matters for anyone reading order flow or gauging whether a level will
-hold on a weak vs. strong tape day.
+**4. Relative strength vs. a benchmark — beta-adjusted, continuous through the
+day, not a single snapshot number.** "NVDA is up 2% today" means something
+different if SPY is up 1.8% vs. flat, but a raw spread also conflates two
+different things: a high-beta name is *supposed* to move more than the index
+in both directions, so out-beta-ing the tape on a strong day isn't
+relative strength, it's leverage. This skill fits **beta** from 60 trading
+days of daily returns (`beta = cov(r_stock, r_bench) / var(r_bench)`,
+reported with its correlation so a weak fit is visible, not hidden) and
+computes **alpha(t) = stock's session-cum-% - beta × benchmark's
+session-cum-%** at every intraday bar — the excess return net of what beta
+alone would predict, evolving through the whole session rather than read
+once at the end.
+
+On top of the continuous alpha curve, a **rolling 30-minute scan** flags two
+things explicitly rather than leaving them for someone to spot in a
+squiggly line: a window where the stock's move had the **opposite sign** of
+the benchmark's ("moved against the tape"), and a window where the
+benchmark made a real move while the stock stayed inside a flat band ("held
+through a real index move"). Both get a shaded band and a label directly on
+the chart, with start time and both legs' moves in the summary — this is
+the answer to "did it hold up, or even move against the index, during the
+day," not just at the open. See `analyze.py`'s `detect_divergence_windows`
+for the exact thresholds and why they're set where they are (tight enough
+to matter, coarse enough that a single noisy bar can't trigger a flag).
+
+**Noise handling, specifically for when there is no real trading:** bars
+with zero volume on either leg (a halt, a stale print, a data hiccup) are
+dropped before any of this is computed. Every session is re-based to 0 at
+*its own* open — never the whole window's first bar — and plotted on a
+positional (bar-index) x-axis with a hard visual break at each session
+boundary, so the overnight/weekend gap between sessions is never drawn as a
+sloped line implying a real move happened while the market was closed. The
+drawn alpha line is a short rolling median (smooths single-bar bid/ask
+bounce) and the divergence scan runs on the same rebased series with its
+own coarser window — the combination is what keeps the chart to a handful
+of real signals a day instead of a dozen-plus flickers.
 
 ## Workflow
 
@@ -102,7 +131,9 @@ get_price_history(contract_id, security_type="STK", step="ONE_DAY",  period="SIX
 get_price_history(contract_id, security_type="STK", step="ONE_HOUR", period="ONE_MONTH",   outside_rth=false)
 get_price_history(contract_id, security_type="STK", step="FIVE_MINS", period="TWO_DAYS",   outside_rth=false)
 ```
-Fetch the same **FIVE_MINS/TWO_DAYS** call for the benchmark. Use
+Fetch the same **FIVE_MINS/TWO_DAYS** call for the benchmark, plus the same
+**ONE_DAY/SIX_MONTHS** call for the benchmark (needed to fit beta — don't
+skip it just because the ticker's own daily bars are already in hand). Use
 `FIVE_MINS` rather than `ONE_MIN` for the intraday leg — a two-day window at
 one-minute resolution is ~780 bars per symbol, which is far more than the
 volume-profile/VWAP math or the chart need and just burns context; five
@@ -159,8 +190,12 @@ python3 <this-skill-dir>/scripts/analyze.py \
   --ticker NVDA --benchmark SPY \
   --daily nvda_daily.json --hourly nvda_hourly.json \
   --intraday nvda_5min.json --bench-intraday spy_5min.json \
+  --bench-daily spy_daily.json \
   --options options_oi.json --outdir out/
 ```
+`--bench-daily` is the benchmark's own `ONE_DAY/SIX_MONTHS` history (fetched
+in step 2) — it's what beta is fit from, separate from `--daily` (the
+ticker's own daily bars, used for pivots/swing S/R).
 This does no network I/O — it only reads the files above. It prints a JSON
 summary to stdout and writes to `--outdir`:
 - `01_daily.png`, `02_hourly.png`, `03_intraday_volume_profile.png`,
@@ -182,19 +217,25 @@ The user wants to *see* the levels, not just read strike numbers. Either:
   artifact-capable.
 
 Quote the numeric summary in the reply too (pivots, POC/VAH/VAL, call
-wall/put wall/max pain, RS spread) — the charts support the numbers, they
-don't replace saying them.
+wall/put wall/max pain, beta, current alpha, and the named divergence
+windows) — the charts support the numbers, they don't replace saying them.
 
 ## Data schema reference
 
-`analyze.py --daily/--hourly/--intraday/--bench-intraday` each expect the
-raw `get_price_history` JSON (a dict with `time`, `open`, `high`, `low`,
-`close`, `volume` parallel arrays, ISO timestamps). `--options` expects the
-`options_oi.json` schema shown above. The script never calls IBKR itself —
-all fetching happens in the conversation, by design, so it stays usable in
-any environment that has the JSON files, and so a fetch failure is visible
-to Claude (and reported to the user) rather than silently swallowed inside
-a script.
+`analyze.py --daily/--hourly/--intraday/--bench-intraday/--bench-daily` each
+expect the raw `get_price_history` JSON (a dict with `time`, `open`, `high`,
+`low`, `close`, `volume` parallel arrays, ISO timestamps). `--options`
+expects the `options_oi.json` schema shown above. The script never calls
+IBKR itself — all fetching happens in the conversation, by design, so it
+stays usable in any environment that has the JSON files, and so a fetch
+failure is visible to Claude (and reported to the user) rather than silently
+swallowed inside a script.
+
+`summary.json`'s `relative_strength` block: `beta` and `beta_correlation`
+(fit over `beta_lookback_days`, default 60), `alpha_now_pp` (beta-adjusted
+excess return at the last bar), `pct_session_alpha_positive`, and
+`divergence_windows` — a list of `{class: "against"|"held", start_time,
+end_time, stock_move_pp, bench_move_pp}`.
 
 ## Caveats to say out loud every time
 
@@ -209,6 +250,11 @@ a script.
 - **The options snapshot loop is the token/latency-expensive step.** If
   asked to scan several tickers, say so before doing all of them back to
   back, or narrow the strike range further.
+- **Beta fit over 60 days can have weak correlation for a single volatile
+  name** (a low `beta_correlation` in the summary) — say so when it's low.
+  A beta fit from a weak linear relationship still produces an alpha number,
+  but that alpha is picking up a lot of idiosyncratic noise, not just
+  genuine relative strength; don't report the number without the caveat.
 - **Relative strength needs a benchmark that actually applies.** SPY is a
   reasonable default; a single-stock reader in a sector that diverges hard
   from the S&P 500 (e.g. gold miners, biotech) is better served by a sector

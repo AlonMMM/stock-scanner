@@ -991,8 +991,9 @@ def build_html_report(ticker, summary, imgs_b64):
     held = [w for w in rs["divergence_windows"] if w["class"] == "held"]
     if against or held:
         def fmt_w(w):
-            t0 = w["start_time"][11:16]
-            t1 = w["end_time"][11:16]
+            same_day = w["start_time"][:10] == w["end_time"][:10]
+            t0 = w["start_time"][11:16] if same_day else w["start_time"][5:16].replace("T", " ")
+            t1 = w["end_time"][11:16] if same_day else w["end_time"][5:16].replace("T", " ")
             return f"{t0}–{t1} (מניה {w['stock_move_pp']:+.2f} / בנצ'מרק {w['bench_move_pp']:+.2f})"
         parts = []
         if against:

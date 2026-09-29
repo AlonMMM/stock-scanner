@@ -1,0 +1,368 @@
+{
+  "ticker": "NVDA",
+  "spot": 222.53,
+  "generated_at": "2026-09-20T08:26:50.035846+00:00",
+  "pivots_from_prior_day": {
+    "pp": 221.01,
+    "r1": 223.99,
+    "r2": 225.71,
+    "r3": 228.69,
+    "s1": 219.29,
+    "s2": 216.31,
+    "s3": 214.59
+  },
+  "prior_week_range": {
+    "high": 234.76,
+    "low": 217.2
+  },
+  "swing_sr_clusters": [
+    {
+      "level": 214.72,
+      "strength": 7
+    },
+    {
+      "level": 190.34,
+      "strength": 3
+    },
+    {
+      "level": 198.19,
+      "strength": 3
+    },
+    {
+      "level": 208.39,
+      "strength": 3
+    },
+    {
+      "level": 231.38,
+      "strength": 2
+    },
+    {
+      "level": 235.65,
+      "strength": 2
+    }
+  ],
+  "volume_profile": {
+    "poc": 219.55,
+    "value_area_high": 219.94,
+    "value_area_low": 218.69
+  },
+  "session_vwap_last": 220.04,
+  "options": {
+    "expiry": "2026-09-21",
+    "dte": 2,
+    "call_wall": {
+      "strike": 240,
+      "call_oi": 5448,
+      "put_oi": 0
+    },
+    "put_wall": {
+      "strike": 210,
+      "call_oi": 1167,
+      "put_oi": 3410
+    },
+    "max_pain": 215
+  },
+  "relative_strength": {
+    "benchmark": "SPY",
+    "beta_60d": 1.93,
+    "beta_60d_correlation": 0.55,
+    "beta_60d_lookback_days": 60,
+    "beta_recent": 2.81,
+    "beta_recent_window_days": 20,
+    "beta_regime_shift": 0.88,
+    "alpha_now_pp": 1.1,
+    "pct_session_alpha_positive": 100.0,
+    "divergence_windows": [
+      {
+        "class": "held",
+        "start_idx": 19,
+        "end_idx": 25,
+        "start_time": "2026-09-17T15:05:00+00:00",
+        "end_time": "2026-09-17T15:35:00+00:00",
+        "stock_move_pp": 0.014,
+        "bench_move_pp": 0.165
+      },
+      {
+        "class": "against",
+        "start_idx": 78,
+        "end_idx": 86,
+        "start_time": "2026-09-18T13:30:00+00:00",
+        "end_time": "2026-09-18T14:10:00+00:00",
+        "stock_move_pp": 0.938,
+        "bench_move_pp": -0.242
+      },
+      {
+        "class": "held",
+        "start_idx": 135,
+        "end_idx": 141,
+        "start_time": "2026-09-18T18:15:00+00:00",
+        "end_time": "2026-09-18T18:45:00+00:00",
+        "stock_move_pp": -0.009,
+        "bench_move_pp": 0.154
+      }
+    ],
+    "rs_line_at_new_high": false,
+    "rs_ratio_now": 100.61,
+    "rs_momentum_now": 99.24,
+    "rs_quadrant": "Weakening"
+  },
+  "trade_plan": {
+    "spot": 222.53,
+    "resistance_ladder": [
+      {
+        "members": [
+          {
+            "level": 223.99,
+            "label": "R1",
+            "source": "pivot",
+            "distance_pct": 0.66
+          }
+        ],
+        "level": 223.99,
+        "labels": [
+          "R1"
+        ],
+        "distance_pct": 0.66
+      },
+      {
+        "members": [
+          {
+            "level": 225.71,
+            "label": "R2",
+            "source": "pivot",
+            "distance_pct": 1.43
+          }
+        ],
+        "level": 225.71,
+        "labels": [
+          "R2"
+        ],
+        "distance_pct": 1.43
+      },
+      {
+        "members": [
+          {
+            "level": 228.69,
+            "label": "R3",
+            "source": "pivot",
+            "distance_pct": 2.77
+          }
+        ],
+        "level": 228.69,
+        "labels": [
+          "R3"
+        ],
+        "distance_pct": 2.77
+      },
+      {
+        "members": [
+          {
+            "level": 231.38,
+            "label": "swing (2x touched)",
+            "source": "swing",
+            "distance_pct": 3.98
+          }
+        ],
+        "level": 231.38,
+        "labels": [
+          "swing (2x touched)"
+        ],
+        "distance_pct": 3.98
+      },
+      {
+        "members": [
+          {
+            "level": 234.76,
+            "label": "prior week high",
+            "source": "prior_week",
+            "distance_pct": 5.5
+          },
+          {
+            "level": 235.65,
+            "label": "swing (2x touched)",
+            "source": "swing",
+            "distance_pct": 5.9
+          }
+        ],
+        "level": 235.2,
+        "labels": [
+          "prior week high",
+          "swing (2x touched)"
+        ],
+        "distance_pct": 5.69
+      }
+    ],
+    "support_ladder": [
+      {
+        "members": [
+          {
+            "level": 221.01,
+            "label": "PP",
+            "source": "pivot",
+            "distance_pct": -0.68
+          },
+          {
+            "level": 220.04,
+            "label": "VWAP",
+            "source": "vwap",
+            "distance_pct": -1.12
+          },
+          {
+            "level": 219.94,
+            "label": "VAH",
+            "source": "volume_profile",
+            "distance_pct": -1.16
+          },
+          {
+            "level": 219.55,
+            "label": "POC",
+            "source": "volume_profile",
+            "distance_pct": -1.34
+          },
+          {
+            "level": 219.29,
+            "label": "S1",
+            "source": "pivot",
+            "distance_pct": -1.46
+          },
+          {
+            "level": 218.69,
+            "label": "VAL",
+            "source": "volume_profile",
+            "distance_pct": -1.73
+          }
+        ],
+        "level": 219.75,
+        "labels": [
+          "PP",
+          "VWAP",
+          "VAH",
+          "POC",
+          "S1",
+          "VAL"
+        ],
+        "distance_pct": -1.25
+      },
+      {
+        "members": [
+          {
+            "level": 217.2,
+            "label": "prior week low",
+            "source": "prior_week",
+            "distance_pct": -2.4
+          },
+          {
+            "level": 216.31,
+            "label": "S2",
+            "source": "pivot",
+            "distance_pct": -2.8
+          }
+        ],
+        "level": 216.75,
+        "labels": [
+          "prior week low",
+          "S2"
+        ],
+        "distance_pct": -2.6
+      },
+      {
+        "members": [
+          {
+            "level": 215.0,
+            "label": "max pain",
+            "source": "options",
+            "distance_pct": -3.38
+          },
+          {
+            "level": 214.72,
+            "label": "swing (7x touched)",
+            "source": "swing",
+            "distance_pct": -3.51
+          },
+          {
+            "level": 214.59,
+            "label": "S3",
+            "source": "pivot",
+            "distance_pct": -3.57
+          }
+        ],
+        "level": 214.77,
+        "labels": [
+          "max pain",
+          "swing (7x touched)",
+          "S3"
+        ],
+        "distance_pct": -3.49
+      },
+      {
+        "members": [
+          {
+            "level": 210.0,
+            "label": "put wall (OI 3410)",
+            "source": "options",
+            "distance_pct": -5.63
+          }
+        ],
+        "level": 210.0,
+        "labels": [
+          "put wall (OI 3410)"
+        ],
+        "distance_pct": -5.63
+      },
+      {
+        "members": [
+          {
+            "level": 208.39,
+            "label": "swing (3x touched)",
+            "source": "swing",
+            "distance_pct": -6.35
+          }
+        ],
+        "level": 208.39,
+        "labels": [
+          "swing (3x touched)"
+        ],
+        "distance_pct": -6.35
+      }
+    ],
+    "scenarios": {
+      "if_long": {
+        "entry": 222.53,
+        "stop": 219.75,
+        "stop_label": "PP/VWAP/VAH/POC/S1/VAL",
+        "risk": 2.78,
+        "target": 223.99,
+        "target_label": "R1",
+        "reward": 1.46,
+        "rr_ratio": 0.53,
+        "target_2": 225.71,
+        "target_2_label": "R2",
+        "reward_2": 3.18,
+        "rr_ratio_2": 1.14
+      },
+      "if_short": {
+        "entry": 222.53,
+        "stop": 223.99,
+        "stop_label": "R1",
+        "risk": 1.46,
+        "target": 219.75,
+        "target_label": "PP/VWAP/VAH/POC/S1/VAL",
+        "reward": 2.78,
+        "rr_ratio": 1.9,
+        "target_2": 216.75,
+        "target_2_label": "prior week low/S2",
+        "reward_2": 5.78,
+        "rr_ratio_2": 3.96
+      }
+    }
+  },
+  "charts": [
+    "01_daily.png",
+    "02_hourly.png",
+    "03_intraday_volume_profile.png",
+    "04_options_oi.png",
+    "05_relative_strength.png",
+    "06_trade_levels.png",
+    "07_rs_rotation.png"
+  ]
+}
